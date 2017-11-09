@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">米兰仓管</string>
+    <string name="menu_home">首页</string>
+    <string name="menu_logout">注销</string>
+</resources>

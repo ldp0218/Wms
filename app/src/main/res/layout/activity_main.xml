@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar_layout" />
+
+    <GridView
+        android:id="@+id/gridview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#ddd"
+        android:columnWidth="90dp"
+        android:gravity="center"
+        android:horizontalSpacing="1dp"
+        android:numColumns="2"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="1dp" />
+    <!--
+        android:columnWidth="90dp"          每列的宽度，也就是Item的宽度
+        android:horizontalSpacing="2dp"   两行之间的边距
+        android:verticalSpacing="2dp"    两列之间的边距
+        android:numColumns="2"          GridView的列数设置为两个
+        android:stretchMode="columnWidth"  缩放与列宽大小同步
+    -->
+</LinearLayout>
