@@ -21,7 +21,8 @@
         </activity>
         <activity android:name=".MainActivity" />
         <activity android:name=".WlrkActivity" />
-        <activity android:name=".RkdActivity"></activity>
+        <activity android:name=".RkdActivity" />
+        <activity android:name=".MaterialSelectActivity"></activity>
     </application>
 
 </manifest>

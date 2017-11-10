@@ -19,5 +19,5 @@ interface RequestInterface {
     fun jhrkInfo(@Query("id") id: Int): Call<ApiBean<Jhrk>>
 
     @GET("action/material/materialList?selectValue=4")
-    fun materialList(@Query("searchValue") txm: String, @Query("ckid") ckid: Int): Call<ApiBean<ResponseList<Material>>>
+    fun materialList(@Query("searchValue") txm: String, @Query("ckid") ckid: Int, @Query("page") page: Int = 1): Call<ApiBean<ResponseList<Material>>>
 }

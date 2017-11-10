@@ -9,7 +9,6 @@ import android.media.AudioManager
 import android.media.SoundPool
 import android.os.Vibrator
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.mcxtzhang.swipemenulib.SwipeMenuLayout
@@ -48,8 +47,15 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk) {
                 RetrofitManager.instance.materialList(barcodeStr, jhrk.ck_id)
                         .enqueue(object : BaseCallback<ResponseList<Material>>(this@WlrkActivity) {
                             override fun success(data: ResponseList<Material>) {
-                                val materials = data.items
-
+                                if (data.totalPages > 1) {
+                                    val intent = Intent(this@WlrkActivity, MaterialSelectActivity::class.java)
+                                    val bundle = Bundle()
+                                    bundle.putString("code", barcodeStr)
+                                    bundle.putInt("ckId", jhrk.ck_id)
+                                    bundle.putSerializable("data", data)
+                                    intent.putExtras(bundle)
+                                    startActivityForResult(intent, 0)
+                                }
                             }
                         })
             }
@@ -95,7 +101,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk) {
                             val list = jhrk.jhmx as MutableList<Jhmx>
                             if (list.size > 0) {
                                 status = RkStatus.NOTSCAN
-                                listView_wl.adapter = object : CommonAdapter<Jhmx>(this@WlrkActivity, list, R.layout.listview_wl_item) {
+                                listView_wl.adapter = object : CommonAdapter<Jhmx>(list, R.layout.listview_wl_item) {
                                     override fun convert(holder: ViewHolder, t: Jhmx, position: Int) {
                                         holder.setText(R.id.textView_name, t.ma_name)
                                         holder.setText(R.id.textView_wrknum, t.jhdmx_num.toString())

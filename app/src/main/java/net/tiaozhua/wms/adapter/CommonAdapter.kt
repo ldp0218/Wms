@@ -1,8 +1,6 @@
 package net.tiaozhua.wms.adapter
 
-import android.content.Context
 import android.view.ViewGroup
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.BaseAdapter
 
@@ -10,8 +8,7 @@ import android.widget.BaseAdapter
  * 通用ListView/GridView Adapter
  * Created by ldp on 2017/11/9.
 */
-abstract class CommonAdapter<T>(private var mContext: Context, private var mDatas: MutableList<T>?, private val layoutId: Int) : BaseAdapter() {
-    protected var mInflater: LayoutInflater = LayoutInflater.from(mContext)
+abstract class CommonAdapter<T>(private var mDatas: MutableList<T>?, private val layoutId: Int) : BaseAdapter() {
 
     /**
      * 刷新数据，初始化数据
@@ -47,7 +44,7 @@ abstract class CommonAdapter<T>(private var mContext: Context, private var mData
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val holder = ViewHolder[mContext, convertView, parent, layoutId, position]
+        val holder = ViewHolder[parent.context, convertView, parent, layoutId, position]
         convert(holder, getItem(position), position)
         return holder.getConvertView()
     }
@@ -67,11 +64,30 @@ abstract class CommonAdapter<T>(private var mContext: Context, private var mData
     }
 
     /**
+     * 刷新数据
+     *
+     * @param list
+     */
+    fun refresh(list: List<T>?) {
+        this.mDatas?.clear()
+        if (null != list) {
+            val temp = arrayListOf<T>()
+            temp.addAll(list)
+            if (this.mDatas != null) {
+                this.mDatas!!.addAll(temp)
+            } else {
+                this.mDatas = temp
+            }
+        }
+        notifyDataSetChanged()
+    }
+
+    /**
      * 加载更多数据
      *
      * @param list
      */
-    fun addDatas(list: List<T>?) {
+    fun loadmore(list: List<T>?) {
         if (null != list) {
             val temp = arrayListOf<T>()
             temp.addAll(list)
@@ -82,7 +98,6 @@ abstract class CommonAdapter<T>(private var mContext: Context, private var mData
             }
             notifyDataSetChanged()
         }
-
     }
 
 }

@@ -7,4 +7,7 @@
     <color name="popup_bg">#8f000000</color>
     <color name="login_bg">#6495ED</color>
     <color name="red_ff4a57">#FF3C4A</color>
+    <color name="theme_blue">#3F51B5</color>
+    <color name="theme_lightgrey">#FFE9E9E9</color>
+    <color name="color_grey">#aaa</color>
 </resources>
