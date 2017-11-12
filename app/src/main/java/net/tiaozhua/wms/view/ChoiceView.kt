@@ -6,6 +6,7 @@ import android.widget.RadioButton
 import android.widget.TextView
 import android.widget.Checkable
 import android.widget.FrameLayout
+import kotlinx.android.synthetic.main.listview_material.view.*
 import net.tiaozhua.wms.R
 
 /**
@@ -18,8 +19,8 @@ class ChoiceView(context: Context) : FrameLayout(context), Checkable {
 
     init {
         View.inflate(context, R.layout.listview_material, this)
-        tv = findViewById(R.id.textView_name) as TextView
-        rb = findViewById(R.id.rb_item) as RadioButton
+        tv = textView_name
+        rb = rb_item
     }
 
     override fun setChecked(checked: Boolean) {

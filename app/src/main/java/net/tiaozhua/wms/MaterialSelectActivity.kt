@@ -1,7 +1,6 @@
 package net.tiaozhua.wms
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import kotlinx.android.synthetic.main.activity_materialselect.*
 import net.tiaozhua.wms.bean.Material

@@ -3,10 +3,9 @@ package net.tiaozhua.wms
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.EditText
 import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_login.*
 import net.tiaozhua.wms.bean.ApiBean
 import net.tiaozhua.wms.utils.LoadingDialog
 import net.tiaozhua.wms.utils.RetrofitManager
@@ -25,13 +24,11 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun login(view: View) {
-        val editTextName = findViewById(R.id.editText_name) as EditText
-        val editTextPassword = findViewById(R.id.editText_password) as EditText
-        if (editTextName.text.isEmpty() || editTextPassword.text.isEmpty()) {
+        if (editText_name.text.isEmpty() || editText_password.text.isEmpty()) {
             return
         }
         LoadingDialog.show(this@LoginActivity, false)
-        val call = RetrofitManager.instance.login(editTextName.text.toString(), editTextPassword.text.toString())
+        val call = RetrofitManager.instance.login(editText_name.text.toString(), editText_password.text.toString())
         call.enqueue(object : Callback<ApiBean<String>> {
             override fun onResponse(call: Call<ApiBean<String>>?, response: Response<ApiBean<String>>?) {
                 LoadingDialog.dismiss()

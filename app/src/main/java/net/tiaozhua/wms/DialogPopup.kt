@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.Animation
 import android.widget.Toast
+import kotlinx.android.synthetic.main.popup_scan_material.view.*
 
 import razerdp.basepopup.BasePopupWindow
 
@@ -59,8 +60,8 @@ class DialogPopup(context: Activity) : BasePopupWindow(context), View.OnClickLis
             receiverTag = true
             context.registerReceiver(WlrkActivity.wlrkActivity.mScanReceiver, filter)
         }
-        popupView.findViewById(R.id.button_close).setOnClickListener(this)
-        popupView.findViewById(R.id.button_commit).setOnClickListener(this)
+        popupView.button_close.setOnClickListener(this)
+        popupView.button_commit.setOnClickListener(this)
     }
 
     override fun onClick(v: View) {

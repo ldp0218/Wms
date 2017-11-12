@@ -43,8 +43,8 @@ abstract class BaseActivity(private val layoutId: Int) : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(layoutId)
 
-        toolbar = findViewById(R.id.toolbar) as Toolbar
-        toolbarTitle = findViewById(R.id.toolbar_title) as TextView
+        toolbar = findViewById(R.id.toolbar)
+        toolbarTitle = findViewById(R.id.toolbar_title)
         toolbar.overflowIcon = ContextCompat.getDrawable(this, R.mipmap.more)
         //将Toolbar显示到界面
         setSupportActionBar(toolbar)

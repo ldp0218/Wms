@@ -3,8 +3,8 @@ package net.tiaozhua.wms
 import android.content.Intent
 import android.os.Bundle
 import android.widget.AdapterView
-import android.widget.GridView
 import android.widget.SimpleAdapter
+import kotlinx.android.synthetic.main.activity_main.*
 
 import java.util.ArrayList
 import java.util.HashMap
@@ -16,7 +16,6 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
         isShowBacking = false
         toolbarTitle.text = "米兰仓库管理"
 
-        val gridView = findViewById(R.id.gridview) as GridView
         val itemList = ArrayList<Map<String, Any>>()
         itemList.add(object : HashMap<String, Any>() {
             init {
@@ -64,8 +63,8 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
                 //ImageItem的XML文件里面的一个ImageView,TextView ID
                 intArrayOf(R.id.img, R.id.txt))
         //添加并且显示
-        gridView.adapter = saImageItems
-        gridView.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+        gridview.adapter = saImageItems
+        gridview.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             val text = itemList[position]["text"].toString()
             when (text) {
                 "物料入库" -> startActivity(Intent(this@MainActivity, WlrkActivity::class.java))
