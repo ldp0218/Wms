@@ -32,7 +32,7 @@
                 android:paddingLeft="20dp">
 
                 <TextView
-                    android:id="@+id/editText_name"
+                    android:id="@+id/textView_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -217,7 +217,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
         android:onClick="lldClick"
-        android:text="领料单"
+        android:text="入库单"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@+id/button_close"
         app:layout_constraintRight_toLeftOf="@+id/button4"
@@ -229,7 +229,7 @@
         android:layout_height="wrap_content"
         android:layout_marginRight="16dp"
         android:onClick="ckClick"
-        android:text="出库"
+        android:text="入库"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 

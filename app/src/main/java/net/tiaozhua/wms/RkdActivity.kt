@@ -1,5 +1,6 @@
 package net.tiaozhua.wms
 
+import android.app.Activity
 import android.content.DialogInterface
 import android.os.Bundle
 import android.widget.AdapterView
@@ -16,7 +17,7 @@ class RkdActivity : BaseActivity(R.layout.activity_rkd) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        toolbarTitle.text = "领料单"
+        toolbarTitle.text = "入库单"
 
         RetrofitManager.instance.wlrkd().enqueue(object : BaseCallback<ResponseList<Orders>>(context = this@RkdActivity) {
             override fun success(data: ResponseList<Orders>) {
@@ -24,12 +25,12 @@ class RkdActivity : BaseActivity(R.layout.activity_rkd) {
                 val items = data.items
                 listViewRkd.adapter = RkdAdapter(items, this@RkdActivity)
                 listViewRkd.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-                    DialogUtil.showDialog(this@RkdActivity, null, "是否选择该领料单?",
+                    DialogUtil.showDialog(this@RkdActivity, null, "是否选择该入库单?",
                         null,
                         DialogInterface.OnClickListener {_, _ ->
                             val intent = Intent()
                             intent.putExtra("id", items[position].wid)// 放入返回值
-                            setResult(0, intent)// 放入回传的值,并添加一个Code,方便区分返回的数据
+                            setResult(Activity.RESULT_OK, intent) // 放入回传的值,并添加一个Code,方便区分返回的数据
                             finish()
                         }
                     )

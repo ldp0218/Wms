@@ -21,7 +21,7 @@ data class Jhrk(val ck_id: Int, val ck_name: String, val client_id: Int, val cli
 
 data class Jhmx(val ck_id: Int, val hj_name: String?, val jh_id: Int, val jhdmx_id: Int, val jhdmx_num: Double,
                 val jhmx_id: Int, val ma_code: String, val ma_id: Int, val ma_model: String, val ma_name: String,
-                val ma_spec: String, val ma_txm: String, val mx_num: Double, val mx_price: Double, val mx_remark: String, val mx_unit: String)
+                val ma_spec: String, val ma_txm: String, var mx_num: Double, val mx_price: Double, val mx_remark: String, val mx_unit: String)
 
 data class Material(val begin_num: Double, val charcode: String, val ck_name: String, val comment: String, val kc_flag: Boolean,
                     val kc_hw_name: String, val kc_id: Int, val kc_num: Double, val ma_address: String,val ma_code: String,

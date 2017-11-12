@@ -39,7 +39,7 @@ class RkdAdapter(private val list: List<Orders>, context: Context) : BaseAdapter
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view: View = convertView ?: inflater.inflate(R.layout.listview_rkd_item, null)
         val item: Orders = list[position]
-        val no: TextView = view.findViewOften(R.id.editText_name)
+        val no: TextView = view.findViewOften(R.id.textView_name)
         no.text = item.dj_no
         val date: TextView = view.findViewOften(R.id.textView_date)
         date.text = item.date

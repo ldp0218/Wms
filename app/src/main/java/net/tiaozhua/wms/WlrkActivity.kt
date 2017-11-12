@@ -1,6 +1,7 @@
 package net.tiaozhua.wms
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -32,9 +33,11 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk) {
     private val soundid: Int by lazy { soundpool.load("/etc/Scan_new.ogg", 1) }
     private lateinit var barcodeStr: String
     private var status = RkStatus.EMPTY
-    private lateinit var jhrk: Jhrk
+    internal lateinit var jhrk: Jhrk
+    internal lateinit var jhmxList: MutableList<Jhmx>
+    internal lateinit var material: Material
 
-    val mScanReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+    internal val mScanReceiver: BroadcastReceiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
             soundpool.play(soundid, 1f, 1f, 0, 0, 1f)
@@ -48,13 +51,11 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk) {
                         .enqueue(object : BaseCallback<ResponseList<Material>>(this@WlrkActivity) {
                             override fun success(data: ResponseList<Material>) {
                                 if (data.totalPages > 1) {
-                                    val intent = Intent(this@WlrkActivity, MaterialSelectActivity::class.java)
-                                    val bundle = Bundle()
-                                    bundle.putString("code", barcodeStr)
-                                    bundle.putInt("ckId", jhrk.ck_id)
-                                    bundle.putSerializable("data", data)
-                                    intent.putExtras(bundle)
-                                    startActivityForResult(intent, 0)
+                                    val activityIntent = Intent(this@WlrkActivity, MaterialSelectActivity::class.java)
+                                    activityIntent.putExtra("code", barcodeStr)
+                                    activityIntent.putExtra("ckId", jhrk.ck_id)
+                                    intent.putExtra("data", data)
+                                    startActivityForResult(activityIntent, 0)
                                 }
                             }
                         })
@@ -68,7 +69,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk) {
         mVibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         toolbarTitle.text = "物料入库"
 
-        wlrkActivity = this
+        self = this
         scrollView_wlrk.smoothScrollTo(0, 0)
     }
 
@@ -86,39 +87,53 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk) {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        data?.let {
-            RetrofitManager.instance.jhrkInfo(it.getIntExtra("id", 0))
-                    .enqueue(object : BaseCallback<Jhrk>(context = this) {
-                        override fun success(data: Jhrk) {
-                            jhrk = data
-                            editText_no.setText(jhrk.jh_no)
-                            editText_date.setText(jhrk.jh_ldrq)
-                            editText_ghdw.setText(jhrk.client_name)
-                            editText_jsr.setText(jhrk.handler_name)
-                            editText_rkck.setText(jhrk.ck_name)
-                            editText_beizhu.setText(jhrk.remark)
-                            val list = jhrk.jhmx as MutableList<Jhmx>
-                            if (list.size > 0) {
-                                status = RkStatus.NOTSCAN
-                                listView_wl.adapter = object : CommonAdapter<Jhmx>(list, R.layout.listview_wl_item) {
-                                    override fun convert(holder: ViewHolder, t: Jhmx, position: Int) {
-                                        holder.setText(R.id.textView_name, t.ma_name)
-                                        holder.setText(R.id.textView_wrknum, t.jhdmx_num.toString())
-                                        holder.setText(R.id.textView_scannum, "0")
-                                        holder.setText(R.id.textView_hw, t.hj_name ?: "")
-                                        holder.setOnClickListener(R.id.btnDelete, View.OnClickListener { _ ->
-                                            Toast.makeText(this@WlrkActivity, "删除:" + position, Toast.LENGTH_SHORT).show()
-                                            //在ListView里，点击侧滑菜单上的选项时，如果想让擦花菜单同时关闭，调用这句话
-                                            (holder.getConvertView() as SwipeMenuLayout).quickClose()
-                                            list.removeAt(position)
-                                            notifyDataSetChanged()
-                                        })
+        //super.onActivityResult(requestCode, resultCode, data)
+        when (resultCode) {
+            Activity.RESULT_OK -> {
+                RetrofitManager.instance.jhrkInfo(data!!.getIntExtra("id", 0))
+                        .enqueue(object : BaseCallback<Jhrk>(context = this) {
+                            override fun success(data: Jhrk) {
+                                jhrk = data
+                                editText_no.setText(jhrk.jh_no)
+                                editText_date.setText(jhrk.jh_ldrq)
+                                editText_ghdw.setText(jhrk.client_name)
+                                editText_jsr.setText(jhrk.handler_name)
+                                editText_rkck.setText(jhrk.ck_name)
+                                editText_beizhu.setText(jhrk.remark)
+                                jhmxList = jhrk.jhmx as MutableList<Jhmx>
+                                if (jhmxList.size > 0) {
+                                    status = RkStatus.NOTSCAN
+                                    listView_wl.adapter = object : CommonAdapter<Jhmx>(jhmxList, R.layout.listview_wl_item) {
+                                        override fun convert(holder: ViewHolder, t: Jhmx, position: Int) {
+                                            holder.setText(R.id.textView_name, t.ma_name)
+                                            holder.setText(R.id.textView_wrknum, t.jhdmx_num.toString())
+                                            holder.setText(R.id.textView_scannum, "0")
+                                            holder.setText(R.id.textView_hw, t.hj_name ?: "")
+                                            holder.setOnClickListener(R.id.btnDelete, View.OnClickListener { _ ->
+                                                Toast.makeText(this@WlrkActivity, "删除:" + position, Toast.LENGTH_SHORT).show()
+                                                //在ListView里，点击侧滑菜单上的选项时，如果想让擦花菜单同时关闭，调用这句话
+                                                (holder.getConvertView() as SwipeMenuLayout).quickClose()
+                                                jhmxList.removeAt(position)
+                                                notifyDataSetChanged()
+                                            })
+                                        }
                                     }
                                 }
                             }
-                        }
-                    })
+                        })
+            }
+            1 -> {
+                material = data!!.getSerializableExtra("material") as Material
+                val view = dialogPopup!!.popupView
+                view.editText_tm.setText(material.ma_txm)
+                view.editText_no.setText(material.ma_code)
+                view.textView_name.text = material.ma_name
+                view.textView_kcnum.text = material.kc_num.toString()
+                view.textView_spec.text = material.ma_spec
+                view.textView_model.text = material.ma_model
+                view.textView_hw.text = material.kc_hw_name
+                view.textView_remark.text = material.comment
+            }
         }
     }
 
@@ -135,7 +150,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk) {
 
     companion object {
         @SuppressLint("StaticFieldLeak")
-        lateinit var wlrkActivity: WlrkActivity
+        lateinit var self: WlrkActivity
     }
 
     fun scanClick(view: View) {
@@ -143,7 +158,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk) {
             dialogPopup = DialogPopup(this@WlrkActivity)
             dialogPopup!!.showPopupWindow()
         } else {
-            Toast.makeText(this@WlrkActivity, "请选择领料单", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@WlrkActivity, "请选择入库单", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -154,7 +169,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk) {
 
     fun ckClick(view: View) {
         when (status) {
-            RkStatus.EMPTY -> Toast.makeText(this@WlrkActivity, "请选择领料单", Toast.LENGTH_SHORT).show()
+            RkStatus.EMPTY -> Toast.makeText(this@WlrkActivity, "请选择入库单", Toast.LENGTH_SHORT).show()
             RkStatus.NOTSCAN, RkStatus.NOTFINISH -> Toast.makeText(this@WlrkActivity, "有物料未扫描", Toast.LENGTH_SHORT).show()
             RkStatus.FINISHED -> {
 

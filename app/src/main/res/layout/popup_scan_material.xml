@@ -114,7 +114,7 @@
                         android:text="物料名称" />
 
                     <TextView
-                        android:id="@+id/editText_name"
+                        android:id="@+id/textView_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                 </LinearLayout>
@@ -136,14 +136,14 @@
                         android:text="数量" />
 
                     <EditText
-                        android:id="@+id/editText2"
+                        android:id="@+id/editText_num"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="2"
                         android:background="@null"
                         android:ems="1"
                         android:hint="请输入数量"
-                        android:inputType="textPersonName"
+                        android:inputType="number"
                         android:textSize="14sp" />
 
                     <TextView
@@ -157,7 +157,7 @@
                         android:id="@+id/textView_kcnum"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1" />
+                        android:layout_weight="2" />
                 </LinearLayout>
 
                 <LinearLayout

@@ -1,5 +1,6 @@
 package net.tiaozhua.wms
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import kotlinx.android.synthetic.main.activity_materialselect.*
@@ -7,6 +8,8 @@ import net.tiaozhua.wms.bean.Material
 import net.tiaozhua.wms.view.ChoiceView
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.ListView
+import android.widget.Toast
 import net.tiaozhua.wms.bean.ResponseList
 import net.tiaozhua.wms.utils.BaseCallback
 import net.tiaozhua.wms.utils.RetrofitManager
@@ -22,18 +25,17 @@ class MaterialSelectActivity : BaseActivity(R.layout.activity_materialselect) {
         @Suppress("UNCHECKED_CAST")
         responseList = intent.getSerializableExtra("data") as ResponseList<Material>
         val items = responseList.items.toMutableList()
-        val adapter = object : ArrayAdapter<Material>(this, R.layout.listview_material, items) {
+        listview.adapter = object : ArrayAdapter<Material>(this, R.layout.listview_material, items) {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                 val view = if (convertView == null) {
-                        ChoiceView(this@MaterialSelectActivity)
-                    } else {
-                        convertView as ChoiceView
-                    }
+                    ChoiceView(this@MaterialSelectActivity)
+                } else {
+                    convertView as ChoiceView
+                }
                 view.setTextView(getItem(position).ma_name)
                 return view
             }
         }
-        listview.adapter = adapter
         refreshLayout.isEnableRefresh = false
         refreshLayout.setOnLoadmoreListener { smartLayout ->
             smartLayout.layout.postDelayed({
@@ -53,5 +55,20 @@ class MaterialSelectActivity : BaseActivity(R.layout.activity_materialselect) {
                 }
             }, 1000)
         }
+
+        btn_return.setOnClickListener({ _ ->
+            finish()
+        })
+
+        btn_confirm.setOnClickListener({ _ ->
+            if (listview.checkedItemPosition == ListView.INVALID_POSITION) {
+                Toast.makeText(this, "请选择物料", Toast.LENGTH_SHORT).show()
+            } else {
+                val intent = Intent()
+                intent.putExtra("material", items[listview.checkedItemPosition])
+                setResult(1, intent)
+                finish()
+            }
+        })
     }
 }

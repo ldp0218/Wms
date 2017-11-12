@@ -17,7 +17,7 @@
         android:text="单据编号" />
 
     <TextView
-        android:id="@+id/editText_name"
+        android:id="@+id/textView_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
@@ -32,7 +32,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/editText_name"
+        android:layout_below="@+id/textView_name"
         android:layout_marginBottom="5dp"
         android:layout_marginRight="10dp"
         android:labelFor="@+id/textView_date"
@@ -42,7 +42,7 @@
         android:id="@+id/textView_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/editText_name"
+        android:layout_below="@+id/textView_name"
         android:layout_toRightOf="@+id/textView_riqi"
         android:textColor="@android:color/black" />
 
@@ -50,7 +50,7 @@
         android:id="@+id/textView_gyslabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/editText_name"
+        android:layout_below="@+id/textView_name"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_toLeftOf="@+id/textView_gys"
@@ -62,7 +62,7 @@
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/editText_name"
+        android:layout_below="@+id/textView_name"
         android:textColor="@android:color/black" />
 
     <TextView
