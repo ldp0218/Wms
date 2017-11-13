@@ -9,6 +9,7 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_wlrk.*
 import kotlinx.android.synthetic.main.popup_scan_material.view.*
 import net.tiaozhua.wms.bean.Material
 import net.tiaozhua.wms.bean.ResponseList
@@ -76,12 +77,27 @@ class DialogPopup(context: Activity) : BasePopupWindow(context), View.OnClickLis
                     RetrofitManager.instance.materialList(barcode, ckId)
                             .enqueue(object : BaseCallback<ResponseList<Material>>(context) {
                                 override fun success(data: ResponseList<Material>) {
-                                    if (data.totalPages > 1) {
-                                        val intent = Intent(context, MaterialSelectActivity::class.java)
-                                        intent.putExtra("code", barcode)
-                                        intent.putExtra("ckId", ckId)
-                                        intent.putExtra("data", data)
-                                        WlrkActivity.self.startActivityForResult(intent, 0)
+                                    when {
+                                        data.totalCount == 0 -> Toast.makeText(context, "未查询到相关信息", Toast.LENGTH_SHORT).show()
+                                        data.totalCount > 1 -> {
+                                            val intent = Intent(context, MaterialSelectActivity::class.java)
+                                            intent.putExtra("code", barcode)
+                                            intent.putExtra("ckId", ckId)
+                                            intent.putExtra("data", data)
+                                            WlrkActivity.self.startActivityForResult(intent, 0)
+                                        }
+                                        else -> {
+                                            val material = data.items[0]
+                                            WlrkActivity.self.material = material
+                                            popupView.editText_tm.setText(material.ma_txm)
+                                            popupView.editText_no.setText(material.ma_code)
+                                            popupView.textView_name.text = material.ma_name
+                                            popupView.textView_kcnum.text = material.kc_num.toString()
+                                            popupView.textView_spec.text = material.ma_spec
+                                            popupView.textView_model.text = material.ma_model
+                                            popupView.textView_hw.text = material.kc_hw_name
+                                            popupView.textView_remark.text = material.comment
+                                        }
                                     }
                                 }
                             })
@@ -104,7 +120,11 @@ class DialogPopup(context: Activity) : BasePopupWindow(context), View.OnClickLis
                             Toast.makeText(context, "请输入数量", Toast.LENGTH_SHORT).show()
                             return
                         }
-                        item.mx_num = numStr.toDouble()
+                        item.scan_num = numStr.toInt()
+                        // 重新加载数据
+                        WlrkActivity.self.listView_wl.adapter = WlrkActivity.self.wlAdapter
+                        WlrkActivity.self.wlAdapter.notifyDataSetChanged()
+
                         hasMaterial = true
                     }
                 }
