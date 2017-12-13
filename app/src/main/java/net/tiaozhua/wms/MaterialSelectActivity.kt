@@ -38,8 +38,8 @@ class MaterialSelectActivity : BaseActivity(R.layout.activity_materialselect) {
         }
         refreshLayout.isEnableRefresh = false
         refreshLayout.setOnLoadmoreListener { smartLayout ->
-            smartLayout.layout.postDelayed({
-                if (responseList.totalPages > responseList.page) {
+            if (responseList.totalPages > responseList.page) {
+                smartLayout.layout.postDelayed({
                     RetrofitManager.instance.materialList(code, ckId, responseList.page + 1)
                             .enqueue(object : BaseCallback<ResponseList<Material>>(this@MaterialSelectActivity) {
                                 override fun success(data: ResponseList<Material>) {
@@ -52,8 +52,10 @@ class MaterialSelectActivity : BaseActivity(R.layout.activity_materialselect) {
                                     }
                                 }
                             })
-                }
-            }, 1000)
+                }, 1000)
+            } else {
+                smartLayout.finishLoadmore()
+            }
         }
 
         btn_return.setOnClickListener({ _ ->

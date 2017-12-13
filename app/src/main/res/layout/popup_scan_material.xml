@@ -84,8 +84,8 @@
                         android:paddingLeft="10dp"
                         android:text="物料编号" />
 
-                    <EditText
-                        android:id="@+id/editText_no"
+                    <TextView
+                        android:id="@+id/textView_no"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -269,6 +269,17 @@
                         android:background="@android:color/holo_blue_light"
                         android:text="确认"
                         android:textColor="@android:color/white" />
+
+                    <Button
+                        android:id="@+id/button_update"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="false"
+                        android:layout_alignParentRight="true"
+                        android:background="@android:color/holo_blue_light"
+                        android:text="修改"
+                        android:textColor="@android:color/white"
+                        android:visibility="invisible" />
                 </RelativeLayout>
             </LinearLayout>
 

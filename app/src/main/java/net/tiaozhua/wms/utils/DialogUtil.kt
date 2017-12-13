@@ -25,6 +25,7 @@ object DialogUtil {
                    message: String,
                    positiveCallback: DialogInterface.OnClickListener) {
         val builder = AlertDialog.Builder(context)
+        builder.setCancelable(false)
         builder.setMessage(message)
         builder.setPositiveButton("确定", positiveCallback)
         builder.show()

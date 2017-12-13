@@ -23,6 +23,7 @@ class RkdActivity : BaseActivity(R.layout.activity_rkd) {
             override fun success(data: ResponseList<Orders>) {
                 val listViewRkd = this@RkdActivity.listView_rkd
                 val items = data.items
+                listViewRkd.emptyView = empty
                 listViewRkd.adapter = RkdAdapter(items, this@RkdActivity)
                 listViewRkd.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
                     DialogUtil.showDialog(this@RkdActivity, null, "是否选择该入库单?",
