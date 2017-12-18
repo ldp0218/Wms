@@ -8,7 +8,6 @@
         android:id="@+id/shoukuan"
         android:layout_width="70dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:layout_margin="10dp"
         android:gravity="center"
         android:orientation="vertical">
@@ -18,7 +17,7 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_weight="1"
-            android:src="@mipmap/ic_launcher"/>
+            android:src="@mipmap/ic_launcher" />
 
         <TextView
             android:id="@+id/txt"
@@ -30,6 +29,6 @@
             android:gravity="center"
             android:text="测试"
             android:textColor="#666666"
-            android:textSize="12dp" />
+            android:textSize="12sp" />
     </LinearLayout>
 </RelativeLayout>

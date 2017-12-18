@@ -24,11 +24,11 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun login(view: View) {
-        if (textView_name.text.isEmpty() || editText_password.text.isEmpty()) {
+        if (textView_no.text.isEmpty() || editText_password.text.isEmpty()) {
             return
         }
         LoadingDialog.show(this@LoginActivity, false)
-        val call = RetrofitManager.instance.login(textView_name.text.toString(), editText_password.text.toString())
+        val call = RetrofitManager.instance.login(textView_no.text.toString(), editText_password.text.toString())
         call.enqueue(object : Callback<ApiBean<String>> {
             override fun onResponse(call: Call<ApiBean<String>>?, response: Response<ApiBean<String>>?) {
                 LoadingDialog.dismiss()

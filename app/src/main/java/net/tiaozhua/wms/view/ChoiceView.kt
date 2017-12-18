@@ -19,7 +19,7 @@ class ChoiceView(context: Context) : FrameLayout(context), Checkable {
 
     init {
         View.inflate(context, R.layout.listview_material, this)
-        tv = textView_name
+        tv = textView_no
         rb = rb_item
     }
 

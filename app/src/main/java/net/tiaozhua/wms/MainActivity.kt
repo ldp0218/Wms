@@ -68,8 +68,7 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
             val text = itemList[position]["text"].toString()
             when (text) {
                 "物料入库" -> startActivity(Intent(this@MainActivity, WlrkActivity::class.java))
-                "物料出库" -> {
-                }
+                "物料出库" -> startActivity(Intent(this@MainActivity, WlckActivity::class.java))
                 "物料查询" -> {
                 }
                 "物料盘点" -> {

@@ -12,7 +12,7 @@
         layout="@layout/toolbar_layout" />
 
     <ScrollView
-        android:id="@+id/scrollView_wlrk"
+        android:id="@+id/scrollView_wlck"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -27,16 +27,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingStart="20dp"
-                android:paddingEnd="0dp">
+                android:paddingEnd="0dp"
+                android:paddingStart="20dp">
 
                 <TextView
                     android:id="@+id/textView_no"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="单据编号"
-                    android:labelFor="@id/editText_no"/>
+                    android:labelFor="@id/editText_no"
+                    android:text="单据编号" />
 
                 <EditText
                     android:id="@+id/editText_no"
@@ -56,16 +56,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingStart="20dp"
-                android:paddingEnd="0dp">
+                android:paddingEnd="0dp"
+                android:paddingStart="20dp">
 
                 <TextView
                     android:id="@+id/textView_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="单据日期"
-                    android:labelFor="@id/editText_date"/>
+                    android:labelFor="@id/editText_date"
+                    android:text="单据日期" />
 
                 <EditText
                     android:id="@+id/editText_date"
@@ -84,19 +84,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingStart="20dp"
-                android:paddingEnd="0dp">
+                android:paddingStart="20dp">
 
                 <TextView
-                    android:id="@+id/textView_ghdw"
+                    android:id="@+id/textView_llr"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="15dp"
                     android:layout_weight="1"
-                    android:text="供货单位"
-                    android:labelFor="@id/editText_ghdw"/>
+                    android:labelFor="@id/editText_llr"
+                    android:text="领料人" />
 
                 <EditText
-                    android:id="@+id/editText_ghdw"
+                    android:id="@+id/editText_llr"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="20dp"
@@ -112,21 +112,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingStart="20dp"
-                android:paddingEnd="0dp">
+                android:paddingEnd="0dp"
+                android:paddingStart="20dp">
 
                 <TextView
-                    android:id="@+id/textView_jsr"
+                    android:id="@+id/textView_bm"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:paddingStart="0dp"
-                    android:paddingEnd="10dp"
-                    android:text="经手人"
-                    android:labelFor="@id/editText_jsr"/>
+                    android:labelFor="@id/editText_bm"
+                    android:paddingEnd="25dp"
+                    android:text="部门" />
 
                 <EditText
-                    android:id="@+id/editText_jsr"
+                    android:id="@+id/editText_bm"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="20dp"
@@ -143,8 +142,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingStart="20dp"
-                android:paddingEnd="0dp">
+                android:paddingEnd="0dp"
+                android:paddingStart="20dp">
 
                 <TextView
                     android:id="@+id/textView_ck"
@@ -152,7 +151,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:labelFor="@id/editText_ck"
-                    android:text="入库仓库" />
+                    android:text="领料仓库" />
 
                 <EditText
                     android:id="@+id/editText_ck"
@@ -171,18 +170,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingStart="20dp"
-                android:paddingEnd="0dp">
+                android:paddingEnd="0dp"
+                android:paddingStart="20dp">
 
                 <TextView
                     android:id="@+id/textView_beizhu"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:paddingStart="0dp"
+                    android:labelFor="@id/editText_beizhu"
                     android:paddingEnd="25dp"
-                    android:text="备注"
-                    android:labelFor="@id/editText_beizhu"/>
+                    android:paddingStart="0dp"
+                    android:text="备注" />
 
                 <EditText
                     android:id="@+id/editText_beizhu"
@@ -240,21 +239,21 @@
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:onClick="rkdClick"
-            android:text="入库单"
+            android:onClick="lldClick"
+            android:text="领料单"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="@+id/button_close"
             app:layout_constraintRight_toLeftOf="@+id/button4"
             app:layout_constraintStart_toEndOf="@+id/saomiao" />
 
         <Button
-            style="?android:buttonBarButtonStyle"
             android:id="@+id/button4"
+            style="?android:buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:onClick="rkClick"
-            android:text="入库"
+            android:onClick="ckClick"
+            android:text="出库"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent" />
     </LinearLayout>

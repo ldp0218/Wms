@@ -16,6 +16,7 @@ import net.tiaozhua.wms.utils.RetrofitManager
 
 class MaterialSelectActivity : BaseActivity(R.layout.activity_materialselect) {
     private lateinit var responseList: ResponseList<Material>
+    private lateinit var adapter: ArrayAdapter<Material>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,7 +26,7 @@ class MaterialSelectActivity : BaseActivity(R.layout.activity_materialselect) {
         @Suppress("UNCHECKED_CAST")
         responseList = intent.getSerializableExtra("data") as ResponseList<Material>
         val items = responseList.items.toMutableList()
-        listview.adapter = object : ArrayAdapter<Material>(this, R.layout.listview_material, items) {
+        adapter = object : ArrayAdapter<Material>(this, R.layout.listview_material, items) {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                 val view = if (convertView == null) {
                     ChoiceView(this@MaterialSelectActivity)
@@ -36,14 +37,16 @@ class MaterialSelectActivity : BaseActivity(R.layout.activity_materialselect) {
                 return view
             }
         }
+        listview.adapter = adapter
         refreshLayout.isEnableRefresh = false
         refreshLayout.setOnLoadmoreListener { smartLayout ->
             if (responseList.totalPages > responseList.page) {
                 smartLayout.layout.postDelayed({
                     RetrofitManager.instance.materialList(code, ckId, responseList.page + 1)
                             .enqueue(object : BaseCallback<ResponseList<Material>>(this@MaterialSelectActivity) {
-                                override fun success(data: ResponseList<Material>) {
+                                override fun successData(data: ResponseList<Material>) {
                                     items.addAll(data.items)
+                                    adapter.notifyDataSetChanged()
                                     responseList.page = data.page
                                     responseList.totalPages = data.totalPages
                                     smartLayout.finishLoadmore()

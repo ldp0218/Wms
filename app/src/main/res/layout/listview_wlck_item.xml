@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.mcxtzhang.swipemenulib.SwipeMenuLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:ios="false"
+    app:leftSwipe="true"
+    app:swipeEnable="true"
+    android:focusable="true">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/layout_wl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="10dp"
+        android:paddingStart="20dp"
+        android:paddingTop="10dp"
+        tools:ignore="RtlSymmetry">
+
+        <TextView
+            android:id="@+id/textView_no"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginBottom="5dp"
+            android:text="物料名称"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            tools:ignore="RtlHardcoded" />
+
+        <TextView
+            android:id="@+id/textView_wcknumlabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/textView_no"
+            android:layout_marginBottom="5dp"
+            android:layout_marginEnd="10dp"
+            android:text="未领数量" />
+
+        <TextView
+            android:id="@+id/textView_wcknum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_no"
+            android:layout_toEndOf="@+id/textView_wcknumlabel" />
+
+        <TextView
+            android:id="@+id/textView_cklabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_no"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_toStartOf="@+id/textView_cknum"
+            android:text="出库数量" />
+
+        <TextView
+            android:id="@+id/textView_cknum"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/textView_no" />
+
+        <TextView
+            android:id="@+id/textView_hwlabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_wcknumlabel"
+            android:layout_marginEnd="10dp"
+            android:text="仓库货位" />
+
+        <TextView
+            android:id="@+id/textView_hw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_wcknumlabel"
+            android:layout_toEndOf="@+id/textView_hwlabel" />
+
+        <TextView
+            android:id="@+id/textView_dwlabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_wcknumlabel"
+            android:layout_toStartOf="@+id/textView_dw"
+            android:paddingEnd="38dp"
+            android:text="单位" />
+
+        <TextView
+            android:id="@+id/textView_dw"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/textView_wcknumlabel" />
+
+    </RelativeLayout>
+
+    <!-- 以下都是侧滑菜单的内容依序排列 -->
+    <Button
+        android:id="@+id/btnDelete"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
+        android:background="@color/red_ff4a57"
+        android:text="删除"
+        android:textColor="@android:color/white"/>
+
+</com.mcxtzhang.swipemenulib.SwipeMenuLayout>

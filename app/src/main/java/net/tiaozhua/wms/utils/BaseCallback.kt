@@ -4,28 +4,34 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.widget.Toast
+import net.tiaozhua.wms.LoginActivity
 import net.tiaozhua.wms.bean.ApiBean
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import net.tiaozhua.wms.LoginActivity
-import net.tiaozhua.wms.RkdActivity
-import net.tiaozhua.wms.bean.Jhrk
 
 
 /**
- * Created by ldp on 2017/11/8.
- */
-abstract class BaseCallback<T>(context: Context) : Callback<ApiBean<T>> {
-
-    private val context: Context = context
+* Created by ldp on 2017/11/8.
+*/
+abstract class BaseCallback<T>(private val context: Context) : Callback<ApiBean<T>> {
 
     override fun onResponse(call: Call<ApiBean<T>>?, response: Response<ApiBean<T>>?) {
         response?.body()?.let {
             when (it.code) {
+                0 -> {
+                    if (it.data != null) {
+                        failureData(it.data)
+                    } else {
+                        Toast.makeText(context, it.info, Toast.LENGTH_SHORT).show()
+                    }
+                }
                 1 -> { // 正常
-                    success(it.data)
+                    if (it.data != null) {
+                        successData(it.data)
+                    } else {
+                        successInfo(it.info ?: "1")
+                    }
                 }
                 2 -> { // 登录超时
                     DialogUtil.showAlert(context, "请重新登录",
@@ -46,7 +52,9 @@ abstract class BaseCallback<T>(context: Context) : Callback<ApiBean<T>> {
         Toast.makeText(context, "服务繁忙，请稍后重试", Toast.LENGTH_SHORT).show()
     }
 
-    abstract fun success(data: T)
+    protected open  fun successInfo(info: String) {}
 
+    protected open  fun successData(data: T) {}
 
+    protected open fun failureData(data: T) {}
 }

@@ -37,11 +37,11 @@ class WlAdapter(private val list: List<Jhmx>, context: Context) : BaseAdapter() 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view: View = convertView ?: inflater.inflate(R.layout.listview_wl_item, null)
         val item: Jhmx = list[position]
-        val name: TextView = view.findViewOften(R.id.textView_name)
+        val name: TextView = view.findViewOften(R.id.textView_no)
         name.text = item.ma_name
         val wrknum: TextView = view.findViewOften(R.id.textView_wrknum)
         wrknum.text = item.jhdmx_num.toString()
-        val scannum: TextView = view.findViewOften(R.id.textView_scannum)
+        val scannum: TextView = view.findViewOften(R.id.textView_cknum)
         scannum.text = "0"
         val hw: TextView = view.findViewOften(R.id.textView_hw)
         hw.text = item.hj_name

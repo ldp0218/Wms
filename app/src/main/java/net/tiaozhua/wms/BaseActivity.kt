@@ -1,5 +1,6 @@
 package net.tiaozhua.wms
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.widget.TextView
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
+import net.tiaozhua.wms.utils.DialogUtil
 
 /**
 * Created by ldp on 2017/11/7.
@@ -65,13 +67,28 @@ abstract class BaseActivity(private val layoutId: Int) : AppCompatActivity() {
         }
     }
 
+    protected open fun isExit(): Boolean {
+        return false
+    }
+
     /**
      * 版本号小于21的后退按钮图片
      */
     private fun showBack() {
         //setNavigationIcon必须在setSupportActionBar(toolbar);方法后面加入
         toolbar.setNavigationIcon(R.mipmap.arrow_left)
-        toolbar.setNavigationOnClickListener { onBackPressed() }
+        toolbar.setNavigationOnClickListener {
+            if (isExit()) {
+                DialogUtil.showDialog(this, null, "数据未保存,是否离开?",
+                        null,
+                        DialogInterface.OnClickListener { _, _ ->
+                            onBackPressed()
+                        }
+                )
+            } else {
+                onBackPressed()
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -82,12 +99,37 @@ abstract class BaseActivity(private val layoutId: Int) : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_home -> {
-                val intent = Intent(this, MainActivity::class.java)
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                startActivity(intent)
-                return true
+                if (isExit()) {
+                    DialogUtil.showDialog(this, null, "数据未保存,是否离开?",
+                            null,
+                            DialogInterface.OnClickListener { _, _ ->
+                                val intent = Intent(this, MainActivity::class.java)
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                startActivity(intent)
+                            }
+                    )
+                } else {
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    startActivity(intent)
+                }
             }
-            R.id.menu_logout -> startActivity(Intent(this, LoginActivity::class.java))
+            R.id.menu_logout -> {
+                if (isExit()) {
+                    DialogUtil.showDialog(this, null, "数据未保存,是否离开?",
+                            null,
+                            DialogInterface.OnClickListener { _, _ ->
+                                val intent = Intent(this, LoginActivity::class.java)
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                startActivity(intent)
+                            }
+                    )
+                } else {
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    startActivity(intent)
+                }
+            }
         }
         return false
     }
