@@ -19,14 +19,11 @@ import kotlinx.android.synthetic.main.popup_scan_material.view.*
 import net.tiaozhua.wms.adapter.CommonAdapter
 import net.tiaozhua.wms.adapter.ViewHolder
 import net.tiaozhua.wms.bean.*
-import net.tiaozhua.wms.utils.BaseCallback
-import net.tiaozhua.wms.utils.DialogUtil
-import net.tiaozhua.wms.utils.RetrofitManager
-import net.tiaozhua.wms.utils.ScanStatus
+import net.tiaozhua.wms.utils.*
 import okhttp3.MediaType
 import okhttp3.RequestBody
 
-class WlrkActivity : BaseActivity(R.layout.activity_wlrk) {
+class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener {
 
     private var dialogPopup: DialogPopup? = null
     private lateinit var mVibrator: Vibrator
@@ -48,50 +45,24 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk) {
             mVibrator.vibrate(100)
             barcodeStr = String(intent.getByteArrayExtra("barocode"), 0, intent.getIntExtra("length", 0))
 
-            when (status) {
-                ScanStatus.SCAN, ScanStatus.FINISH -> {
-                    if (dialogPopup == null) {
-                        dialogPopup = DialogPopup(this@WlrkActivity)
-                        dialogPopup!!.setScan()     // 设置为扫描界面
-                        dialogPopup!!.showPopupWindow()
-                    }
-                    if (!dialogPopup!!.isShowing) {
-                        for (item in jhrk.jhmx) {
-                            if (item.ma_id == material?.ma_id) {
-                                if (item.mx_num > 0) {
-                                    jhmx = item
-                                    dialogPopup!!.setUpdate()
-                                } else {
-                                    dialogPopup!!.setScan()
-                                }
-                                break
-                            }
-                        }
-                        dialogPopup!!.showPopupWindow()
-                    } else {
-                        for (item in jhrk.jhmx) {
-                            if (item.ma_id == material?.ma_id) {
-                                if (item.mx_num > 0) {
-                                    jhmx = item
-                                    dialogPopup!!.setUpdate()
-                                }
-                                break
-                            }
-                        }
-                    }
-                }
-                else -> Toast.makeText(this@WlrkActivity, "请选择入库单", Toast.LENGTH_SHORT).show()
-            }
-            if (barcodeStr.startsWith("d:")) {  //  以此标志判断扫描的是单据还是物料
+            if (barcodeStr.startsWith(DjFlag.RKD.value)) {  //  以此标志判断扫描的是单据还是物料
                 val id = try {      // 截取后面的id
                     barcodeStr.substring(2).toInt()
                 } catch (e: NumberFormatException) { 0 }
+                if (id == 0) {
+                    Toast.makeText(this@WlrkActivity, "未识别二维码", Toast.LENGTH_SHORT).show()
+                    return
+                }
+                LoadingDialog.show(this@WlrkActivity)
                 RetrofitManager.instance.jhrkInfo(id)
                         .enqueue(object : BaseCallback<Jhrk>(context = this@WlrkActivity) {
                             override fun successData(data: Jhrk) {
                                 jhrk = data
-                                if (jhrk.pdacode == 0) {    // pdacode值判断是否已入库
+                                if (jhrk.pdacode == 0) {    // 判断是否已入库
                                     Toast.makeText(this@WlrkActivity, "该入库单已入库", Toast.LENGTH_SHORT).show()
+                                    return
+                                } else if (jhrk.pdacode == 2) {     // 是否存在该单据
+                                    Toast.makeText(this@WlrkActivity, "该入库单不存在", Toast.LENGTH_SHORT).show()
                                     return
                                 }
                                 editText_no.setText(jhrk.jh_no)
@@ -138,7 +109,50 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk) {
                             }
                         })
             } else {
+                when (status) {
+                    ScanStatus.SCAN, ScanStatus.FINISH -> {
+                        if (dialogPopup == null) {
+                            dialogPopup = DialogPopup(this@WlrkActivity)
+                            dialogPopup!!.setScan()     // 设置为扫描界面
+                            dialogPopup!!.showPopupWindow()
+                        }
+                        if (!dialogPopup!!.isShowing) {
+                            var flag = true
+                            for (item in jhrk.jhmx) {
+                                if (item.ma_txm == barcodeStr) {
+                                    if (item.mx_num > 0) {
+                                        jhmx = item
+                                        dialogPopup!!.setUpdate()
+                                    } else {
+                                        dialogPopup!!.setScan()
+                                    }
+                                    flag = false
+                                    break
+                                }
+                            }
+                            if (flag) {
+                                dialogPopup!!.setScan()
+                            }
+                            dialogPopup!!.showPopupWindow()
+                        } else {
+                            for (item in jhrk.jhmx) {
+                                if (item.ma_txm == barcodeStr) {
+                                    if (item.mx_num > 0) {
+                                        jhmx = item
+                                        dialogPopup!!.setUpdate()
+                                    }
+                                    break
+                                }
+                            }
+                        }
+                    }
+                    else -> {
+                        Toast.makeText(this@WlrkActivity, "请选择入库单", Toast.LENGTH_SHORT).show()
+                        return
+                    }
+                }
                 dialogPopup!!.popupView.editText_tm.setText(barcodeStr)
+                LoadingDialog.show(this@WlrkActivity)
                 RetrofitManager.instance.materialList(barcodeStr, jhrk.ck_id)
                         .enqueue(object : BaseCallback<ResponseList<Material>>(this@WlrkActivity) {
                             override fun successData(data: ResponseList<Material>) {
@@ -178,6 +192,11 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk) {
         super.onCreate(savedInstanceState)
         mVibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         toolbarTitle.text = "物料入库"
+
+        // 为按钮设置点击监听事件
+        scan.setOnClickListener(this@WlrkActivity)
+        rkd.setOnClickListener(this@WlrkActivity)
+        rk.setOnClickListener(this@WlrkActivity)
 
         scrollView_wlrk.smoothScrollTo(0, 0)
         if (!receiverTag) {     //在注册广播接受者的时候 判断是否已被注册,避免重复多次注册广播
@@ -231,6 +250,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk) {
         //super.onActivityResult(requestCode, resultCode, data)
         when (resultCode) {
             Activity.RESULT_OK -> {     // 选择了入库单
+                LoadingDialog.show(this@WlrkActivity)
                 RetrofitManager.instance.jhrkInfo(intent!!.getIntExtra("id", 0))
                         .enqueue(object : BaseCallback<Jhrk>(context = this) {
                             override fun successData(data: Jhrk) {
@@ -255,13 +275,17 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk) {
                                             holder.setOnClickListener(R.id.btnDelete, View.OnClickListener { _ ->
                                                 //在ListView里，点击侧滑菜单上的选项时，如果想让擦花菜单同时关闭，调用这句话
                                                 (holder.getConvertView() as SwipeMenuLayout).quickClose()
-                                                if (jhrk.delJhmx == null) {
-                                                    jhrk.delJhmx = mutableListOf()
-                                                }
                                                 val obj = jhmxList[position]
-                                                jhrk.delJhmx!!.add(obj)
-                                                jhmxList.removeAt(position)
-                                                notifyDataSetChanged()
+                                                if (obj.mx_num == 0) {
+                                                    if (jhrk.delJhmx == null) {
+                                                        jhrk.delJhmx = mutableListOf()
+                                                    }
+                                                    jhrk.delJhmx!!.add(obj)
+                                                    jhmxList.removeAt(position)
+                                                    notifyDataSetChanged()
+                                                } else {
+                                                    Toast.makeText(this@WlrkActivity, "物料已扫描不能删除", Toast.LENGTH_SHORT).show()
+                                                }
                                             })
                                             holder.setOnClickListener(R.id.layout_wl, View.OnClickListener { _ ->
                                                 if (jhmxList[position].mx_num > 0) {
@@ -295,72 +319,75 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk) {
         }
     }
 
-    fun scanClick(view: View) {
-        when (status) {
-            ScanStatus.EMPTY -> Toast.makeText(this@WlrkActivity, "请选择入库单", Toast.LENGTH_SHORT).show()
-            ScanStatus.SCAN, ScanStatus.FINISH -> {
-                dialogPopup = DialogPopup(this@WlrkActivity)
-                dialogPopup!!.setScan()     // 设置为扫描界面
-                dialogPopup!!.showPopupWindow()
-            }
-        }
-    }
-
-    fun rkdClick(view: View) {
-        val intent = Intent(this@WlrkActivity, WlrkdActivity::class.java)
-        startActivityForResult(intent, 0)
-    }
-
-    fun rkClick(view: View) = when (status) {
-        ScanStatus.EMPTY -> Toast.makeText(this@WlrkActivity, "请选择入库单", Toast.LENGTH_SHORT).show()
-        ScanStatus.SCAN -> {
-            val isNotFinished = jhrk.jhmx.any { it.mx_num == 0 }
-            if (isNotFinished) {
-                Toast.makeText(this@WlrkActivity, "有物料未扫描", Toast.LENGTH_SHORT).show()
-            } else {
-                status = ScanStatus.FINISH
-                DialogUtil.showDialog(this, null, "物料已全部扫描,是否入库?",
-                        null,
-                        DialogInterface.OnClickListener { _, _ ->
-                            jhrk.oldJhmx = jhrk.jhmx
-                            val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), Gson().toJson(jhrk))
-                            RetrofitManager.instance.updateJh(requestBody)
-                                    .enqueue(object : BaseCallback<List<Jhmx>>(context = this) {
-                                        override fun successInfo(info: String) {
-                                            if (info == "1") {
-                                                Toast.makeText(this@WlrkActivity, "完成入库", Toast.LENGTH_SHORT).show()
-                                                clearData()
-                                            }
-                                        }
-                                        override fun failureData(data: List<Jhmx>) {
-                                            Log.i("result", data.toString())
-                                            Toast.makeText(this@WlrkActivity, "有物料超出可入库数量", Toast.LENGTH_SHORT).show()
-                                        }
-                                    })
-                        }
-                )
-            }
-        }
-        ScanStatus.FINISH -> {
-            DialogUtil.showDialog(this, null, "物料已全部扫描,是否入库?",
-                    null,
-                    DialogInterface.OnClickListener { _, _ ->
-                        jhrk.oldJhmx = jhrk.jhmx
-                        val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), Gson().toJson(jhrk))
-                        RetrofitManager.instance.updateJh(requestBody)
-                                .enqueue(object : BaseCallback<List<Jhmx>>(context = this) {
-                                    override fun successInfo(info: String) {
-                                        if (info == "1") {
-                                            Toast.makeText(this@WlrkActivity, "完成入库", Toast.LENGTH_SHORT).show()
-                                            clearData()
-                                        }
-                                    }
-                                    override fun failureData(data: List<Jhmx>) {
-                                        Toast.makeText(this@WlrkActivity, "有物料超出可入库数量", Toast.LENGTH_SHORT).show()
-                                    }
-                                })
+    override fun onClick(v: View) {
+        Log.i("view", v.toString())
+        when (v.id) {
+            R.id.scan -> {      // 扫描
+                when (status) {
+                    ScanStatus.EMPTY -> Toast.makeText(this@WlrkActivity, "请选择入库单", Toast.LENGTH_SHORT).show()
+                    ScanStatus.SCAN, ScanStatus.FINISH -> {
+                        dialogPopup = DialogPopup(this@WlrkActivity)
+                        dialogPopup!!.setScan()     // 设置为扫描界面
+                        dialogPopup!!.showPopupWindow()
                     }
-            )
+                }
+            }
+            R.id.rkd -> {   // 入库单
+                val intent = Intent(this@WlrkActivity, WlrkdActivity::class.java)
+                startActivityForResult(intent, 0)
+            }
+            R.id.rk -> {    // 入库
+                when (status) {
+                    ScanStatus.EMPTY -> Toast.makeText(this@WlrkActivity, "请选择入库单", Toast.LENGTH_SHORT).show()
+                    ScanStatus.SCAN -> {
+                        val isNotFinished = jhrk.jhmx.any { it.mx_num == 0 }
+                        if (isNotFinished) {
+                            Toast.makeText(this@WlrkActivity, "有物料未扫描", Toast.LENGTH_SHORT).show()
+                        } else {
+                            status = ScanStatus.FINISH
+                            DialogUtil.showDialog(this, null, "物料已全部扫描,是否入库?",
+                                    null,
+                                    DialogInterface.OnClickListener { _, _ ->
+                                        jhrk.oldJhmx = jhrk.jhmx
+                                        LoadingDialog.show(this@WlrkActivity)
+                                        val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), Gson().toJson(jhrk))
+                                        RetrofitManager.instance.updateJh(requestBody)
+                                                .enqueue(object : BaseCallback<List<Jhmx>>(context = this) {
+                                                    override fun successInfo(info: String) {
+                                                        Toast.makeText(this@WlrkActivity, "完成入库", Toast.LENGTH_SHORT).show()
+                                                        clearData()
+                                                    }
+                                                    override fun failureData(data: List<Jhmx>) {
+                                                        Log.i("result", data.toString())
+                                                        Toast.makeText(this@WlrkActivity, "有物料超出可入库数量", Toast.LENGTH_SHORT).show()
+                                                    }
+                                                })
+                                    }
+                            )
+                        }
+                    }
+                    ScanStatus.FINISH -> {
+                        DialogUtil.showDialog(this, null, "物料已全部扫描,是否入库?",
+                                null,
+                                DialogInterface.OnClickListener { _, _ ->
+                                    jhrk.oldJhmx = jhrk.jhmx
+                                    LoadingDialog.show(this@WlrkActivity)
+                                    val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), Gson().toJson(jhrk))
+                                    RetrofitManager.instance.updateJh(requestBody)
+                                            .enqueue(object : BaseCallback<List<Jhmx>>(context = this) {
+                                                override fun successInfo(info: String) {
+                                                    Toast.makeText(this@WlrkActivity, "完成入库", Toast.LENGTH_SHORT).show()
+                                                    clearData()
+                                                }
+                                                override fun failureData(data: List<Jhmx>) {
+                                                    Toast.makeText(this@WlrkActivity, "有物料超出可入库数量", Toast.LENGTH_SHORT).show()
+                                                }
+                                            })
+                                }
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -376,7 +403,6 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk) {
         editText_ck.setText("")
         editText_beizhu.setText("")
         jhrk.jhmx.clear()
-        listView_wl.adapter = wlAdapter
         wlAdapter.notifyDataSetChanged()
     }
 }

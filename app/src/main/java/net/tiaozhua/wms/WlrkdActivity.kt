@@ -11,6 +11,7 @@ import net.tiaozhua.wms.utils.BaseCallback
 import net.tiaozhua.wms.utils.RetrofitManager
 import android.content.Intent
 import net.tiaozhua.wms.utils.DialogUtil
+import net.tiaozhua.wms.utils.LoadingDialog
 
 class WlrkdActivity : BaseActivity(R.layout.activity_dj) {
 
@@ -18,6 +19,7 @@ class WlrkdActivity : BaseActivity(R.layout.activity_dj) {
         super.onCreate(savedInstanceState)
         toolbarTitle.text = "入库单"
 
+        LoadingDialog.show(this@WlrkdActivity)
         RetrofitManager.instance.wlrkd().enqueue(object : BaseCallback<ResponseList<Orders>>(context = this@WlrkdActivity) {
             override fun successData(data: ResponseList<Orders>) {
                 val items = data.items

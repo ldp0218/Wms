@@ -1,4 +1,4 @@
-package net.tiaozhua.wms.utils
+package net.tiaozhua.wms.bean
 
 /**
 * Created by ldp on 2017/12/6.

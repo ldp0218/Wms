@@ -21,15 +21,13 @@ class LoadingDialog : Dialog {
     companion object {
         private var mLoadingProgress: LoadingDialog? = null
 
-        fun show(context: Context, cancelable: Boolean) {
+        fun show(context: Context) {
             mLoadingProgress = LoadingDialog(context, R.style.progress_dialog)
             mLoadingProgress?.setCanceledOnTouchOutside(false)
             mLoadingProgress?.setContentView(R.layout.dialog)
             //按返回键响应是否取消等待框的显示
-            mLoadingProgress?.setCancelable(cancelable)
-
+            mLoadingProgress?.setCancelable(false)
             mLoadingProgress?.show()
-
         }
 
         fun dismiss() {

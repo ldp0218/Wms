@@ -10,6 +10,7 @@ import net.tiaozhua.wms.bean.Ckd
 import net.tiaozhua.wms.bean.ResponseList
 import net.tiaozhua.wms.utils.BaseCallback
 import net.tiaozhua.wms.utils.DialogUtil
+import net.tiaozhua.wms.utils.LoadingDialog
 import net.tiaozhua.wms.utils.RetrofitManager
 
 class WlckdActivity : BaseActivity(R.layout.activity_dj) {
@@ -18,6 +19,7 @@ class WlckdActivity : BaseActivity(R.layout.activity_dj) {
         super.onCreate(savedInstanceState)
         toolbarTitle.text = "领料单"
 
+        LoadingDialog.show(this@WlckdActivity)
         RetrofitManager.instance.wlckd().enqueue(object : BaseCallback<ResponseList<Ckd>>(context = this@WlckdActivity) {
             override fun successData(data: ResponseList<Ckd>) {
                 val items = data.items

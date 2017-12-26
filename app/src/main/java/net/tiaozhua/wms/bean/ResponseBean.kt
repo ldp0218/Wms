@@ -7,7 +7,7 @@ import java.io.Serializable
 */
 const val SCAN_ACTION = "urovo.rcv.message"  // PDA扫描结束action
 
-data class ApiBean<out I>(val code: Int, val data: I, val info: String)
+data class ApiBean<out T>(val code: Int, val data: T, val info: String?)
 
 data class ResponseList<out T>(val items: List<T>, val limit: Int, var page: Int, val totalCount: Int, var totalPages: Int) : Serializable
 
@@ -33,7 +33,19 @@ data class Material(val begin_num: Double, val charcode: String, val ck_name: St
 
 data class Ckd(val check_date: String, val check_flag: Int, val check_name: String, val check_remark: String, val ck_flag: Int,
                val ck_id: Int, val ck_name: String, val ckd_id: Int, val ckd_ldrq: String, val ckd_no: String, val llr_name: String, val llr_id: Int,
-               val remark: String, val bm_id: Int, val bm_name: String, val jx: Int, var ckdmx: MutableList<Ckdmx>) : Serializable
+               val remark: String, val bm_id: Int, val bm_name: String, val jx: Int, var ckdmx: MutableList<Ckdmx>, val pdacode: Int) : Serializable
 
 data class Ckdmx(val kc_hw_name: String, val kc_num: Int, val ma_code: String, val ma_id: Int, val ma_model: String, val ma_name: String, val hj_name: String?,
-                 val ma_spec: String, val ma_txm: String, val ma_unit: String, val mckmx_id: Int, val mx_num: Int, val mx_remark: String, val wc_num: Int, var ck_num: Int)
+                 val ma_spec: String, val ma_txm: String, val ma_unit: String, val mckmx_id: Int, var mx_num: Int, val mx_remark: String, val wc_num: Int, var ck_num: Int)
+
+data class CkdFailureData(val clldList: List<Ckdmx>?, val ckcList: List<Ckdmx>?)
+
+data class Ck(val ck_id: Int, val ck_name: String)
+
+data class Pd(val id: Int, val pd_hao: String, val pd_date: String, val ck_id: Int, val ck_no: String,
+              val ck_name: String, val pd_state: Int, val handler: String, val pd_remark: String)
+
+data class Pdmx(val type: Int, var pd_id: Int?, var iid: Int?, var kc_num: Int, var pd_num: Int, var id: Int?, var ck_id: Int,
+                var hao: String, var txm: String, var name: String, var spec: String, var model: String, var hw: String, var comment: String)
+
+data class PdResult(val code: Int, val info: String?, val id: Int, val pd_id: Int)

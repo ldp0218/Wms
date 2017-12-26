@@ -12,6 +12,7 @@ import android.widget.ListView
 import android.widget.Toast
 import net.tiaozhua.wms.bean.ResponseList
 import net.tiaozhua.wms.utils.BaseCallback
+import net.tiaozhua.wms.utils.LoadingDialog
 import net.tiaozhua.wms.utils.RetrofitManager
 
 class MaterialSelectActivity : BaseActivity(R.layout.activity_materialselect) {

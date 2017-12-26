@@ -24,7 +24,9 @@
         <activity android:name=".WlrkdActivity" />
         <activity android:name=".MaterialSelectActivity" />
         <activity android:name=".WlckActivity" />
-        <activity android:name=".WlckdActivity"></activity>
+        <activity android:name=".WlckdActivity" />
+        <activity android:name=".WlpdActivity" />
+        <activity android:name=".KcpdActivity"></activity>
     </application>
 
 </manifest>

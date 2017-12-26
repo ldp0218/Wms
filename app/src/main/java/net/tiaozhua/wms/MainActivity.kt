@@ -69,15 +69,10 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
             when (text) {
                 "物料入库" -> startActivity(Intent(this@MainActivity, WlrkActivity::class.java))
                 "物料出库" -> startActivity(Intent(this@MainActivity, WlckActivity::class.java))
-                "物料查询" -> {
-                }
-                "物料盘点" -> {
-                }
+                "物料盘点" -> startActivity(Intent(this@MainActivity, WlpdActivity::class.java))
                 "成品入库" -> {
                 }
                 "成品出库" -> {
-                }
-                "成品查询" -> {
                 }
                 "成品盘点" -> {
                 }

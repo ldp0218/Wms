@@ -18,6 +18,7 @@ abstract class BaseCallback<T>(private val context: Context) : Callback<ApiBean<
 
     override fun onResponse(call: Call<ApiBean<T>>?, response: Response<ApiBean<T>>?) {
         response?.body()?.let {
+            LoadingDialog.dismiss()
             when (it.code) {
                 0 -> {
                     if (it.data != null) {
@@ -40,15 +41,15 @@ abstract class BaseCallback<T>(private val context: Context) : Callback<ApiBean<
                             }
                     )
                 }
-                3 -> { // 无权限
-                    Toast.makeText(context, it.info, Toast.LENGTH_SHORT).show()
-                }
+                3 -> Toast.makeText(context, it.info, Toast.LENGTH_SHORT).show()    // 无权限
+                5 -> Toast.makeText(context, "已完成盘点，请勿重复提交！", Toast.LENGTH_SHORT).show()
                 else -> Toast.makeText(context, it.info, Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     override fun onFailure(call: Call<ApiBean<T>>?, t: Throwable?) {
+        LoadingDialog.dismiss()
         Toast.makeText(context, "服务繁忙，请稍后重试", Toast.LENGTH_SHORT).show()
     }
 
