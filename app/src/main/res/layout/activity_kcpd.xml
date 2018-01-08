@@ -116,10 +116,13 @@
     </ScrollView>
 
     <ImageView
+        android:id="@+id/imageView_line"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:srcCompat="@android:color/darker_gray" />
+
     <LinearLayout
+        android:id="@+id/layout_menu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center">

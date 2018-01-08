@@ -28,7 +28,7 @@ import okhttp3.RequestBody
 
 class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener {
 
-    private var dialogPopup: DialogPopup? = null
+    private var wlPopup: WlPopup? = null
     private lateinit var mVibrator: Vibrator
     private lateinit var mScanManager: ScanManager
     private val soundpool = SoundPool(1, AudioManager.STREAM_NOTIFICATION, 100)
@@ -98,12 +98,12 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                                             })
                                             holder.setOnClickListener(R.id.layout_wl, View.OnClickListener { _ ->
                                                 if (ckd.ckdmx[position].ck_num > 0) {
-                                                    if (dialogPopup == null) {
-                                                        dialogPopup = DialogPopup(this@WlckActivity)
+                                                    if (wlPopup == null) {
+                                                        wlPopup = WlPopup(this@WlckActivity)
                                                     }
                                                     ckdmx = ckd.ckdmx[position]
-                                                    dialogPopup!!.setUpdate()     // 设置为修改界面
-                                                    dialogPopup!!.showPopupWindow()
+                                                    wlPopup!!.setUpdate()     // 设置为修改界面
+                                                    wlPopup!!.showPopupWindow()
                                                 }
                                             })
                                         }
@@ -113,37 +113,38 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                             }
                         })
             } else {
+                var flag = true
                 when (status) {
                     ScanStatus.SCAN, ScanStatus.FINISH -> {
-                        if (dialogPopup == null) {
-                            dialogPopup = DialogPopup(this@WlckActivity)
-                            dialogPopup!!.setScan()
-                            dialogPopup!!.showPopupWindow()
+                        if (wlPopup == null) {
+                            wlPopup = WlPopup(this@WlckActivity)
+                            wlPopup!!.setScan()
+                            wlPopup!!.showPopupWindow()
                         }
-                        if (!dialogPopup!!.isShowing) {
-                            var flag = true
+                        if (!wlPopup!!.isShowing) {
                             for (item in ckd.ckdmx) {
                                 if (item.ma_txm == barcodeStr) {
                                     if (item.ck_num > 0) {
                                         ckdmx = item
-                                        dialogPopup!!.setUpdate()
+                                        wlPopup!!.setUpdate()
                                     } else {
-                                        dialogPopup!!.setScan()
+                                        wlPopup!!.setScan()
                                     }
                                     flag = false
                                     break
                                 }
                             }
                             if (flag) {
-                                dialogPopup!!.setScan()
+                                wlPopup!!.setScan()
                             }
-                            dialogPopup!!.showPopupWindow()
+                            wlPopup!!.showPopupWindow()
                         } else {
                             for (item in ckd.ckdmx) {
                                 if (item.ma_txm == barcodeStr) {
                                     if (item.ck_num > 0) {
                                         ckdmx = item
-                                        dialogPopup!!.setUpdate()
+                                        wlPopup!!.setUpdate()
+                                        flag = false
                                     }
                                     break
                                 }
@@ -152,8 +153,8 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                     }
                     else -> Toast.makeText(this@WlckActivity, "请选择领料单", Toast.LENGTH_SHORT).show()
                 }
-                if (dialogPopup != null && dialogPopup!!.isShowing) {
-                    val view = dialogPopup!!.popupView
+                if (flag) {     // 扫描新的
+                    val view = wlPopup!!.popupView
                     view.editText_tm.setText(barcodeStr)
                     LoadingDialog.show(this@WlckActivity)
                     RetrofitManager.instance.materialList(barcodeStr, ckd.ck_id)
@@ -170,7 +171,7 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                                         }
                                         else -> {
                                             material = data.items[0]
-                                            val popupView = dialogPopup!!.popupView
+                                            val popupView = wlPopup!!.popupView
                                             popupView.editText_tm.setText(material!!.ma_txm)
                                             popupView.textView_no.text = material!!.ma_code
                                             popupView.textView_no.text = material!!.ma_name
@@ -222,9 +223,9 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
             receiverTag = false
             unregisterReceiver(mScanReceiver)
         }
-        if (dialogPopup != null) {
-            dialogPopup!!.dismiss()
-            dialogPopup = null
+        if (wlPopup != null) {
+            wlPopup!!.dismiss()
+            wlPopup = null
         }
     }
 
@@ -250,11 +251,10 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
         return false
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent) {
-        //super.onActivityResult(requestCode, resultCode, data)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         when (resultCode) {
             Activity.RESULT_OK -> {     // 选择了领料单
-                ckd = intent.getSerializableExtra("ckd") as Ckd
+                ckd = intent?.getSerializableExtra("ckd") as Ckd
                 LoadingDialog.show(this@WlckActivity)
                 RetrofitManager.instance.ckdmxList(ckd.ckd_id, ckd.ck_id)
                         .enqueue(object : BaseCallback<List<Ckdmx>>(context = this) {
@@ -288,12 +288,12 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                                             })
                                             holder.setOnClickListener(R.id.layout_wl, View.OnClickListener { _ ->
                                                 if (ckd.ckdmx[position].ck_num > 0) {
-                                                    if (dialogPopup == null) {
-                                                        dialogPopup = DialogPopup(this@WlckActivity)
+                                                    if (wlPopup == null) {
+                                                        wlPopup = WlPopup(this@WlckActivity)
                                                     }
                                                     ckdmx = ckd.ckdmx[position]
-                                                    dialogPopup!!.setUpdate()     // 设置为修改界面
-                                                    dialogPopup!!.showPopupWindow()
+                                                    wlPopup!!.setUpdate()     // 设置为修改界面
+                                                    wlPopup!!.showPopupWindow()
                                                 }
                                             })
                                         }
@@ -304,8 +304,8 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                         })
             }
             1 -> {      // 选择了物料
-                material = intent.getSerializableExtra("material") as Material
-                val view = dialogPopup!!.popupView
+                material = intent?.getSerializableExtra("material") as Material
+                val view = wlPopup!!.popupView
                 view.editText_tm.setText(material!!.ma_txm)
                 view.textView_no.text = material!!.ma_code
                 view.textView_name.text = material!!.ma_name
@@ -324,9 +324,9 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                 when (status) {
                     ScanStatus.EMPTY -> Toast.makeText(this@WlckActivity, "请选择领料单", Toast.LENGTH_SHORT).show()
                     ScanStatus.SCAN, ScanStatus.FINISH -> {
-                        dialogPopup = DialogPopup(this@WlckActivity)
-                        dialogPopup!!.setScan()     // 设置为扫描界面
-                        dialogPopup!!.showPopupWindow()
+                        wlPopup = WlPopup(this@WlckActivity)
+                        wlPopup!!.setScan()     // 设置为扫描界面
+                        wlPopup!!.showPopupWindow()
                     }
                 }
             }
@@ -357,7 +357,12 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                                                     }
                                                     override fun failureData(data: CkdFailureData) {
                                                         Log.i("result", data.toString())
-                                                        Toast.makeText(this@WlckActivity, "有物料超出可领数量", Toast.LENGTH_SHORT).show()
+                                                        if (data.clldList!= null && data.clldList.isNotEmpty()) {
+                                                            Toast.makeText(this@WlckActivity, "有物料超出可领数量", Toast.LENGTH_SHORT).show()
+                                                        }
+                                                        if (data.ckcList!= null && data.ckcList.isNotEmpty()) {
+                                                            Toast.makeText(this@WlckActivity, "有物料超出库存数量", Toast.LENGTH_SHORT).show()
+                                                        }
                                                     }
                                                 })
                                     }

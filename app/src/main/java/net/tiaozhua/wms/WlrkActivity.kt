@@ -25,18 +25,18 @@ import okhttp3.RequestBody
 
 class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener {
 
-    private var dialogPopup: DialogPopup? = null
+    private var wlPopup: WlPopup? = null
     private lateinit var mVibrator: Vibrator
     private lateinit var mScanManager: ScanManager
     private val soundpool = SoundPool(1, AudioManager.STREAM_NOTIFICATION, 100)
     private val soundid by lazy { soundpool.load("/etc/Scan_new.ogg", 1) }
     private lateinit var barcodeStr: String
+    private var receiverTag: Boolean = false
     private var status = ScanStatus.EMPTY
     internal lateinit var jhrk: Jhrk
     internal lateinit var jhmx: Jhmx
     internal var material: Material? = null
     internal lateinit var wlAdapter: BaseAdapter
-    private var receiverTag: Boolean = false
 
     private val mScanReceiver = object : BroadcastReceiver() {
 
@@ -94,12 +94,12 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                                             })
                                             holder.setOnClickListener(R.id.layout_wl, View.OnClickListener { _ ->
                                                 if (jhmxList[position].mx_num > 0) {
-                                                    if (dialogPopup == null) {
-                                                        dialogPopup = DialogPopup(this@WlrkActivity)
+                                                    if (wlPopup == null) {
+                                                        wlPopup = WlPopup(this@WlrkActivity)
                                                     }
                                                     jhmx = jhmxList[position]
-                                                    dialogPopup!!.setUpdate()     // 设置为修改界面
-                                                    dialogPopup!!.showPopupWindow()
+                                                    wlPopup!!.setUpdate()     // 设置为修改界面
+                                                    wlPopup!!.showPopupWindow()
                                                 }
                                             })
                                         }
@@ -109,37 +109,38 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                             }
                         })
             } else {
+                var flag = true
                 when (status) {
                     ScanStatus.SCAN, ScanStatus.FINISH -> {
-                        if (dialogPopup == null) {
-                            dialogPopup = DialogPopup(this@WlrkActivity)
-                            dialogPopup!!.setScan()     // 设置为扫描界面
-                            dialogPopup!!.showPopupWindow()
+                        if (wlPopup == null) {
+                            wlPopup = WlPopup(this@WlrkActivity)
+                            wlPopup!!.setScan()     // 设置为扫描界面
+                            wlPopup!!.showPopupWindow()
                         }
-                        if (!dialogPopup!!.isShowing) {
-                            var flag = true
+                        if (!wlPopup!!.isShowing) {
                             for (item in jhrk.jhmx) {
                                 if (item.ma_txm == barcodeStr) {
                                     if (item.mx_num > 0) {
                                         jhmx = item
-                                        dialogPopup!!.setUpdate()
+                                        wlPopup!!.setUpdate()
                                     } else {
-                                        dialogPopup!!.setScan()
+                                        wlPopup!!.setScan()
                                     }
                                     flag = false
                                     break
                                 }
                             }
                             if (flag) {
-                                dialogPopup!!.setScan()
+                                wlPopup!!.setScan()
                             }
-                            dialogPopup!!.showPopupWindow()
+                            wlPopup!!.showPopupWindow()
                         } else {
                             for (item in jhrk.jhmx) {
                                 if (item.ma_txm == barcodeStr) {
                                     if (item.mx_num > 0) {
                                         jhmx = item
-                                        dialogPopup!!.setUpdate()
+                                        wlPopup!!.setUpdate()
+                                        flag = false
                                     }
                                     break
                                 }
@@ -151,38 +152,40 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                         return
                     }
                 }
-                dialogPopup!!.popupView.editText_tm.setText(barcodeStr)
-                LoadingDialog.show(this@WlrkActivity)
-                RetrofitManager.instance.materialList(barcodeStr, jhrk.ck_id)
-                        .enqueue(object : BaseCallback<ResponseList<Material>>(this@WlrkActivity) {
-                            override fun successData(data: ResponseList<Material>) {
-                                when {
-                                    data.totalCount == 0 -> Toast.makeText(context, "未查询到相关信息", Toast.LENGTH_SHORT).show()
-                                    data.totalCount > 1 -> {
-                                        val activityIntent = Intent(this@WlrkActivity, MaterialSelectActivity::class.java)
-                                        activityIntent.putExtra("code", barcodeStr)
-                                        activityIntent.putExtra("ckId", jhrk.ck_id)
-                                        intent.putExtra("data", data)
-                                        startActivityForResult(activityIntent, 0)
-                                    }
-                                    else -> {
-                                        material = data.items[0]
-                                        val popupView = dialogPopup!!.popupView
-                                        popupView.editText_tm.setText(material!!.ma_txm)
-                                        popupView.textView_no.text = material!!.ma_code
-                                        popupView.textView_no.text = material!!.ma_name
-                                        popupView.textView_kcnum.text = material!!.kc_num.toString()
-                                        popupView.textView_spec.text = material!!.ma_spec
-                                        popupView.textView_model.text = material!!.ma_model
-                                        popupView.textView_hw.text = material!!.kc_hw_name
-                                        popupView.textView_remark.text = material!!.comment
-                                        popupView.editText_num.requestFocus()
-                                        popupView.editText_num.setSelection(popupView.editText_num.text.toString().trim().length)
-                                        DialogUtil.showInputMethod(context, popupView.editText_num, true, 100)
+                if (flag) {     // 扫描新的
+                    wlPopup!!.popupView.editText_tm.setText(barcodeStr)
+                    LoadingDialog.show(this@WlrkActivity)
+                    RetrofitManager.instance.materialList(barcodeStr, jhrk.ck_id)
+                            .enqueue(object : BaseCallback<ResponseList<Material>>(this@WlrkActivity) {
+                                override fun successData(data: ResponseList<Material>) {
+                                    when {
+                                        data.totalCount == 0 -> Toast.makeText(context, "未查询到相关信息", Toast.LENGTH_SHORT).show()
+                                        data.totalCount > 1 -> {
+                                            val activityIntent = Intent(this@WlrkActivity, MaterialSelectActivity::class.java)
+                                            activityIntent.putExtra("code", barcodeStr)
+                                            activityIntent.putExtra("ckId", jhrk.ck_id)
+                                            intent.putExtra("data", data)
+                                            startActivityForResult(activityIntent, 0)
+                                        }
+                                        else -> {
+                                            material = data.items[0]
+                                            val popupView = wlPopup!!.popupView
+                                            popupView.editText_tm.setText(material!!.ma_txm)
+                                            popupView.textView_no.text = material!!.ma_code
+                                            popupView.textView_no.text = material!!.ma_name
+                                            popupView.textView_kcnum.text = material!!.kc_num.toString()
+                                            popupView.textView_spec.text = material!!.ma_spec
+                                            popupView.textView_model.text = material!!.ma_model
+                                            popupView.textView_hw.text = material!!.kc_hw_name
+                                            popupView.textView_remark.text = material!!.comment
+                                            popupView.editText_num.requestFocus()
+                                            popupView.editText_num.setSelection(popupView.editText_num.text.toString().trim().length)
+                                            DialogUtil.showInputMethod(context, popupView.editText_num, true, 100)
+                                        }
                                     }
                                 }
-                            }
-                        })
+                            })
+                }
             }
         }
 
@@ -218,9 +221,9 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
             receiverTag = false
             unregisterReceiver(mScanReceiver)
         }
-        if (dialogPopup != null) {
-            dialogPopup!!.dismiss()
-            dialogPopup = null
+        if (wlPopup != null) {
+            wlPopup!!.dismiss()
+            wlPopup = null
         }
     }
 
@@ -247,7 +250,6 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        //super.onActivityResult(requestCode, resultCode, data)
         when (resultCode) {
             Activity.RESULT_OK -> {     // 选择了入库单
                 LoadingDialog.show(this@WlrkActivity)
@@ -289,12 +291,12 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                                             })
                                             holder.setOnClickListener(R.id.layout_wl, View.OnClickListener { _ ->
                                                 if (jhmxList[position].mx_num > 0) {
-                                                    if (dialogPopup == null) {
-                                                        dialogPopup = DialogPopup(this@WlrkActivity)
+                                                    if (wlPopup == null) {
+                                                        wlPopup = WlPopup(this@WlrkActivity)
                                                     }
                                                     jhmx = jhmxList[position]
-                                                    dialogPopup!!.setUpdate()     // 设置为修改界面
-                                                    dialogPopup!!.showPopupWindow()
+                                                    wlPopup!!.setUpdate()     // 设置为修改界面
+                                                    wlPopup!!.showPopupWindow()
                                                 }
                                             })
                                         }
@@ -306,7 +308,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
             }
             1 -> {      // 选择了物料
                 material = intent!!.getSerializableExtra("material") as Material
-                val view = dialogPopup!!.popupView
+                val view = wlPopup!!.popupView
                 view.editText_tm.setText(material!!.ma_txm)
                 view.textView_no.text = material!!.ma_code
                 view.textView_name.text = material!!.ma_name
@@ -320,15 +322,14 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
     }
 
     override fun onClick(v: View) {
-        Log.i("view", v.toString())
         when (v.id) {
             R.id.scan -> {      // 扫描
                 when (status) {
                     ScanStatus.EMPTY -> Toast.makeText(this@WlrkActivity, "请选择入库单", Toast.LENGTH_SHORT).show()
                     ScanStatus.SCAN, ScanStatus.FINISH -> {
-                        dialogPopup = DialogPopup(this@WlrkActivity)
-                        dialogPopup!!.setScan()     // 设置为扫描界面
-                        dialogPopup!!.showPopupWindow()
+                        wlPopup = WlPopup(this@WlrkActivity)
+                        wlPopup!!.setScan()     // 设置为扫描界面
+                        wlPopup!!.showPopupWindow()
                     }
                 }
             }
@@ -394,14 +395,14 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
     /***
      * 清除数据,重置表单
      */
-    fun clearData() {
+    private fun clearData() {
         status = ScanStatus.EMPTY
-        editText_no.setText("")
-        editText_date.setText("")
-        editText_ghdw.setText("")
-        editText_jsr.setText("")
-        editText_ck.setText("")
-        editText_beizhu.setText("")
+        editText_no.text.clear()
+        editText_date.text.clear()
+        editText_ghdw.text.clear()
+        editText_jsr.text.clear()
+        editText_ck.text.clear()
+        editText_beizhu.text.clear()
         jhrk.jhmx.clear()
         wlAdapter.notifyDataSetChanged()
     }

@@ -17,21 +17,21 @@ import net.tiaozhua.wms.utils.DialogUtil
 import net.tiaozhua.wms.utils.LoadingDialog
 import net.tiaozhua.wms.utils.RetrofitManager
 
-class WlpdActivity : BaseActivity(R.layout.activity_pd) {
+class CppdActivity : BaseActivity(R.layout.activity_pd) {
     internal lateinit var pdAdapter: BaseAdapter
     internal var pdList: MutableList<Pd>? = null
     internal var page = 1
     private var totalPages = 0
-    private val type = 0    // 设置类型为物料
+    private val type = 1    // 设置类型为成品
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        toolbarTitle.text = "物料盘点"
+        toolbarTitle.text = "成品盘点"
 
-        self = this
+        CppdActivity.self = this
         LoadingDialog.show(this)
         RetrofitManager.instance.pdList(type)
-                .enqueue(object : BaseCallback<ResponseList<Pd>>(this@WlpdActivity) {
+                .enqueue(object : BaseCallback<ResponseList<Pd>>(this@CppdActivity) {
                     override fun successData(data: ResponseList<Pd>) {
                         LoadingDialog.dismiss()
                         page = data.page
@@ -46,22 +46,22 @@ class WlpdActivity : BaseActivity(R.layout.activity_pd) {
                                 holder.setOnClickListener(R.id.btnDelete, View.OnClickListener { _ ->
                                     //在ListView里，点击侧滑菜单上的选项时，如果想让擦花菜单同时关闭，调用这句话
                                     (holder.getConvertView() as SwipeMenuLayout).quickClose()
-                                    DialogUtil.showDialog(this@WlpdActivity, null, "是否删除?",
+                                    DialogUtil.showDialog(this@CppdActivity, null, "是否删除?",
                                             null,
                                             DialogInterface.OnClickListener { _, _ ->
                                                 RetrofitManager.instance.delPd(type, t.id)
-                                                        .enqueue(object : BaseCallback<String>(this@WlpdActivity) {
-                                                        override fun successInfo(info: String) {
-                                                            pdList!!.removeAt(position)
-                                                            notifyDataSetChanged()
-                                                        }
-                                                    })
+                                                        .enqueue(object : BaseCallback<String>(this@CppdActivity) {
+                                                            override fun successInfo(info: String) {
+                                                                pdList!!.removeAt(position)
+                                                                notifyDataSetChanged()
+                                                            }
+                                                        })
                                             }
                                     )
                                 })
                                 holder.setOnClickListener(R.id.layout_pd, View.OnClickListener { _ ->
                                     // 点击查看详情
-                                    val intent = Intent(this@WlpdActivity, KcpdActivity::class.java)
+                                    val intent = Intent(this@CppdActivity, KcpdActivity::class.java)
                                     intent.putExtra("type", type)  // 设置标识
                                     intent.putExtra("pdId", t.id)
                                     intent.putExtra("ckId", t.ck_id)
@@ -76,7 +76,7 @@ class WlpdActivity : BaseActivity(R.layout.activity_pd) {
                         refreshLayout.setOnRefreshListener { smartLayout ->     // 刷新
                             smartLayout.layout.postDelayed({
                                 RetrofitManager.instance.pdList(type, 1, page * 10)
-                                        .enqueue(object : BaseCallback<ResponseList<Pd>>(this@WlpdActivity) {
+                                        .enqueue(object : BaseCallback<ResponseList<Pd>>(this@CppdActivity) {
                                             override fun successData(data: ResponseList<Pd>) {
                                                 pdList!!.clear()
                                                 pdList!!.addAll(data.items)
@@ -90,7 +90,7 @@ class WlpdActivity : BaseActivity(R.layout.activity_pd) {
                             if (totalPages > page) {
                                 smartLayout.layout.postDelayed({
                                     RetrofitManager.instance.pdList(type, page + 1)
-                                            .enqueue(object : BaseCallback<ResponseList<Pd>>(this@WlpdActivity) {
+                                            .enqueue(object : BaseCallback<ResponseList<Pd>>(this@CppdActivity) {
                                                 override fun successData(data: ResponseList<Pd>) {
                                                     pdList!!.addAll(data.items)
                                                     pdAdapter.notifyDataSetChanged()
@@ -112,14 +112,13 @@ class WlpdActivity : BaseActivity(R.layout.activity_pd) {
 
         // 开始新盘点
         pandian.setOnClickListener {
-            val intent = Intent(this@WlpdActivity, KcpdActivity::class.java)
+            val intent = Intent(this@CppdActivity, KcpdActivity::class.java)
             intent.putExtra("type", type)  // 设置标识
             startActivity(intent)
         }
     }
-
     companion object {
         @SuppressLint("StaticFieldLeak")
-        lateinit var self: WlpdActivity
+        lateinit var self: CppdActivity
     }
 }

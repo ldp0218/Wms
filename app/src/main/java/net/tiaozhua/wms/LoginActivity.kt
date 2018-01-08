@@ -31,6 +31,7 @@ class LoginActivity : AppCompatActivity() {
                 override fun onResponse(call: Call<ApiBean<String>>?, response: Response<ApiBean<String>>?) {
                     LoadingDialog.dismiss()
                     if (response?.body()?.code == 1) {
+                        editText_password.text.clear()
                         startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                     } else {
                         Toast.makeText(this@LoginActivity, response?.body()?.info ?: "服务繁忙，请稍后重试", Toast.LENGTH_SHORT).show()

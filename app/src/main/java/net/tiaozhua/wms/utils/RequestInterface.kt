@@ -57,4 +57,19 @@ interface RequestInterface {
 
     @POST("action/kc/finishPd")
     fun finishPd(@Query("pdId") pdId: Int): Call<ApiBean<String>>
+
+    @POST("action/kc/delPd")
+    fun delPd(@Query("type") type: Int, @Query("pdId") pdId: Int): Call<ApiBean<String>>
+
+    @GET("action/rk/getRk_no")
+    fun getRkNo(): Call<ApiBean<String>>
+
+    @GET("action/product/getProductRkInfo")
+    fun getProductRkInfo(@Query("id") id: Int): Call<ApiBean<Rkmx>>
+
+    @POST("action/rk/insert_rk")
+    fun insertRk(@Body rkd: RequestBody): Call<ApiBean<List<Rkmx>>>
+
+    @GET("action/pda/productList")
+    fun productList(@Query("id") id: Int, @Query("ckid") ckid: Int): Call<ApiBean<ResponseList<Product>>>
 }

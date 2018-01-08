@@ -125,7 +125,7 @@ abstract class BaseActivity(private val layoutId: Int) : AppCompatActivity() {
                             }
                     )
                 } else {
-                    val intent = Intent(this, MainActivity::class.java)
+                    val intent = Intent(this, LoginActivity::class.java)
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     startActivity(intent)
                 }

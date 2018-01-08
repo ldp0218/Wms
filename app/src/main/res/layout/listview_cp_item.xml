@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.mcxtzhang.swipemenulib.SwipeMenuLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:ios="false"
+    app:leftSwipe="true"
+    app:swipeEnable="true"
+    android:focusable="true">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/layout_cp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="10dp"
+        android:paddingStart="10dp"
+        android:paddingTop="10dp"
+        tools:ignore="RtlSymmetry">
+
+        <TextView
+            android:id="@+id/textView_nolabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:text="卡号" />
+
+        <TextView
+            android:id="@+id/textView_no"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_toEndOf="@+id/textView_nolabel"
+            android:ellipsize="end"
+            android:textColor="@android:color/black"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/textView_namelabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_toStartOf="@+id/textView_name"
+            android:text="名称" />
+
+        <TextView
+            android:id="@+id/textView_name"
+            android:layout_width="110dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/textView_bzlabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_namelabel"
+            android:paddingEnd="5dp"
+            android:text="包装编码" />
+
+        <TextView
+            android:id="@+id/textView_bzcode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_no"
+            android:layout_toEndOf="@+id/textView_bzlabel"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/textView_numlabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_no"
+            android:layout_marginEnd="5dp"
+            android:layout_toStartOf="@+id/textView_num"
+            android:text="数量" />
+
+        <TextView
+            android:id="@+id/textView_num"
+            android:layout_width="110dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/textView_no"
+            android:textColor="@android:color/black" />
+
+    </RelativeLayout>
+
+    <!-- 以下都是侧滑菜单的内容依序排列 -->
+    <Button
+        android:id="@+id/btnDelete"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
+        android:background="@color/red_ff4a57"
+        android:text="删除"
+        android:textColor="@android:color/white"/>
+
+</com.mcxtzhang.swipemenulib.SwipeMenuLayout>

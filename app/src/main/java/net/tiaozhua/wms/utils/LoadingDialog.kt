@@ -2,15 +2,11 @@ package net.tiaozhua.wms.utils
 
 import android.app.Dialog
 import android.content.Context
-import android.text.TextUtils
-import android.view.View
-import android.widget.TextView
-
 import net.tiaozhua.wms.R
 
 /**
- * Created by ldp on 2017/11/2.
- */
+* Created by ldp on 2017/11/2.
+*/
 
 class LoadingDialog : Dialog {
 

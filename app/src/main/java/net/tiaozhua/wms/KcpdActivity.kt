@@ -7,13 +7,12 @@ import android.media.AudioManager
 import android.media.SoundPool
 import android.os.Bundle
 import android.os.Vibrator
-import android.util.Log
 import android.view.View
 import android.widget.BaseAdapter
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_kcpd.*
-import kotlinx.android.synthetic.main.activity_pd.*
 import kotlinx.android.synthetic.main.popup_scan_material.view.*
+import kotlinx.android.synthetic.main.popup_scan_product.view.*
 import net.tiaozhua.wms.adapter.CommonAdapter
 import net.tiaozhua.wms.adapter.ViewHolder
 import net.tiaozhua.wms.bean.*
@@ -27,9 +26,9 @@ import java.util.*
 class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener {
 
     private val type by lazy { intent.getIntExtra("type", 0) }  // 0代表物料；1代表成品
-    private val pdId by lazy { intent.getIntExtra("pdId", -1) }
     internal var ckId: Int = 0
-    private var dialogPopup: DialogPopup? = null
+    private var wlPopup: WlPopup? = null
+    private var cpPopup: CpPopup? = null
     private lateinit var mVibrator: Vibrator
     private lateinit var mScanManager: ScanManager
     private val soundpool = SoundPool(1, AudioManager.STREAM_NOTIFICATION, 100)
@@ -38,7 +37,7 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
     private var receiverTag: Boolean = false
     internal lateinit var pdmxList: MutableList<Pdmx>
     internal lateinit var pdmx: Pdmx
-    internal lateinit var wlAdapter: BaseAdapter
+    internal lateinit var pdAdapter: BaseAdapter
 
     private val mScanReceiver = object : BroadcastReceiver() {
 
@@ -47,86 +46,176 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
             mVibrator.vibrate(100)
             barcodeStr = String(intent.getByteArrayExtra("barocode"), 0, intent.getIntExtra("length", 0))
 
-
-            if (dialogPopup == null) {
-                dialogPopup = DialogPopup(this@KcpdActivity)
-                dialogPopup!!.setScan()
-                dialogPopup!!.showPopupWindow()
-            }
-            if (!dialogPopup!!.isShowing) {
-                var flag = true
-                for (item in pdmxList) {
-                    if (item.hao == barcodeStr) {
-                        if (item.pd_num > 0) {
-                            pdmx = item
-                            dialogPopup!!.setUpdate()
-                        } else {
-                            dialogPopup!!.setScan()
+            if (type == 0) {
+                if (wlPopup == null) {
+                    wlPopup = WlPopup(this@KcpdActivity)
+                    wlPopup!!.setScan()
+                    wlPopup!!.showPopupWindow()
+                }
+                if (!wlPopup!!.isShowing) {
+                    var flag = true
+                    for (item in pdmxList) {
+                        if (item.hao == barcodeStr) {
+                            if (item.pd_num > 0) {
+                                pdmx = item
+                                wlPopup!!.setUpdate()
+                            } else {
+                                wlPopup!!.setScan()
+                            }
+                            flag = false
+                            break
                         }
-                        flag = false
-                        break
+                    }
+                    if (flag) {
+                        wlPopup!!.setScan()
+                    }
+                    wlPopup!!.showPopupWindow()
+                } else {
+                    for (item in pdmxList) {
+                        if (item.hao == barcodeStr) {
+                            if (item.pd_num > 0) {
+                                pdmx = item
+                                wlPopup!!.setUpdate()
+                            }
+                            break
+                        }
                     }
                 }
-                if (flag) {
-                    dialogPopup!!.setScan()
-                }
-                dialogPopup!!.showPopupWindow()
-            } else {
-                for (item in pdmxList) {
-                    if (item.hao == barcodeStr) {
-                        if (item.pd_num > 0) {
-                            pdmx = item
-                            dialogPopup!!.setUpdate()
-                        }
-                        break
-                    }
-                }
-            }
-            if (dialogPopup != null && dialogPopup!!.isShowing) {
-                val view = dialogPopup!!.popupView
-                view.editText_tm.setText(barcodeStr)
-                LoadingDialog.show(this@KcpdActivity)
-                RetrofitManager.instance.materialList(barcodeStr, ckId)
-                        .enqueue(object : BaseCallback<ResponseList<Material>>(this@KcpdActivity) {
-                            override fun successData(data: ResponseList<Material>) {
-                                when {
-                                    data.totalCount == 0 -> Toast.makeText(context, "未查询到相关信息", Toast.LENGTH_SHORT).show()
-                                    data.totalCount > 1 -> {
-                                        val activityIntent = Intent(this@KcpdActivity, MaterialSelectActivity::class.java)
-                                        activityIntent.putExtra("code", barcodeStr)
-                                        activityIntent.putExtra("ckId", ckId)
-                                        intent.putExtra("data", data)
-                                        startActivityForResult(activityIntent, 0)
-                                    }
-                                    else -> {
-                                        val material = data.items[0]
-                                        pdmx.iid = material.ma_id
-                                        pdmx.kc_num = material.kc_num
-                                        pdmx.hao = material.ma_code
-                                        pdmx.ck_id = ckId
-                                        pdmx.txm = material.ma_txm
-                                        pdmx.name = material.ma_name
-                                        pdmx.spec = material.ma_spec
-                                        pdmx.model = material.ma_model
-                                        pdmx.hw = material.kc_hw_name
-                                        pdmx.comment = material.comment
-                                        val popupView = dialogPopup!!.popupView
-                                        popupView.editText_tm.setText(pdmx.txm)
-                                        popupView.textView_no.text = pdmx.hao
-                                        popupView.textView_name.text = pdmx.name
-                                        popupView.textView_kcnum.text = pdmx.kc_num.toString()
-                                        popupView.textView_spec.text = pdmx.spec
-                                        popupView.textView_model.text = pdmx.model
-                                        popupView.textView_hw.text = pdmx.hw
-                                        popupView.textView_remark.text = pdmx.comment
-                                        popupView.editText_num.requestFocus()
-                                        popupView.editText_num.setSelection(popupView.editText_num.text.toString().trim().length)
-                                        DialogUtil.showInputMethod(context, popupView.editText_num, true, 100)
-                                        // 扫描后为pdmx设值
+                if (wlPopup != null && wlPopup!!.isShowing) {
+                    val view = wlPopup!!.popupView
+                    view.editText_tm.setText(barcodeStr)
+                    LoadingDialog.show(this@KcpdActivity)
+                    RetrofitManager.instance.materialList(barcodeStr, ckId)
+                            .enqueue(object : BaseCallback<ResponseList<Material>>(this@KcpdActivity) {
+                                override fun successData(data: ResponseList<Material>) {
+                                    when {
+                                        data.totalCount == 0 -> Toast.makeText(context, "未查询到相关信息", Toast.LENGTH_SHORT).show()
+                                        data.totalCount > 1 -> {
+                                            val activityIntent = Intent(this@KcpdActivity, MaterialSelectActivity::class.java)
+                                            activityIntent.putExtra("code", barcodeStr)
+                                            activityIntent.putExtra("ckId", ckId)
+                                            intent.putExtra("data", data)
+                                            startActivityForResult(activityIntent, 0)
+                                        }
+                                        else -> {
+                                            val material = data.items[0]
+                                            pdmx.iid = material.ma_id
+                                            pdmx.kc_num = material.kc_num
+                                            pdmx.hao = material.ma_code
+                                            pdmx.ck_id = ckId
+                                            pdmx.txm = material.ma_txm
+                                            pdmx.name = material.ma_name
+                                            pdmx.spec = material.ma_spec
+                                            pdmx.model = material.ma_model
+                                            pdmx.hw = material.kc_hw_name
+                                            pdmx.comment = material.comment
+                                            val popupView = wlPopup!!.popupView
+                                            popupView.editText_tm.setText(pdmx.txm)
+                                            popupView.textView_no.text = pdmx.hao
+                                            popupView.textView_name.text = pdmx.name
+                                            popupView.textView_kcnum.text = pdmx.kc_num.toString()
+                                            popupView.textView_spec.text = pdmx.spec
+                                            popupView.textView_model.text = pdmx.model
+                                            popupView.textView_hw.text = pdmx.hw
+                                            popupView.textView_remark.text = pdmx.comment
+                                            popupView.editText_num.requestFocus()
+                                            popupView.editText_num.setSelection(popupView.editText_num.text.toString().trim().length)
+                                            DialogUtil.showInputMethod(context, popupView.editText_num, true, 100)
+                                            // 扫描后为pdmx设值
+                                        }
                                     }
                                 }
+                            })
+                }
+            } else {
+                if (cpPopup == null) {
+                    cpPopup = CpPopup(this@KcpdActivity)
+                    cpPopup!!.setScan()
+                    cpPopup!!.showPopupWindow()
+                }
+                if (!cpPopup!!.isShowing) {
+                    var flag = true
+                    for (item in pdmxList) {
+                        if (item.hao == barcodeStr) {
+                            if (item.pd_num > 0) {
+                                pdmx = item
+                                cpPopup!!.setUpdate()
+                            } else {
+                                cpPopup!!.setScan()
                             }
-                        })
+                            flag = false
+                            break
+                        }
+                    }
+                    if (flag) {
+                        cpPopup!!.setScan()
+                    }
+                    cpPopup!!.showPopupWindow()
+                } else {
+                    for (item in pdmxList) {
+                        if (item.hao == barcodeStr) {
+                            if (item.pd_num > 0) {
+                                pdmx = item
+                                cpPopup!!.setUpdate()
+                            }
+                            break
+                        }
+                    }
+                }
+                if (cpPopup != null && cpPopup!!.isShowing) {
+                    val view = cpPopup!!.popupView
+                    view.editText_protm.setText(barcodeStr)
+                    val id = try {
+                        barcodeStr.toInt()
+                    } catch (e: NumberFormatException) {
+                        0
+                    }
+                    if (id == 0) {
+                        Toast.makeText(context, "未查询到相关信息", Toast.LENGTH_SHORT).show()
+                        return
+                    }
+                    LoadingDialog.show(this@KcpdActivity)
+                    RetrofitManager.instance.productList(id, ckId)
+                            .enqueue(object : BaseCallback<ResponseList<Product>>(this@KcpdActivity) {
+                                override fun successData(data: ResponseList<Product>) {
+                                    when {
+                                        data.totalCount == 0 -> Toast.makeText(context, "未查询到相关信息", Toast.LENGTH_SHORT).show()
+                                        data.totalCount > 1 -> {
+//                                            val activityIntent = Intent(this@KcpdActivity, MaterialSelectActivity::class.java)
+//                                            activityIntent.putExtra("code", barcodeStr)
+//                                            activityIntent.putExtra("ckId", ckId)
+//                                            intent.putExtra("data", data)
+//                                            startActivityForResult(activityIntent, 0)
+                                        }
+                                        else -> {
+                                            val product = data.items[0]
+                                            pdmx.xsd_bz_id = id
+                                            pdmx.txm = barcodeStr
+                                            pdmx.iid = product.bz_id
+                                            pdmx.kc_num = product.kc_num
+                                            pdmx.bz_code = product.bz_code
+                                            pdmx.scd_no = product.scd_no
+                                            pdmx.hao = product.pro_code
+                                            pdmx.ck_id = ckId
+                                            pdmx.name = product.pro_name
+                                            pdmx.spec = product.pro_spec
+                                            pdmx.model = product.pro_model
+                                            pdmx.hw = product.kc_hw_name
+                                            val popupView = cpPopup!!.popupView
+                                            popupView.textView_proname.text = pdmx.name
+                                            popupView.textView_bzcode.text = pdmx.bz_code
+                                            popupView.textView_scdno.text = pdmx.scd_no
+                                            popupView.textView_prokcnum.text = pdmx.kc_num.toString()
+                                            popupView.editText_prohw.setText(pdmx.hw)
+                                            popupView.editText_pronum.requestFocus()
+                                            popupView.editText_pronum.setSelection(popupView.editText_pronum.text.toString().trim().length)
+                                            DialogUtil.showInputMethod(context, popupView.editText_pronum, true, 100)
+                                            // 扫描后为pdmx设值
+                                        }
+                                    }
+                                }
+                            })
+                }
             }
         }
 
@@ -146,7 +235,12 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
             registerReceiver(mScanReceiver, IntentFilter(SCAN_ACTION))
         }
 
-        pdmx = Pdmx(0, null, null, 0, 0, null, 0, "", "", "", "", "", "", "")     // 初始化pdmx
+        val finish = intent.getIntExtra("finish", -1)
+        if (finish == 1) {
+            imageView_line.visibility = View.GONE
+            layout_menu.visibility = View.GONE
+        }
+        pdmx = Pdmx(type, null, null, 0, 0, null, 0, "", "", "", "", "", "", "")     // 初始化pdmx
         ckId = when {
             intent.hasExtra("ckId") -> intent.getIntExtra("ckId", -1)
             type == 0 -> 79
@@ -154,11 +248,10 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
         }
         val ckName = when {
             intent.hasExtra("ckName") -> intent.getStringExtra("ckName")
-            type == 0 -> "物料盘点"
-            else -> "成品盘点"
+            type == 0 -> "物料仓库"
+            else -> "成品仓库"
         }
         textView_ck.text = ckName
-//        LoadingDialog.show(this@KcpdActivity)
 //        RetrofitManager.instance.ckList()
 //                .enqueue(object : BaseCallback<ResponseList<Ck>>(context = this) {
 //                    override fun successData(data: ResponseList<Ck>) {
@@ -171,49 +264,73 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
             intent.getStringExtra("pdDate")
         } else SimpleDateFormat("yyyy-MM-dd").format(Date())
         textView_date.text = pdDate
-        if (pdId > -1) {    // 盘点中(点击盘点详情)
+        val pdId = intent.getIntExtra("pdId", -1)
+        pdmx.pd_id = if (pdId == -1) null else pdId
+        if (pdmx.pd_id != null) {    // 盘点中(点击盘点详情)
             LoadingDialog.show(this)
-            RetrofitManager.instance.pdmxList(type, ckId, pdId)
+            RetrofitManager.instance.pdmxList(type, ckId, pdmx.pd_id!!)
                     .enqueue(object : BaseCallback<ResponseList<Pdmx>>(this@KcpdActivity) {
                         override fun successData(data: ResponseList<Pdmx>) {
                             LoadingDialog.dismiss()
                             pdmxList = data.items.toMutableList()
-                            wlAdapter = object : CommonAdapter<Pdmx>(pdmxList, R.layout.listview_kcpd_item) {
+                            pdAdapter = object : CommonAdapter<Pdmx>(pdmxList, R.layout.listview_kcpd_item) {
                                 override fun convert(holder: ViewHolder, t: Pdmx, position: Int) {
                                     holder.setText(R.id.textView_no, t.hao)
                                     holder.setText(R.id.textView_kcnum, t.kc_num.toString())
                                     holder.setText(R.id.textView_pdnum, t.pd_num.toString())
                                     holder.setOnClickListener(R.id.layout_wl, View.OnClickListener { _ ->
-                                        if (dialogPopup == null) {
-                                            dialogPopup = DialogPopup(this@KcpdActivity)
+                                        if (type == 0) {
+                                            if (wlPopup == null) {
+                                                wlPopup = WlPopup(this@KcpdActivity)
+                                            }
+                                            pdmx = t
+                                            pdmx.type = type
+                                            wlPopup!!.setUpdate()     // 设置为修改界面
+                                            wlPopup!!.showPopupWindow()
+                                        } else {
+                                            if (cpPopup == null) {
+                                                cpPopup = CpPopup(this@KcpdActivity)
+                                            }
+                                            pdmx = t
+                                            pdmx.type = type
+                                            cpPopup!!.setUpdate()     // 设置为修改界面
+                                            cpPopup!!.showPopupWindow()
                                         }
-                                        pdmx = pdmxList[position]
-                                        dialogPopup!!.setUpdate()     // 设置为修改界面
-                                        dialogPopup!!.showPopupWindow()
                                     })
                                 }
                             }
-                            listView_kcpd.adapter = wlAdapter
+                            listView_kcpd.adapter = pdAdapter
                         }
                     })
         } else {    // 新盘点
             pdmxList = mutableListOf()
-            wlAdapter = object : CommonAdapter<Pdmx>(pdmxList, R.layout.listview_kcpd_item) {
+            pdAdapter = object : CommonAdapter<Pdmx>(pdmxList, R.layout.listview_kcpd_item) {
                 override fun convert(holder: ViewHolder, t: Pdmx, position: Int) {
                     holder.setText(R.id.textView_no, t.hao)
                     holder.setText(R.id.textView_kcnum, t.kc_num.toString())
                     holder.setText(R.id.textView_pdnum, t.pd_num.toString())
                     holder.setOnClickListener(R.id.layout_wl, View.OnClickListener { _ ->
-                        if (dialogPopup == null) {
-                            dialogPopup = DialogPopup(this@KcpdActivity)
+                        if (type == 0) {
+                            if (wlPopup == null) {
+                                wlPopup = WlPopup(this@KcpdActivity)
+                            }
+                            pdmx = t
+                            pdmx.type = type
+                            wlPopup!!.setUpdate()     // 设置为修改界面
+                            wlPopup!!.showPopupWindow()
+                        } else {
+                            if (cpPopup == null) {
+                                cpPopup = CpPopup(this@KcpdActivity)
+                            }
+                            pdmx = t
+                            pdmx.type = type
+                            cpPopup!!.setUpdate()     // 设置为修改界面
+                            cpPopup!!.showPopupWindow()
                         }
-                        pdmx = pdmxList[position]
-                        dialogPopup!!.setUpdate()     // 设置为修改界面
-                        dialogPopup!!.showPopupWindow()
                     })
                 }
             }
-            listView_kcpd.adapter = wlAdapter
+            listView_kcpd.adapter = pdAdapter
         }
     }
 
@@ -230,9 +347,13 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
             receiverTag = false
             unregisterReceiver(mScanReceiver)
         }
-        if (dialogPopup != null) {
-            dialogPopup!!.dismiss()
-            dialogPopup = null
+        if (wlPopup != null) {
+            wlPopup!!.dismiss()
+            wlPopup = null
+        }
+        if (cpPopup != null) {
+            cpPopup!!.dismiss()
+            cpPopup = null
         }
     }
 
@@ -240,11 +361,13 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
         when (v.id) {
             R.id.scan -> {  // 扫描
                 if (type == 0) {    // 物料
-                    dialogPopup = DialogPopup(this@KcpdActivity)
-                    dialogPopup!!.setScan()     // 设置为扫描界面
-                    dialogPopup!!.showPopupWindow()
+                    wlPopup = WlPopup(this@KcpdActivity)
+                    wlPopup!!.setScan()     // 设置为扫描界面
+                    wlPopup!!.showPopupWindow()
                 } else {    // 成品
-
+                    cpPopup = CpPopup(this@KcpdActivity)
+                    cpPopup!!.setScan()
+                    cpPopup!!.showPopupWindow()
                 }
             }
             R.id.finish -> {    // 完成盘点
@@ -255,15 +378,22 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
                             null,
                             DialogInterface.OnClickListener { _, _ ->
                                 LoadingDialog.show(this)
-                                RetrofitManager.instance.finishPd(pdId).enqueue(object : BaseCallback<String>(this) {
+                                RetrofitManager.instance.finishPd(pdmx.pd_id!!).enqueue(object : BaseCallback<String>(this) {
                                     override fun successInfo(info: String) {
-                                        RetrofitManager.instance.pdList(type, 1, WlpdActivity.self.page * 10)
+                                        val page = if (type == 0) WlpdActivity.self.page else CppdActivity.self.page
+                                        RetrofitManager.instance.pdList(type, 1, page * 10)
                                                 .enqueue(object : BaseCallback<ResponseList<Pd>>(this@KcpdActivity) {
                                                     override fun successData(data: ResponseList<Pd>) {
                                                         LoadingDialog.dismiss()
-                                                        WlpdActivity.self.pdList!!.clear()
-                                                        WlpdActivity.self.pdList!!.addAll(data.items)
-                                                        WlpdActivity.self.pdAdapter.notifyDataSetChanged()
+                                                        if (type == 0) {
+                                                            WlpdActivity.self.pdList!!.clear()
+                                                            WlpdActivity.self.pdList!!.addAll(data.items)
+                                                            WlpdActivity.self.pdAdapter.notifyDataSetChanged()
+                                                        } else {
+                                                            CppdActivity.self.pdList!!.clear()
+                                                            CppdActivity.self.pdList!!.addAll(data.items)
+                                                            CppdActivity.self.pdAdapter.notifyDataSetChanged()
+                                                        }
                                                         Toast.makeText(this@KcpdActivity, "已完成", Toast.LENGTH_SHORT).show()
                                                         finish()
                                                     }
@@ -277,10 +407,10 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         when (resultCode) {
             1 -> {      // 选择了物料
-                val material = intent.getSerializableExtra("material") as Material
+                val material = intent?.getSerializableExtra("material") as Material
                 pdmx.iid = material.ma_id
                 pdmx.kc_num = material.kc_num
                 pdmx.hao = material.ma_code
@@ -290,7 +420,7 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
                 pdmx.model = material.ma_model
                 pdmx.hw = material.kc_hw_name
                 pdmx.comment = material.comment
-                val view = dialogPopup!!.popupView
+                val view = wlPopup!!.popupView
                 view.editText_tm.setText(material.ma_txm)
                 view.textView_no.text = material.ma_code
                 view.textView_name.text = material.ma_name
