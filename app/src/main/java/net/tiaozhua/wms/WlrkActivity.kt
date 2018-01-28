@@ -19,7 +19,10 @@ import kotlinx.android.synthetic.main.popup_scan_material.view.*
 import net.tiaozhua.wms.adapter.CommonAdapter
 import net.tiaozhua.wms.adapter.ViewHolder
 import net.tiaozhua.wms.bean.*
-import net.tiaozhua.wms.utils.*
+import net.tiaozhua.wms.utils.BaseCallback
+import net.tiaozhua.wms.utils.DialogUtil
+import net.tiaozhua.wms.utils.LoadingDialog
+import net.tiaozhua.wms.utils.RetrofitManager
 import okhttp3.MediaType
 import okhttp3.RequestBody
 
@@ -50,7 +53,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                     barcodeStr.substring(2).toInt()
                 } catch (e: NumberFormatException) { 0 }
                 if (id == 0) {
-                    Toast.makeText(this@WlrkActivity, "未识别二维码", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@WlrkActivity, "未识别的二维码", Toast.LENGTH_SHORT).show()
                     return
                 }
                 LoadingDialog.show(this@WlrkActivity)
@@ -66,11 +69,11 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                                     return
                                 }
                                 editText_no.setText(jhrk.jh_no)
-                                editText_date.setText(jhrk.jh_ldrq)
-                                editText_ghdw.setText(jhrk.client_name)
-                                editText_jsr.setText(jhrk.handler_name)
-                                editText_ck.setText(jhrk.ck_name)
-                                editText_beizhu.setText(jhrk.remark)
+//                                editText_date.setText(jhrk.jh_ldrq)
+//                                editText_ghdw.setText(jhrk.client_name)
+//                                editText_jsr.setText(jhrk.handler_name)
+//                                editText_ck.setText(jhrk.ck_name)
+//                                editText_beizhu.setText(jhrk.remark)
                                 val jhmxList = jhrk.jhmx
                                 if (jhmxList.size > 0) {
                                     status = ScanStatus.SCAN
@@ -197,9 +200,9 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
         toolbarTitle.text = "物料入库"
 
         // 为按钮设置点击监听事件
-        scan.setOnClickListener(this@WlrkActivity)
-        rkd.setOnClickListener(this@WlrkActivity)
-        rk.setOnClickListener(this@WlrkActivity)
+        scan.setOnClickListener(this)
+        rkd.setOnClickListener(this)
+        rk.setOnClickListener(this)
 
         scrollView_wlrk.smoothScrollTo(0, 0)
         if (!receiverTag) {     //在注册广播接受者的时候 判断是否已被注册,避免重复多次注册广播
@@ -259,11 +262,11 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                                 jhrk = data
                                 jhrk.dj_id = intent.getIntExtra("dj_id", 0)
                                 editText_no.setText(jhrk.jh_no)
-                                editText_date.setText(jhrk.jh_ldrq)
-                                editText_ghdw.setText(jhrk.client_name)
-                                editText_jsr.setText(jhrk.handler_name)
-                                editText_ck.setText(jhrk.ck_name)
-                                editText_beizhu.setText(jhrk.remark)
+//                                editText_date.setText(jhrk.jh_ldrq)
+//                                editText_ghdw.setText(jhrk.client_name)
+//                                editText_jsr.setText(jhrk.handler_name)
+//                                editText_ck.setText(jhrk.ck_name)
+//                                editText_beizhu.setText(jhrk.remark)
                                 val jhmxList = jhrk.jhmx
                                 if (jhmxList.size > 0) {
                                     status = ScanStatus.SCAN
@@ -398,11 +401,11 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
     private fun clearData() {
         status = ScanStatus.EMPTY
         editText_no.text.clear()
-        editText_date.text.clear()
-        editText_ghdw.text.clear()
-        editText_jsr.text.clear()
-        editText_ck.text.clear()
-        editText_beizhu.text.clear()
+//        editText_date.text.clear()
+//        editText_ghdw.text.clear()
+//        editText_jsr.text.clear()
+//        editText_ck.text.clear()
+//        editText_beizhu.text.clear()
         jhrk.jhmx.clear()
         wlAdapter.notifyDataSetChanged()
     }

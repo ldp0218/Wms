@@ -53,7 +53,7 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                     barcodeStr.substring(2).toInt()
                 } catch (e: NumberFormatException) { 0 }
                 if (id == 0) {
-                    Toast.makeText(this@WlckActivity, "未识别二维码", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@WlckActivity, "未识别的二维码", Toast.LENGTH_SHORT).show()
                     return
                 }
                 LoadingDialog.show(this@WlckActivity)
@@ -69,11 +69,11 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                                     return
                                 }
                                 editText_no.setText(ckd.ckd_no)
-                                editText_date.setText(ckd.ckd_ldrq)
-                                editText_llr.setText(ckd.llr_name)
-                                editText_bm.setText(ckd.bm_name)
-                                editText_ck.setText(ckd.ck_name)
-                                editText_beizhu.setText(ckd.remark)
+//                                editText_date.setText(ckd.ckd_ldrq)
+//                                editText_llr.setText(ckd.llr_name)
+//                                editText_bm.setText(ckd.bm_name)
+//                                editText_ck.setText(ckd.ck_name)
+//                                editText_beizhu.setText(ckd.remark)
                                 val ckdmxList = ckd.ckdmx
                                 if (ckdmxList.size > 0) {
                                     status = ScanStatus.SCAN
@@ -199,9 +199,9 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
         toolbarTitle.text = "物料出库"
 
         // 为按钮设置点击监听事件
-        scan.setOnClickListener(this@WlckActivity)
-        lld.setOnClickListener(this@WlckActivity)
-        ck.setOnClickListener(this@WlckActivity)
+        scan.setOnClickListener(this)
+        lld.setOnClickListener(this)
+        ck.setOnClickListener(this)
 
         scrollView_wlck.smoothScrollTo(0, 0)
         if (!receiverTag) {     //在注册广播接受者的时候 判断是否已被注册,避免重复多次注册广播
@@ -261,11 +261,11 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                             override fun successData(data: List<Ckdmx>) {
                                 ckd.ckdmx = data.toMutableList()
                                 editText_no.setText(ckd.ckd_no)
-                                editText_date.setText(ckd.ckd_ldrq)
-                                editText_llr.setText(ckd.llr_name)
-                                editText_bm.setText(ckd.bm_name)
-                                editText_ck.setText(ckd.ck_name)
-                                editText_beizhu.setText(ckd.remark)
+//                                editText_date.setText(ckd.ckd_ldrq)
+//                                editText_llr.setText(ckd.llr_name)
+//                                editText_bm.setText(ckd.bm_name)
+//                                editText_ck.setText(ckd.ck_name)
+//                                editText_beizhu.setText(ckd.remark)
                                 if (ckd.ckdmx.size > 0) {
                                     status = ScanStatus.SCAN
                                     wlAdapter = object : CommonAdapter<Ckdmx>(ckd.ckdmx, R.layout.listview_wlck_item) {
@@ -384,7 +384,12 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                                                 }
                                                 override fun failureData(data: CkdFailureData) {
                                                     Log.i("result", data.toString())
-                                                    Toast.makeText(this@WlckActivity, "有物料超出可出库数量", Toast.LENGTH_SHORT).show()
+                                                    if (data.clldList!= null && data.clldList.isNotEmpty()) {
+                                                        Toast.makeText(this@WlckActivity, "有物料超出可领数量", Toast.LENGTH_SHORT).show()
+                                                    }
+                                                    if (data.ckcList!= null && data.ckcList.isNotEmpty()) {
+                                                        Toast.makeText(this@WlckActivity, "有物料超出库存数量", Toast.LENGTH_SHORT).show()
+                                                    }
                                                 }
                                             })
                                 }
@@ -400,12 +405,12 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
      */
     fun clearData() {
         status = ScanStatus.EMPTY
-        editText_no.setText("")
-        editText_date.setText("")
-        editText_llr.setText("")
-        editText_bm.setText("")
-        editText_ck.setText("")
-        editText_beizhu.setText("")
+        editText_no.text.clear()
+//        editText_date.text.clear()
+//        editText_llr.text.clear()
+//        editText_bm.text.clear()
+//        editText_ck.text.clear()
+//        editText_beizhu.text.clear()
         ckd.ckdmx.clear()
         wlAdapter.notifyDataSetChanged()
     }

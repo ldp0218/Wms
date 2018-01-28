@@ -57,20 +57,20 @@ class CpPopup(private val activity: Activity) : BasePopupWindow(activity), View.
         popupView.editText_protm.isFocusableInTouchMode = false
         popupView.button_commit.text = "修改"
         when (activity) {
-            is CprkActivity -> {
-                popupView.textView_kclabel.visibility = View.GONE
-                popupView.textView_prokcnum.visibility = View.GONE
-                popupView.layout_hw.visibility = View.GONE
-                val p = activity.rkmx
-                popupView.editText_protm.setText(p.xsd_bz_id.toString())
-                popupView.textView_scdno.text = p.scd_no
-                popupView.textView_proname.text = p.pro_name
-                popupView.textView_bzcode.text = p.bz_code
-                popupView.editText_pronum.setText(p.mx_num.toString())
-                popupView.editText_pronum.requestFocus()
-                popupView.editText_pronum.setSelection(popupView.editText_pronum.text.toString().trim().length)
-                popupView.editText_remark.setText(p.mx_remark)
-            }
+//            is CprkActivity -> {
+//                popupView.textView_kclabel.visibility = View.GONE
+//                popupView.textView_prokcnum.visibility = View.GONE
+//                popupView.layout_hw.visibility = View.GONE
+//                val p = activity.rkmx
+//                popupView.editText_protm.setText(p.xsd_bz_id.toString())
+//                popupView.textView_scdno.text = p.scd_no
+//                popupView.textView_proname.text = p.pro_name
+//                popupView.textView_bzcode.text = p.bz_code
+//                popupView.editText_pronum.setText(p.mx_num.toString())
+//                popupView.editText_pronum.requestFocus()
+//                popupView.editText_pronum.setSelection(popupView.editText_pronum.text.toString().trim().length)
+//                popupView.editText_remark.setText(p.mx_remark)
+//            }
             is KcpdActivity -> {
                 val p = activity.pdmx
                 popupView.editText_protm.setText(p.xsd_bz_id.toString())
@@ -125,24 +125,24 @@ class CpPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                         Toast.makeText(context, "未查询到相关信息", Toast.LENGTH_SHORT).show()
                     } else {
                         when (activity) {
-                            is CprkActivity -> {
-                                RetrofitManager.instance.getProductRkInfo(id)
-                                        .enqueue(object : BaseCallback<Rkmx>(context) {
-                                            override fun successData(data: Rkmx) {
-                                                activity.rkmx = data
-                                                popupView.textView_scdno.text = activity.rkmx.scd_no
-                                                popupView.textView_proname.text = activity.rkmx.pro_name
-                                                popupView.textView_bzcode.text = activity.rkmx.bz_code
-                                                popupView.editText_pronum.requestFocus()
-                                                popupView.editText_pronum.setSelection(popupView.editText_pronum.text.toString().trim().length)
-                                                DialogUtil.showInputMethod(context, popupView.editText_pronum, true, 100)
-                                            }
-
-                                            override fun successInfo(info: String) {
-                                                Toast.makeText(context, "未查询到相关信息", Toast.LENGTH_SHORT).show()
-                                            }
-                                        })
-                            }
+//                            is CprkActivity -> {
+//                                RetrofitManager.instance.getProductInfo(id)
+//                                        .enqueue(object : BaseCallback<Bzmx>(context) {
+//                                            override fun successData(data: Bzmx) {
+//                                                activity.rkmx = data
+//                                                popupView.textView_scdno.text = activity.rkmx.scd_no
+//                                                popupView.textView_proname.text = activity.rkmx.pro_name
+//                                                popupView.textView_bzcode.text = activity.rkmx.bz_code
+//                                                popupView.editText_pronum.requestFocus()
+//                                                popupView.editText_pronum.setSelection(popupView.editText_pronum.text.toString().trim().length)
+//                                                DialogUtil.showInputMethod(context, popupView.editText_pronum, true, 100)
+//                                            }
+//
+//                                            override fun successInfo(info: String) {
+//                                                Toast.makeText(context, "未查询到相关信息", Toast.LENGTH_SHORT).show()
+//                                            }
+//                                        })
+//                            }
                             is KcpdActivity -> {
                                 RetrofitManager.instance.productList(id, activity.ckId)
                                         .enqueue(object : BaseCallback<ResponseList<Product>>(context) {
@@ -205,30 +205,30 @@ class CpPopup(private val activity: Activity) : BasePopupWindow(activity), View.
             R.id.button_commit -> {
                 if (popupView.button_commit.text == "确认") {     // 点击确认按钮执行
                     when (activity) {
-                        is CprkActivity -> {
-                            if (popupView.editText_protm.text.isBlank()) {
-                                Toast.makeText(context, "请扫描二维码", Toast.LENGTH_SHORT).show()
-                                return
-                            }
-                            val scdNo = popupView.textView_scdno.text.toString()
-                            if (scdNo.isNotBlank()) {
-                                if (activity.status == ScanStatus.EMPTY) {  // 如果还未开始扫描修改状态为扫描
-                                    activity.status = ScanStatus.SCAN
-                                }
-                                val id = popupView.editText_protm.text.toString().toInt()
-                                val num = popupView.editText_pronum.text.toString().toInt()
-                                val remark = popupView.editText_remark.text.toString()
-                                val proName = popupView.textView_proname.text.toString()
-                                val bzCode = popupView.textView_bzcode.text.toString()
-                                Toast.makeText(context, "数量清点完毕", Toast.LENGTH_SHORT).show()
-                                activity.rkd.rkmx.add(Rkmx(id, num, remark, scdNo, proName, bzCode))
-                                // 重新加载数据
-                                activity.cpAdapter.notifyDataSetChanged()
-                                clearData()
-                            } else {
-                                Toast.makeText(context, "请扫描其它二维码", Toast.LENGTH_SHORT).show()
-                            }
-                        }
+//                        is CprkActivity -> {
+//                            if (popupView.editText_protm.text.isBlank()) {
+//                                Toast.makeText(context, "请扫描二维码", Toast.LENGTH_SHORT).show()
+//                                return
+//                            }
+//                            val scdNo = popupView.textView_scdno.text.toString()
+//                            if (scdNo.isNotBlank()) {
+//                                if (activity.status == ScanStatus.EMPTY) {  // 如果还未开始扫描修改状态为扫描
+//                                    activity.status = ScanStatus.SCAN
+//                                }
+//                                val id = popupView.editText_protm.text.toString().toInt()
+//                                val num = popupView.editText_pronum.text.toString().toInt()
+//                                val remark = popupView.editText_remark.text.toString()
+//                                val proName = popupView.textView_proname.text.toString()
+//                                val bzCode = popupView.textView_bzcode.text.toString()
+//                                Toast.makeText(context, "数量清点完毕", Toast.LENGTH_SHORT).show()
+//                                activity.rkd.rkmx.add(Bzmx(id, num, remark, scdNo, proName, bzCode))
+//                                // 重新加载数据
+//                                activity.cpAdapter.notifyDataSetChanged()
+//                                clearData()
+//                            } else {
+//                                Toast.makeText(context, "请扫描其它二维码", Toast.LENGTH_SHORT).show()
+//                            }
+//                        }
                         is KcpdActivity -> {
                             if (popupView.editText_protm.text.toString().isBlank()) {
                                 Toast.makeText(context, "请扫描二维码", Toast.LENGTH_SHORT).show()
@@ -301,11 +301,11 @@ class CpPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                     }
                     val num = numStr.toInt()
                     when (activity) {
-                        is CprkActivity -> {
-                            Toast.makeText(context, "数量清点完毕", Toast.LENGTH_SHORT).show()
-                            activity.rkmx.mx_num = num
-                            activity.cpAdapter.notifyDataSetChanged()
-                        }
+//                        is CprkActivity -> {
+//                            Toast.makeText(context, "数量清点完毕", Toast.LENGTH_SHORT).show()
+//                            activity.rkmx.mx_num = num
+//                            activity.cpAdapter.notifyDataSetChanged()
+//                        }
                         is KcpdActivity -> {
                             LoadingDialog.show(context)
                             activity.pdmx.pd_num = num

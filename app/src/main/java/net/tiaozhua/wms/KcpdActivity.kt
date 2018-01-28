@@ -128,6 +128,15 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
                             })
                 }
             } else {
+                val id = try {
+                    barcodeStr.substring(0, barcodeStr.indexOf("#")).toInt()
+                } catch (e: NumberFormatException) {
+                    0
+                }
+                if (id == 0) {
+                    Toast.makeText(context, "未查询到相关信息", Toast.LENGTH_SHORT).show()
+                    return
+                }
                 if (cpPopup == null) {
                     cpPopup = CpPopup(this@KcpdActivity)
                     cpPopup!!.setScan()
@@ -136,7 +145,7 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
                 if (!cpPopup!!.isShowing) {
                     var flag = true
                     for (item in pdmxList) {
-                        if (item.hao == barcodeStr) {
+                        if (item.xsd_bz_id == id) {
                             if (item.pd_num > 0) {
                                 pdmx = item
                                 cpPopup!!.setUpdate()
@@ -153,7 +162,7 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
                     cpPopup!!.showPopupWindow()
                 } else {
                     for (item in pdmxList) {
-                        if (item.hao == barcodeStr) {
+                        if (item.xsd_bz_id == id) {
                             if (item.pd_num > 0) {
                                 pdmx = item
                                 cpPopup!!.setUpdate()
@@ -164,16 +173,7 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
                 }
                 if (cpPopup != null && cpPopup!!.isShowing) {
                     val view = cpPopup!!.popupView
-                    view.editText_protm.setText(barcodeStr)
-                    val id = try {
-                        barcodeStr.toInt()
-                    } catch (e: NumberFormatException) {
-                        0
-                    }
-                    if (id == 0) {
-                        Toast.makeText(context, "未查询到相关信息", Toast.LENGTH_SHORT).show()
-                        return
-                    }
+                    view.editText_protm.setText(id.toString())
                     LoadingDialog.show(this@KcpdActivity)
                     RetrofitManager.instance.productList(id, ckId)
                             .enqueue(object : BaseCallback<ResponseList<Product>>(this@KcpdActivity) {
@@ -226,8 +226,8 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
         super.onCreate(savedInstanceState)
         toolbarTitle.text = if (type == 0) "物料盘点" else "成品盘点"
         mVibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        scan.setOnClickListener(this@KcpdActivity)
-        finish.setOnClickListener(this@KcpdActivity)
+        scan.setOnClickListener(this)
+        finish.setOnClickListener(this)
 
         scrollView.smoothScrollTo(0, 0)
         if (!receiverTag) {     //在注册广播接受者的时候 判断是否已被注册,避免重复多次注册广播

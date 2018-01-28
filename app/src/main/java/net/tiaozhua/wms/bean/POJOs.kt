@@ -53,8 +53,22 @@ data class PdResult(val code: Int, val info: String?, val id: Int, val pd_id: In
 
 data class Rkd(var rk_no: String, var ck_id: Int, var ck_name: String, var rk_ldrq: String, var remark: String, val rkmx: MutableList<Rkmx>, val isBill: Int)
 
-data class Rkmx(val xsd_bz_id: Int, var mx_num: Int, var mx_remark: String?, val scd_no: String, val pro_name: String, val bz_code: String)
+data class Rkmx(val xsd_bz_id: Int?, var mx_num: Int, val scd_no: String, val pro_name: String, val bz_id: Int, val bz_code: String)
+
+data class Bzmx(val xsd_bz_id: Int, var kc_num: Int, val bz_id: Int, val pro_type: Int, val xsdmx_id: Int?,
+                val scd_no: String, val pro_name: String, val bz_code: String, val pro_bz_num: Int, var check_num: Int)
 
 data class Product(val pro_id: Int, val pro_name: String, val pro_code: String, val pro_unit: String,
                    val pro_model: String, val pro_spec: String, var bz_id: Int, val bz_code: String,
                    val scd_no: String, val kc_num: Int, val kc_hw_name: String)
+
+data class Xs(val xs_id: Int = 0, val ck_id: Int = 0, val ck_name: String = "", val xs_ldrq: String = "", val xs_no: String = "",
+                 val remark: String = "", val xsmx: MutableList<Xsmx> = mutableListOf(), val pdacode: Int = 0)
+
+data class Xsmx(val xsmx_id: Int, val pro_id: Int, val xsdmx_id: Int, val mx_num: Int, val package_num: Int?, val scd_no: String?,
+                var check_num: Int = 0, val pro_spec: String, val pro_model: String, val pro_color: String, val mx_remark: String?,
+                val pro_type: Int, val bz_id: Int?, val bz_code: String?, val jdList: List<Jiediao>, val bzList: List<Bz>, var xsdbzList: MutableList<Bzmx>)
+
+data class Jiediao(val jxsdmx_id: Int, val hxsdmx_id: Int, val j_num: Int)
+
+data class Bz(val bz_id: Int, val bz_code: String, val bz_ratio: Int, val total: Int, var num: Int = 0)

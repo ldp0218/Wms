@@ -52,150 +52,150 @@
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingEnd="0dp"
-                android:paddingStart="20dp">
+            <!--<LinearLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:orientation="horizontal"-->
+                <!--android:paddingEnd="0dp"-->
+                <!--android:paddingStart="20dp">-->
 
-                <TextView
-                    android:id="@+id/textView_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:labelFor="@id/editText_date"
-                    android:text="单据日期" />
+                <!--<TextView-->
+                    <!--android:id="@+id/textView_date"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:labelFor="@id/editText_date"-->
+                    <!--android:text="单据日期" />-->
 
-                <EditText
-                    android:id="@+id/editText_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="20dp"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
-                    android:inputType="date"
-                    android:textSize="12sp" />
-            </LinearLayout>
+                <!--<EditText-->
+                    <!--android:id="@+id/editText_date"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginEnd="20dp"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:ems="10"-->
+                    <!--android:focusable="false"-->
+                    <!--android:focusableInTouchMode="false"-->
+                    <!--android:inputType="date"-->
+                    <!--android:textSize="12sp" />-->
+            <!--</LinearLayout>-->
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingStart="20dp">
+            <!--<LinearLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:orientation="horizontal"-->
+                <!--android:paddingStart="20dp">-->
 
-                <TextView
-                    android:id="@+id/textView_llr"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="15dp"
-                    android:layout_weight="1"
-                    android:labelFor="@id/editText_llr"
-                    android:text="领料人" />
+                <!--<TextView-->
+                    <!--android:id="@+id/textView_llr"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginEnd="15dp"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:labelFor="@id/editText_llr"-->
+                    <!--android:text="领料人" />-->
 
-                <EditText
-                    android:id="@+id/editText_llr"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="20dp"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
-                    android:inputType="text"
-                    android:textSize="12sp" />
-            </LinearLayout>
+                <!--<EditText-->
+                    <!--android:id="@+id/editText_llr"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginEnd="20dp"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:ems="10"-->
+                    <!--android:focusable="false"-->
+                    <!--android:focusableInTouchMode="false"-->
+                    <!--android:inputType="text"-->
+                    <!--android:textSize="12sp" />-->
+            <!--</LinearLayout>-->
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingEnd="0dp"
-                android:paddingStart="20dp">
+            <!--<LinearLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:orientation="horizontal"-->
+                <!--android:paddingEnd="0dp"-->
+                <!--android:paddingStart="20dp">-->
 
-                <TextView
-                    android:id="@+id/textView_bm"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:labelFor="@id/editText_bm"
-                    android:paddingEnd="25dp"
-                    android:text="部门" />
+                <!--<TextView-->
+                    <!--android:id="@+id/textView_bm"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:labelFor="@id/editText_bm"-->
+                    <!--android:paddingEnd="25dp"-->
+                    <!--android:text="部门" />-->
 
-                <EditText
-                    android:id="@+id/editText_bm"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="20dp"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
-                    android:inputType="text"
-                    android:textSize="12sp" />
+                <!--<EditText-->
+                    <!--android:id="@+id/editText_bm"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginEnd="20dp"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:ems="10"-->
+                    <!--android:focusable="false"-->
+                    <!--android:focusableInTouchMode="false"-->
+                    <!--android:inputType="text"-->
+                    <!--android:textSize="12sp" />-->
 
-            </LinearLayout>
+            <!--</LinearLayout>-->
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingEnd="0dp"
-                android:paddingStart="20dp">
+            <!--<LinearLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:orientation="horizontal"-->
+                <!--android:paddingEnd="0dp"-->
+                <!--android:paddingStart="20dp">-->
 
-                <TextView
-                    android:id="@+id/textView_ck"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:labelFor="@id/editText_ck"
-                    android:text="领料仓库" />
+                <!--<TextView-->
+                    <!--android:id="@+id/textView_ck"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:labelFor="@id/editText_ck"-->
+                    <!--android:text="领料仓库" />-->
 
-                <EditText
-                    android:id="@+id/editText_ck"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="20dp"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
-                    android:inputType="text"
-                    android:textSize="12sp" />
-            </LinearLayout>
+                <!--<EditText-->
+                    <!--android:id="@+id/editText_ck"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginEnd="20dp"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:ems="10"-->
+                    <!--android:focusable="false"-->
+                    <!--android:focusableInTouchMode="false"-->
+                    <!--android:inputType="text"-->
+                    <!--android:textSize="12sp" />-->
+            <!--</LinearLayout>-->
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingEnd="0dp"
-                android:paddingStart="20dp">
+            <!--<LinearLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:orientation="horizontal"-->
+                <!--android:paddingEnd="0dp"-->
+                <!--android:paddingStart="20dp">-->
 
-                <TextView
-                    android:id="@+id/textView_beizhu"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:labelFor="@id/editText_beizhu"
-                    android:paddingEnd="25dp"
-                    android:paddingStart="0dp"
-                    android:text="备注" />
+                <!--<TextView-->
+                    <!--android:id="@+id/textView_beizhu"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:labelFor="@id/editText_beizhu"-->
+                    <!--android:paddingEnd="25dp"-->
+                    <!--android:paddingStart="0dp"-->
+                    <!--android:text="备注" />-->
 
-                <EditText
-                    android:id="@+id/editText_beizhu"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="20dp"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
-                    android:inputType="text"
-                    android:textSize="12sp" />
+                <!--<EditText-->
+                    <!--android:id="@+id/editText_beizhu"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginEnd="20dp"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:ems="10"-->
+                    <!--android:focusable="false"-->
+                    <!--android:focusableInTouchMode="false"-->
+                    <!--android:inputType="text"-->
+                    <!--android:textSize="12sp" />-->
 
-            </LinearLayout>
+            <!--</LinearLayout>-->
 
             <net.tiaozhua.wms.view.CustomListView
                 android:id="@+id/listView_wlck"

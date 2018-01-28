@@ -29,7 +29,8 @@
         <activity android:name=".WlpdActivity" />
         <activity android:name=".KcpdActivity" />
         <activity android:name=".CppdActivity" />
-        <activity android:name=".CprkActivity"></activity>
+        <activity android:name=".CprkActivity" />
+        <activity android:name=".CpckActivity"></activity>
     </application>
 
 </manifest>

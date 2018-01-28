@@ -19,8 +19,8 @@ class WlrkdActivity : BaseActivity(R.layout.activity_dj) {
         super.onCreate(savedInstanceState)
         toolbarTitle.text = "入库单"
 
-        LoadingDialog.show(this@WlrkdActivity)
-        RetrofitManager.instance.wlrkd().enqueue(object : BaseCallback<ResponseList<Orders>>(context = this@WlrkdActivity) {
+        LoadingDialog.show(this)
+        RetrofitManager.instance.wlrkd().enqueue(object : BaseCallback<ResponseList<Orders>>(context = this) {
             override fun successData(data: ResponseList<Orders>) {
                 val items = data.items
                 listView_dj.emptyView = empty

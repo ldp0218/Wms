@@ -75,7 +75,7 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
                 "物料出库" -> startActivity(Intent(this@MainActivity, WlckActivity::class.java))
                 "物料盘点" -> startActivity(Intent(this@MainActivity, WlpdActivity::class.java))
                 "成品入库" -> startActivity(Intent(this@MainActivity, CprkActivity::class.java))
-                "成品出库" -> {}
+                "成品出库" -> startActivity(Intent(this@MainActivity, CpckActivity::class.java))
                 "成品盘点" -> startActivity(Intent(this@MainActivity, CppdActivity::class.java))
             }
         }

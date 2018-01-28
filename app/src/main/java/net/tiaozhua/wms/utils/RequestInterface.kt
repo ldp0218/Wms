@@ -64,12 +64,18 @@ interface RequestInterface {
     @GET("action/rk/getRk_no")
     fun getRkNo(): Call<ApiBean<String>>
 
-    @GET("action/product/getProductRkInfo")
-    fun getProductRkInfo(@Query("id") id: Int): Call<ApiBean<Rkmx>>
+    @GET("action/pda/getProductInfo")
+    fun getProductInfo(@Query("id") id: Int): Call<ApiBean<Bzmx>>
 
     @POST("action/rk/insert_rk")
-    fun insertRk(@Body rkd: RequestBody): Call<ApiBean<List<Rkmx>>>
+    fun insertRk(@Body rkd: RequestBody): Call<ApiBean<List<Bzmx>>>
 
     @GET("action/pda/productList")
     fun productList(@Query("id") id: Int, @Query("ckid") ckid: Int): Call<ApiBean<ResponseList<Product>>>
+
+    @GET("action/pda/hktzd")
+    fun hktzd(@Query("id") id: Int): Call<ApiBean<Xs>>
+
+    @POST("action/pda/cpck")
+    fun cpck(@Body xs: RequestBody): Call<ApiBean<String>>
 }
