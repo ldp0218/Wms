@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -22,7 +22,7 @@
         </activity>
         <activity android:name=".MainActivity" />
         <activity android:name=".WlrkActivity" />
-        <activity android:name=".WlrkdActivity" />
+        <activity android:name=".WljhdActivity" />
         <activity android:name=".MaterialSelectActivity" />
         <activity android:name=".WlckActivity" />
         <activity android:name=".WlckdActivity" />
@@ -30,7 +30,8 @@
         <activity android:name=".KcpdActivity" />
         <activity android:name=".CppdActivity" />
         <activity android:name=".CprkActivity" />
-        <activity android:name=".CpckActivity"></activity>
+        <activity android:name=".CpckActivity" />
+        <activity android:name=".CppdmxActivity" />
     </application>
 
 </manifest>

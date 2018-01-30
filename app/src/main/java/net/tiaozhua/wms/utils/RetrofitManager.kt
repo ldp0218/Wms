@@ -31,6 +31,7 @@ class RetrofitManager private constructor() {
                 .build()
 
         mRetrofit = Retrofit.Builder()
+                // 192.168.0.254
                 .baseUrl("http://192.168.1.142")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)

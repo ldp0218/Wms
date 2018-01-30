@@ -33,7 +33,6 @@ class CppdActivity : BaseActivity(R.layout.activity_pd) {
         RetrofitManager.instance.pdList(type)
                 .enqueue(object : BaseCallback<ResponseList<Pd>>(this@CppdActivity) {
                     override fun successData(data: ResponseList<Pd>) {
-                        LoadingDialog.dismiss()
                         page = data.page
                         totalPages = data.totalPages
                         pdList = data.items.toMutableList()
@@ -61,7 +60,7 @@ class CppdActivity : BaseActivity(R.layout.activity_pd) {
                                 })
                                 holder.setOnClickListener(R.id.layout_pd, View.OnClickListener { _ ->
                                     // 点击查看详情
-                                    val intent = Intent(this@CppdActivity, KcpdActivity::class.java)
+                                    val intent = Intent(this@CppdActivity, CppdmxActivity::class.java)
                                     intent.putExtra("type", type)  // 设置标识
                                     intent.putExtra("pdId", t.id)
                                     intent.putExtra("ckId", t.ck_id)
@@ -112,7 +111,7 @@ class CppdActivity : BaseActivity(R.layout.activity_pd) {
 
         // 开始新盘点
         pandian.setOnClickListener {
-            val intent = Intent(this@CppdActivity, KcpdActivity::class.java)
+            val intent = Intent(this@CppdActivity, CppdmxActivity::class.java)
             intent.putExtra("type", type)  // 设置标识
             startActivity(intent)
         }

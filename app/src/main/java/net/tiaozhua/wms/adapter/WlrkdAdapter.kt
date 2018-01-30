@@ -8,14 +8,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.BaseAdapter
 import net.tiaozhua.wms.R
-import net.tiaozhua.wms.bean.Orders
+import net.tiaozhua.wms.bean.Jhd
 import net.tiaozhua.wms.utils.findViewOften
 
 
 /**
 * Created by ldp on 2017/11/7.
 */
-class WlrkdAdapter(private val list: List<Orders>, context: Context) : BaseAdapter() {
+class WlrkdAdapter(private val list: List<Jhd>, context: Context) : BaseAdapter() {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
 
@@ -38,9 +38,9 @@ class WlrkdAdapter(private val list: List<Orders>, context: Context) : BaseAdapt
     @SuppressLint("InflateParams")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view: View = convertView ?: inflater.inflate(R.layout.listview_rkd_item, null)
-        val item: Orders = list[position]
+        val item: Jhd = list[position]
         val no: TextView = view.findViewOften(R.id.textView_no)
-        no.text = item.dj_no
+        no.text = item.jhd_no
         val date: TextView = view.findViewOften(R.id.textView_date)
         date.text = item.date
         val gys: TextView = view.findViewOften(R.id.textView_llr)
@@ -50,7 +50,7 @@ class WlrkdAdapter(private val list: List<Orders>, context: Context) : BaseAdapt
         val ck: TextView = view.findViewOften(R.id.textView_ck)
         ck.text = item.ck_name
         val bz: TextView = view.findViewOften(R.id.textView_bz)
-        bz.text = item.dj_remark
+        bz.text = item.remark
         return view
     }
 }

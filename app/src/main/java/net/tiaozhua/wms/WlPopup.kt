@@ -55,41 +55,41 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
             is WlrkActivity -> {
                 val m = activity.jhmx
                 popupView.editText_tm.setText(m.ma_txm)
-                popupView.textView_no.text = m.ma_code
                 popupView.textView_name.text = m.ma_name
                 popupView.editText_num.setText(m.mx_num.toString())
                 popupView.editText_num.requestFocus()
+                if (m.mx_price > 0) {
+                    popupView.editText_price.setText(m.mx_price.toString())
+                }
                 popupView.textView_kcnum.text = m.kcnum.toString()
+                popupView.textView_kind.text = m.ma_kind
                 popupView.textView_spec.text = m.ma_spec
-                popupView.textView_model.text = m.ma_model
                 popupView.textView_hw.text = m.hj_name
                 popupView.textView_remark.text = m.mx_remark
             }
             is WlckActivity -> {
                 val m = activity.ckdmx
                 popupView.editText_tm.setText(m.ma_txm)
-                popupView.textView_no.text = m.ma_code
                 popupView.textView_name.text = m.ma_name
                 popupView.editText_num.setText(m.ck_num.toString())
                 popupView.editText_num.requestFocus()
                 popupView.editText_num.setSelection(popupView.editText_num.text.toString().trim().length)
                 popupView.textView_kcnum.text = m.kc_num.toString()
+                popupView.textView_kind.text = m.ma_kind
                 popupView.textView_spec.text = m.ma_spec
-                popupView.textView_model.text = m.ma_model
                 popupView.textView_hw.text = m.hj_name
                 popupView.textView_remark.text = m.mx_remark
             }
             is KcpdActivity -> {
                 val m = activity.pdmx
                 popupView.editText_tm.setText(m.txm)
-                popupView.textView_no.text = m.hao
                 popupView.textView_name.text = m.name
                 popupView.editText_num.setText(m.pd_num.toString())
                 popupView.editText_num.requestFocus()
                 popupView.editText_num.setSelection(popupView.editText_num.text.toString().trim().length)
                 popupView.textView_kcnum.text = m.kc_num.toString()
+                popupView.textView_kind.text = m.kind
                 popupView.textView_spec.text = m.spec
-                popupView.textView_model.text = m.model
                 popupView.textView_hw.text = m.hw
                 popupView.textView_remark.text = m.comment
             }
@@ -127,7 +127,7 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                     val barcode = popupView.editText_tm.text.toString()
                     when (activity) {
                         is WlrkActivity -> {
-                            val ckId = activity.jhrk.ck_id
+                            val ckId = activity.jhd.ck_id
                             LoadingDialog.show(activity)
                             RetrofitManager.instance.materialList(barcode, ckId)
                                     .enqueue(object : BaseCallback<ResponseList<Material>>(context) {
@@ -145,11 +145,10 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                                     val material = data.items[0]
                                                     activity.material = material
                                                     popupView.editText_tm.setText(material.ma_txm)
-                                                    popupView.textView_no.text = material.ma_code
-                                                    popupView.textView_no.text = material.ma_name
+                                                    popupView.textView_name.text = material.ma_name
                                                     popupView.textView_kcnum.text = material.kc_num.toString()
+                                                    popupView.textView_kind.text = material.ma_kind
                                                     popupView.textView_spec.text = material.ma_spec
-                                                    popupView.textView_model.text = material.ma_model
                                                     popupView.textView_hw.text = material.kc_hw_name
                                                     popupView.textView_remark.text = material.comment
                                                     popupView.editText_num.requestFocus()
@@ -178,11 +177,10 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                                     val material = data.items[0]
                                                     activity.material = material
                                                     popupView.editText_tm.setText(material.ma_txm)
-                                                    popupView.textView_no.text = material.ma_code
-                                                    popupView.textView_no.text = material.ma_name
+                                                    popupView.textView_name.text = material.ma_name
                                                     popupView.textView_kcnum.text = material.kc_num.toString()
+                                                    popupView.textView_kind.text = material.ma_kind
                                                     popupView.textView_spec.text = material.ma_spec
-                                                    popupView.textView_model.text = material.ma_model
                                                     popupView.textView_hw.text = material.kc_hw_name
                                                     popupView.textView_remark.text = material.comment
                                                     popupView.editText_num.requestFocus()
@@ -214,21 +212,19 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                                     activity.pdmx.hao = material.ma_code
                                                     activity.pdmx.txm = material.ma_txm
                                                     activity.pdmx.name = material.ma_name
+                                                    activity.pdmx.kind = material.ma_kind
                                                     activity.pdmx.spec = material.ma_spec
-                                                    activity.pdmx.model = material.ma_model
                                                     activity.pdmx.hw = material.kc_hw_name
                                                     activity.pdmx.comment = material.comment
                                                     popupView.editText_tm.setText(material.ma_txm)
-                                                    popupView.textView_no.text = material.ma_code
-                                                    popupView.textView_no.text = material.ma_name
+                                                    popupView.textView_name.text = material.ma_name
                                                     popupView.textView_kcnum.text = material.kc_num.toString()
+                                                    popupView.textView_kind.text = material.ma_kind
                                                     popupView.textView_spec.text = material.ma_spec
-                                                    popupView.textView_model.text = material.ma_model
                                                     popupView.textView_hw.text = material.kc_hw_name
                                                     popupView.textView_remark.text = material.comment
                                                     popupView.editText_num.requestFocus()
                                                     popupView.editText_num.setSelection(popupView.editText_num.text.toString().trim().length)
-                                                    activity.pdmx.iid = material.ma_id
                                                     activity.pdmx.ck_id = activity.ckId
                                                     // 先查询是否已盘点
                                                     if (activity.pdmx.pd_id != null) {
@@ -282,20 +278,26 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                 return
                             }
                             var hasMaterial = false
-                            for (item in activity.jhrk.jhmx) {
+                            for (item in activity.jhd.jhmx) {
                                 if (item.ma_id == activity.material?.ma_id) {
                                     val numStr = popupView.editText_num.text.toString()
                                     if (numStr.isBlank()) {
                                         Toast.makeText(context, "请输入数量", Toast.LENGTH_SHORT).show()
                                         return
                                     }
+                                    val priceStr = popupView.editText_price.text.toString()
+                                    if (priceStr.isBlank()) {
+                                        Toast.makeText(context, "请录入进价", Toast.LENGTH_SHORT).show()
+                                        return
+                                    }
                                     val num = numStr.toInt()
-                                    if (num > item.jhdmx_num) {
+                                    if (num > item.mx_wwcnum) {
                                         Toast.makeText(context, "不能超过未入库数量", Toast.LENGTH_SHORT).show()
                                         return
                                     }
                                     Toast.makeText(context, "数量清点完毕", Toast.LENGTH_SHORT).show()
                                     item.mx_num = num
+                                    item.mx_price = priceStr.toDouble()
                                     // 重新加载数据
                                     activity.wlAdapter.notifyDataSetChanged()
                                     clearData()
@@ -408,11 +410,17 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                     val num = numStr.toInt()
                     when (activity) {
                         is WlrkActivity -> {
-                            if (num > activity.jhmx.jhdmx_num) {
+                            if (num > activity.jhmx.mx_wwcnum) {
                                 Toast.makeText(context, "不能超过未入库数量", Toast.LENGTH_SHORT).show()
                                 return
                             }
+                            val priceStr = popupView.editText_price.text.toString()
+                            if (priceStr.isBlank()) {
+                                Toast.makeText(context, "请录入进价", Toast.LENGTH_SHORT).show()
+                                return
+                            }
                             activity.jhmx.mx_num = num
+                            activity.jhmx.mx_price = priceStr.toDouble()
                             activity.wlAdapter.notifyDataSetChanged()
                         }
                         is WlckActivity -> {
@@ -485,13 +493,13 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
      * 清空弹框数据
      */
     private fun clearData() {
-        popupView.editText_tm.setText("")
-        popupView.textView_no.text = ""
+        popupView.editText_tm.text.clear()
         popupView.textView_name.text = ""
-        popupView.editText_num.setText("")
+        popupView.editText_num.text.clear()
+        popupView.editText_price.text.clear()
         popupView.textView_kcnum.text = ""
+        popupView.textView_kind.text = ""
         popupView.textView_spec.text = ""
-        popupView.textView_model.text = ""
         popupView.textView_hw.text = ""
         popupView.textView_remark.text = ""
     }

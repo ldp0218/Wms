@@ -15,17 +15,20 @@ interface RequestInterface {
     @GET("action/admin/login?type=1")
     fun login(@Query("a_name") name: String, @Query("a_pwd") password: String): Call<ApiBean<String>>
 
-    @GET("action/djcg/djCgPage?limit=100&orderByProp=dj_id&descOrAsc=desc&dj_type=1&type=0")
-    fun wlrkd(): Call<ApiBean<ResponseList<Orders>>>
+    @GET("action/jhd/jhdPage?check_flag=1&finish_flag=0&orderByProp=jhd_id&descOrAsc=desc")
+    fun wljhd(@Query("page") page: Int = 1): Call<ApiBean<ResponseList<Jhd>>>
 
-    @GET("action/jh/jhrkInfo")
-    fun jhrkInfo(@Query("id") id: Int): Call<ApiBean<Jhrk>>
+    @GET("action/pda/jhdInfo")
+    fun jhdInfo(@Query("id") id: Int): Call<ApiBean<Jhd>>
 
     @GET("action/material/materialList?selectValue=4")
     fun materialList(@Query("searchValue") txm: String, @Query("ckid") ckid: Int, @Query("page") page: Int = 1): Call<ApiBean<ResponseList<Material>>>
 
-    @POST("action/jh/updateJh")
-    fun updateJh(@Body jhd: RequestBody): Call<ApiBean<List<Jhmx>>>
+    @GET("action/jh/getJh_no")
+    fun getJhNo(): Call<ApiBean<String>>
+
+    @POST("action/jh/insert_jh")
+    fun insertJh(@Body jhd: RequestBody): Call<ApiBean<List<Jhdmx>>>
 
     @GET("action/ckd/ckdPage?limit=100&orderByProp=ckd_id&descOrAsc=desc&check_flag=1&ck_flag=0")
     fun wlckd(): Call<ApiBean<ResponseList<Ckd>>>

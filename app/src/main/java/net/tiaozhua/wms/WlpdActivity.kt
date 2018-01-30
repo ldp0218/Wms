@@ -33,7 +33,6 @@ class WlpdActivity : BaseActivity(R.layout.activity_pd) {
         RetrofitManager.instance.pdList(type)
                 .enqueue(object : BaseCallback<ResponseList<Pd>>(this@WlpdActivity) {
                     override fun successData(data: ResponseList<Pd>) {
-                        LoadingDialog.dismiss()
                         page = data.page
                         totalPages = data.totalPages
                         pdList = data.items.toMutableList()

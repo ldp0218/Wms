@@ -173,11 +173,9 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                                             material = data.items[0]
                                             val popupView = wlPopup!!.popupView
                                             popupView.editText_tm.setText(material!!.ma_txm)
-                                            popupView.textView_no.text = material!!.ma_code
-                                            popupView.textView_no.text = material!!.ma_name
+                                            popupView.textView_name.text = material!!.ma_name
                                             popupView.textView_kcnum.text = material!!.kc_num.toString()
                                             popupView.textView_spec.text = material!!.ma_spec
-                                            popupView.textView_model.text = material!!.ma_model
                                             popupView.textView_hw.text = material!!.kc_hw_name
                                             popupView.textView_remark.text = material!!.comment
                                             popupView.editText_num.requestFocus()
@@ -307,11 +305,10 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                 material = intent?.getSerializableExtra("material") as Material
                 val view = wlPopup!!.popupView
                 view.editText_tm.setText(material!!.ma_txm)
-                view.textView_no.text = material!!.ma_code
                 view.textView_name.text = material!!.ma_name
                 view.textView_kcnum.text = material!!.kc_num.toString()
                 view.textView_spec.text = material!!.ma_spec
-                view.textView_model.text = material!!.ma_model
+                view.textView_kind.text = material!!.ma_kind
                 view.textView_hw.text = material!!.kc_hw_name
                 view.textView_remark.text = material!!.comment
             }

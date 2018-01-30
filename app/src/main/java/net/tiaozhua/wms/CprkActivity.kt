@@ -28,7 +28,6 @@ import java.util.*
 
 class CprkActivity : BaseActivity(R.layout.activity_cprk), View.OnClickListener {
 
-    private var cpPopup: CpPopup? = null
     internal var status = ScanStatus.EMPTY
     private lateinit var mVibrator: Vibrator
     private lateinit var mScanManager: ScanManager
@@ -115,20 +114,20 @@ class CprkActivity : BaseActivity(R.layout.activity_cprk), View.OnClickListener 
         rkd = Rkd("", 0, "", "", "", mutableListOf(), 1)
         rkmxList = mutableListOf()
 
-        rkd.ck_id = 83
-        rkd.ck_name = "成品仓库"
         rkd.rk_ldrq = SimpleDateFormat("yyyy-MM-dd").format(Date())
+        refreshNo()
 //        editText_ck.setText(rkd.ck_name)
 //        editText_date.setText(rkd.rk_ldrq)
-        refreshNo()
 
-//        RetrofitManager.instance.ckList()
-//                .enqueue(object : BaseCallback<ResponseList<Ck>>(context = this) {
-//                    override fun successData(data: ResponseList<Ck>) {
-//                        ckId = data.items[0].ck_id
-//                        textView_ck.text = data.items[0].ck_name
-//                    }
-//                })
+//        rkd.ck_id = 83
+//        rkd.ck_name = "成品仓库"
+        RetrofitManager.instance.ckList()
+                .enqueue(object : BaseCallback<ResponseList<Ck>>(context = this) {
+                    override fun successData(data: ResponseList<Ck>) {
+                        rkd.ck_id = data.items[0].ck_id
+                        rkd.ck_name = data.items[0].ck_name
+                    }
+                })
 
         // 为按钮设置点击监听事件
         rk.setOnClickListener(this)
@@ -162,10 +161,6 @@ class CprkActivity : BaseActivity(R.layout.activity_cprk), View.OnClickListener 
         if (receiverTag) {   //判断广播是否注册
             receiverTag = false
             unregisterReceiver(mScanReceiver)
-        }
-        if (cpPopup != null) {
-            cpPopup!!.dismiss()
-            cpPopup = null
         }
     }
 
