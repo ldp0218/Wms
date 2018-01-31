@@ -213,9 +213,9 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                                     activity.pdmx.txm = material.ma_txm
                                                     activity.pdmx.name = material.ma_name
                                                     activity.pdmx.kind = material.ma_kind
-                                                    activity.pdmx.spec = material.ma_spec
+                                                    activity.pdmx.spec = material.ma_spec ?: ""
                                                     activity.pdmx.hw = material.kc_hw_name
-                                                    activity.pdmx.comment = material.comment
+                                                    activity.pdmx.comment = material.comment ?: ""
                                                     popupView.editText_tm.setText(material.ma_txm)
                                                     popupView.textView_name.text = material.ma_name
                                                     popupView.textView_kcnum.text = material.kc_num.toString()
@@ -377,7 +377,7 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                                     activity.pdmxList.add(activity.pdmx)
                                                     activity.pdAdapter.notifyDataSetChanged()
                                                     activity.pdmx = Pdmx(0, activity.pdmx.pd_id, null, 0, 0, null, 0, "", "",
-                                                            "", "", "", "", "")
+                                                            "", "", "", "", "","","",0)
                                                     clearData()
                                                 }
                                                 2 -> { // 登录超时
@@ -458,7 +458,7 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                                     }
                                                     activity.pdAdapter.notifyDataSetChanged()
                                                     activity.pdmx = Pdmx(0, activity.pdmx.pd_id, null, 0, 0, null, 0, "", "",
-                                                            "", "", "", "", "")
+                                                            "", "", "", "", "","","",0)
                                                     clearData()
                                                 }
                                                 2 -> { // 登录超时

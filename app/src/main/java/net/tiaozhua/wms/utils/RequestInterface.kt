@@ -42,8 +42,8 @@ interface RequestInterface {
     @GET("action/ckd/lldInfo")
     fun lldInfo(@Query("id") id: Int): Call<ApiBean<Ckd>>
 
-    @GET("action/ck/ckList")
-    fun ckList(): Call<ApiBean<ResponseList<Ck>>>
+//    @GET("action/ck/ckList")
+//    fun ckList(): Call<ApiBean<ResponseList<Ck>>>
 
     @GET("action/kc/pdList")
     fun pdList(@Query("type") type: Int, @Query("page") page: Int = 1, @Query("limit") limit: Int = 10): Call<ApiBean<ResponseList<Pd>>>
@@ -73,8 +73,8 @@ interface RequestInterface {
     @POST("action/rk/insert_rk")
     fun insertRk(@Body rkd: RequestBody): Call<ApiBean<List<Bzmx>>>
 
-    @GET("action/pda/productList")
-    fun productList(@Query("id") id: Int, @Query("ckid") ckid: Int): Call<ApiBean<ResponseList<Product>>>
+//    @GET("action/pda/productList")
+//    fun productList(@Query("id") id: Int, @Query("ckid") ckid: Int): Call<ApiBean<ResponseList<Product>>>
 
     @GET("action/pda/hktzd")
     fun hktzd(@Query("id") id: Int): Call<ApiBean<Xs>>

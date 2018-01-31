@@ -215,8 +215,8 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
 
         jhd = Jhd(0,"",0,"","",0,0,"", "",
                 "",0,"",0,0,"","", mutableListOf())
-        jhd.ck_id = 79
-        jhd.ck_name = "物料仓库"
+        jhd.ck_id = 1
+        jhd.ck_name = "贾家仓库"
         //        RetrofitManager.instance.ckList()
         //                .enqueue(object : BaseCallback<ResponseList<Ck>>(context = this) {
         //                    override fun successData(data: ResponseList<Ck>) {

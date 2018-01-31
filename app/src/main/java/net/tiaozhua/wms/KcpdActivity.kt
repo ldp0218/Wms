@@ -24,7 +24,7 @@ import java.util.*
 
 class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener {
 
-    internal var ckId: Int = 0
+    internal var ckId: Int = 1
     private var wlPopup: WlPopup? = null
     private lateinit var mVibrator: Vibrator
     private lateinit var mScanManager: ScanManager
@@ -102,9 +102,9 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
                                         pdmx.txm = material.ma_txm
                                         pdmx.name = material.ma_name
                                         pdmx.kind = material.ma_kind
-                                        pdmx.spec = material.ma_spec
+                                        pdmx.spec = material.ma_spec ?: ""
                                         pdmx.hw = material.kc_hw_name
-                                        pdmx.comment = material.comment
+                                        pdmx.comment = material.comment ?: ""
                                         val popupView = wlPopup!!.popupView
                                         popupView.editText_tm.setText(pdmx.txm)
                                         popupView.textView_name.text = pdmx.name
@@ -145,7 +145,8 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
             imageView_line.visibility = View.GONE
             layout_menu.visibility = View.GONE
         }
-        pdmx = Pdmx(0, null, null, 0, 0, null, 0, "", "", "", "", "", "", "")     // 初始化pdmx
+        pdmx = Pdmx(0, null, null, 0, 0, null, 0,
+                "", "", "", "", "", "", "","","",0)     // 初始化pdmx
 //        ckId = when {
 //            intent.hasExtra("ckId") -> intent.getIntExtra("ckId", -1)
 //            else -> 79
@@ -155,13 +156,13 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
 //            else -> "物料仓库"
 //        }
 //        textView_ck.text = ckName
-        RetrofitManager.instance.ckList()
-                .enqueue(object : BaseCallback<ResponseList<Ck>>(context = this) {
-                    override fun successData(data: ResponseList<Ck>) {
-                        ckId = data.items[0].ck_id
-                        textView_ck.text = data.items[0].ck_name
-                    }
-                })
+//        RetrofitManager.instance.ckList()
+//                .enqueue(object : BaseCallback<ResponseList<Ck>>(context = this) {
+//                    override fun successData(data: ResponseList<Ck>) {
+//                        ckId = data.items[0].ck_id
+//                        textView_ck.text = data.items[0].ck_name
+//                    }
+//                })
 
         val pdDate = if (intent.hasExtra("pdDate")) {
             intent.getStringExtra("pdDate")
@@ -282,9 +283,9 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
                 pdmx.txm = material.ma_txm
                 pdmx.name = material.ma_name
                 pdmx.kind = material.ma_kind
-                pdmx.spec = material.ma_spec
+                pdmx.spec = material.ma_spec ?: ""
                 pdmx.hw = material.kc_hw_name
-                pdmx.comment = material.comment
+                pdmx.comment = material.comment ?: ""
                 val view = wlPopup!!.popupView
                 view.editText_tm.setText(material.ma_txm)
                 view.textView_name.text = material.ma_name

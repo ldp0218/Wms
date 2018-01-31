@@ -29,7 +29,7 @@ import java.util.*
 
 class CppdmxActivity : BaseActivity(R.layout.activity_cppd), View.OnClickListener {
 
-    private var ckId: Int = 0
+    private var ckId: Int = 1
     private lateinit var mVibrator: Vibrator
     private lateinit var mScanManager: ScanManager
     private val soundpool = SoundPool(1, AudioManager.STREAM_NOTIFICATION, 100)
@@ -98,7 +98,7 @@ class CppdmxActivity : BaseActivity(R.layout.activity_cppd), View.OnClickListene
                                                         }
                                                         pdAdapter.notifyDataSetChanged()
                                                         pdmx = Pdmx(0, result.pd_id, null, 0, 0, null, 0, "", "",
-                                                                "", "", "", "", "")
+                                                                "", "", "", "", "","","",0)
                                                     }
                                                     2 -> { // 登录超时
                                                         DialogUtil.showAlert(context, "请重新登录",
@@ -129,7 +129,7 @@ class CppdmxActivity : BaseActivity(R.layout.activity_cppd), View.OnClickListene
                                     pdmx.kc_num = data.kc_num
                                     pdmx.bz_code = data.bz_code
                                     pdmx.scd_no = data.scd_no
-                                    pdmx.hao = data.pro_model
+                                    pdmx.hao = data.pro_model ?: ""
                                     pdmx.ck_id = ckId
                                     LoadingDialog.show(context)
                                     val requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), Gson().toJson(pdmx))
@@ -149,7 +149,7 @@ class CppdmxActivity : BaseActivity(R.layout.activity_cppd), View.OnClickListene
                                                         pdmxList.add(pdmx)
                                                         pdAdapter.notifyDataSetChanged()
                                                         pdmx = Pdmx(0, result.pd_id, null, 0, 0, null, 0, "", "",
-                                                                "", "", "", "", "")
+                                                                "", "", "", "", "","","",0)
                                                     }
                                                     2 -> { // 登录超时
                                                         DialogUtil.showAlert(context, "请重新登录",
@@ -199,16 +199,15 @@ class CppdmxActivity : BaseActivity(R.layout.activity_cppd), View.OnClickListene
             imageView_line.visibility = View.GONE
             layout_menu.visibility = View.GONE
         }
-        pdmx = Pdmx(1, null, null, 0, 0, null, 0, "", "", "", "", "", "", "")     // 初始化pdmx
-        ckId = when {
-            intent.hasExtra("ckId") -> intent.getIntExtra("ckId", -1)
-            else -> 83
-        }
-        val ckName = when {
-            intent.hasExtra("ckName") -> intent.getStringExtra("ckName")
-            else -> "成品仓库"
-        }
-        textView_ck.text = ckName
+        pdmx = Pdmx(1, null, null, 0, 0, null, 0,
+                "", "", "", "", "", "", "","","",0)     // 初始化pdmx
+//        ckId = when {
+//            intent.hasExtra("ckId") -> intent.getIntExtra("ckId", -1)
+//        }
+//        val ckName = when {
+//            intent.hasExtra("ckName") -> intent.getStringExtra("ckName")
+//        }
+
 //        RetrofitManager.instance.ckList()
 //                .enqueue(object : BaseCallback<ResponseList<Ck>>(context = this) {
 //                    override fun successData(data: ResponseList<Ck>) {

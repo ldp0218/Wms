@@ -72,7 +72,7 @@ class CpckActivity : BaseActivity(R.layout.activity_cpck), View.OnClickListener 
                                     status = ScanStatus.SCAN
                                     cpAdapter = object : CommonAdapter<Xsmx>(xsmxList, R.layout.listview_cpck_item) {
                                         override fun convert(holder: ViewHolder, t: Xsmx, position: Int) {
-                                            holder.setText(R.id.textView_model, t.pro_model)
+                                            holder.setText(R.id.textView_model, t.pro_model ?: "")
                                             holder.setText(R.id.textView_bz, if (t.pro_type == 0) t.mx_remark ?: "" else t.scd_no ?: "")
                                             holder.setText(R.id.textView_num, (t.package_num ?: "").toString())
                                             holder.setText(R.id.textView_scan, t.check_num.toString())

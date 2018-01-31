@@ -115,19 +115,18 @@ class CprkActivity : BaseActivity(R.layout.activity_cprk), View.OnClickListener 
         rkmxList = mutableListOf()
 
         rkd.rk_ldrq = SimpleDateFormat("yyyy-MM-dd").format(Date())
+        rkd.ck_id = 1
         refreshNo()
 //        editText_ck.setText(rkd.ck_name)
 //        editText_date.setText(rkd.rk_ldrq)
 
-//        rkd.ck_id = 83
-//        rkd.ck_name = "成品仓库"
-        RetrofitManager.instance.ckList()
-                .enqueue(object : BaseCallback<ResponseList<Ck>>(context = this) {
-                    override fun successData(data: ResponseList<Ck>) {
-                        rkd.ck_id = data.items[0].ck_id
-                        rkd.ck_name = data.items[0].ck_name
-                    }
-                })
+//        RetrofitManager.instance.ckList()
+//                .enqueue(object : BaseCallback<ResponseList<Ck>>(context = this) {
+//                    override fun successData(data: ResponseList<Ck>) {
+//                        rkd.ck_id = data.items[0].ck_id
+//                        rkd.ck_name = data.items[0].ck_name
+//                    }
+//                })
 
         // 为按钮设置点击监听事件
         rk.setOnClickListener(this)
@@ -140,7 +139,7 @@ class CprkActivity : BaseActivity(R.layout.activity_cprk), View.OnClickListener 
 
         cpAdapter = object : CommonAdapter<Rkmx>(rkd.rkmx, R.layout.listview_cp_item) {
             override fun convert(holder: ViewHolder, t: Rkmx, position: Int) {
-                holder.setText(R.id.textView_no, t.scd_no)
+                holder.setText(R.id.textView_no, t.scd_no ?: "")
                 holder.setText(R.id.textView_name, t.pro_name)
                 holder.setText(R.id.textView_bzcode, t.bz_code)
                 holder.setText(R.id.textView_num, t.mx_num.toString())

@@ -104,14 +104,14 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
 
     override fun onBackPressed() {
         //1.点击的时间差如果大于2000，则提示用户点击两次退出
-        if(System.currentTimeMillis() - mExitTime > 2000) {
-            //2.保存当前时间
-            mExitTime  = System.currentTimeMillis()
-            //3.提示
-            Toast.makeText(this, "再按一次退出登录", Toast.LENGTH_SHORT).show()
-        } else {
-            //4.点击的时间差小于2000，调用父类onBackPressed方法执行退出。
-            super.onBackPressed()
-        }
+//        if(System.currentTimeMillis() - mExitTime > 2000) {
+//            //2.保存当前时间
+//            mExitTime  = System.currentTimeMillis()
+//            //3.提示
+//            Toast.makeText(this, "再按一次退出登录", Toast.LENGTH_SHORT).show()
+//        } else {
+//            //4.点击的时间差小于2000，调用父类onBackPressed方法执行退出。
+//            super.onBackPressed()
+//        }
     }
 }
