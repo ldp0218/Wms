@@ -42,6 +42,7 @@ dependencies {
     compile 'com.github.mcxtzhang:SwipeDelMenuLayout:V1.3.0'
     // 上拉加载，下拉刷新控件库
     compile 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.3'
+    compile 'me.jessyan:retrofit-url-manager:1.2.5'
 }
 repositories {
     mavenCentral()
