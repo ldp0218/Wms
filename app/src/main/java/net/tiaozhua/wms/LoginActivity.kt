@@ -25,17 +25,18 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
 
         // 修改ip地址
-        editText_ip.setText("192.168.0.254")
-        var ipText = editText_ip.text.toString()
-        editText_ip.onFocusChangeListener = View.OnFocusChangeListener { v, hasFocus ->
-            val editText = v as EditText
-            if (ipText != editText.text.toString()) {
-                ipText = editText.text.toString()
-                Toast.makeText(this@LoginActivity, "IP已修改:" + ipText, Toast.LENGTH_SHORT).show()
-                // 可在 App 运行时,随时切换 BaseUrl (指定了 Domain-Name header 的接口)
-                RetrofitUrlManager.getInstance().putDomain("domain", "http://" + ipText);
-            }
-        }
+//        editText_ip.setText("192.168.99.137")
+//        var ipText = editText_ip.text.toString()
+//        editText_ip.onFocusChangeListener = View.OnFocusChangeListener { v, hasFocus ->
+//            val editText = v as EditText
+//            if (ipText != editText.text.toString()) {
+//                ipText = editText.text.toString()
+//                Toast.makeText(this@LoginActivity, "IP已修改:" + ipText, Toast.LENGTH_SHORT).show()
+//                // 可在 App 运行时,随时切换 BaseUrl (指定了 Domain-Name header 的接口)
+//                RetrofitUrlManager.getInstance().putDomain("domain", "http://" + ipText);
+//            }
+//        }
+
 //        editText_ip.addTextChangedListener(object : TextWatcher {
 //            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 //            }

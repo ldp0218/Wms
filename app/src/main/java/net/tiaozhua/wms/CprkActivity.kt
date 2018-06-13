@@ -52,7 +52,7 @@ class CprkActivity : BaseActivity(R.layout.activity_cprk), View.OnClickListener 
                     return
                 }
                 barcodeStr.substring(0, barcodeStr.indexOf("#")).toInt()
-            } catch (e: NumberFormatException) {
+            } catch (e: Exception) {
                 0
             }
             if (id == 0) {

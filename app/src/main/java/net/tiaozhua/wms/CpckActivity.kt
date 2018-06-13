@@ -12,6 +12,7 @@ import android.widget.BaseAdapter
 import android.widget.Toast
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_cpck.*
+import kotlinx.android.synthetic.main.popup_nonscanning.view.*
 import net.tiaozhua.wms.adapter.CommonAdapter
 import net.tiaozhua.wms.adapter.ViewHolder
 import net.tiaozhua.wms.bean.*
@@ -33,6 +34,8 @@ class CpckActivity : BaseActivity(R.layout.activity_cpck), View.OnClickListener 
     internal lateinit var xs: Xs
     internal lateinit var cpAdapter: BaseAdapter
     private var productList: HashSet<String> = hashSetOf()
+    internal var nonScanningList: HashMap<Int, String> = hashMapOf()
+    private var nonScanningPopup: NonScanningPopup? = null
 
     private val mScanReceiver = object : BroadcastReceiver() {
 
@@ -49,6 +52,27 @@ class CpckActivity : BaseActivity(R.layout.activity_cpck), View.OnClickListener 
                     Toast.makeText(this@CpckActivity, "未识别的二维码", Toast.LENGTH_SHORT).show()
                     return
                 }
+                if (productList.size > 0) {
+                    var flag = false
+                    DialogUtil.showDialog(this@CpckActivity, null, "数据未提交，是否重新扫描?",
+                            DialogInterface.OnClickListener {_, _ ->
+                                flag = true
+                            },
+                            DialogInterface.OnClickListener { _, _ ->
+                                LoadingDialog.show(this@CpckActivity)
+                                val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), Gson().toJson(xs))
+                                RetrofitManager.instance.cpck(requestBody)
+                                        .enqueue(object : BaseCallback<String>(context = this@CpckActivity) {
+                                            override fun successInfo(info: String) {
+                                                flag = false
+                                            }
+                                        })
+                            }
+                    )
+                    if (flag) {
+                        return
+                    }
+                }
                 LoadingDialog.show(this@CpckActivity)
                 xs = Xs()
                 RetrofitManager.instance.hktzd(id)
@@ -62,15 +86,23 @@ class CpckActivity : BaseActivity(R.layout.activity_cpck), View.OnClickListener 
                                     Toast.makeText(this@CpckActivity, "此单不存在", Toast.LENGTH_SHORT).show()
                                     return
                                 }
+                                productList.clear()
                                 editText_no.setText(xs.xs_no)
 //                                editText_date.setText(xs.xs_ldrq)
                                 for (item in xs.xsmx) {
                                     item.xsdbzList = mutableListOf()
                                 }
-                                val xsmxList = xs.xsmx
-                                if (xsmxList.size > 0) {
+                                if (xs.xsmx.size > 0) {
+                                    //记录未扫描的包装
+                                    xs.xsmx.forEach {
+                                        if (it.bzList.isNotEmpty()) {
+                                            it.bzList.forEach { bz ->
+                                                nonScanningList[bz.bz_id] = it.pro_model + bz.bz_code
+                                            }
+                                        }
+                                    }
                                     status = ScanStatus.SCAN
-                                    cpAdapter = object : CommonAdapter<Xsmx>(xsmxList, R.layout.listview_cpck_item) {
+                                    cpAdapter = object : CommonAdapter<Xsmx>(xs.xsmx, R.layout.listview_cpck_item) {
                                         override fun convert(holder: ViewHolder, t: Xsmx, position: Int) {
                                             holder.setText(R.id.textView_model, t.pro_model ?: "")
                                             holder.setText(R.id.textView_bz, if (t.pro_type == 0) t.mx_remark ?: "" else t.scd_no ?: "")
@@ -106,6 +138,12 @@ class CpckActivity : BaseActivity(R.layout.activity_cpck), View.OnClickListener 
                                         if (data.kc_num == 0) {
                                             Toast.makeText(context, "此包装还未入库", Toast.LENGTH_SHORT).show()
                                             return
+                                        }
+                                        if (nonScanningList.containsKey(data.bz_id)) {
+                                            nonScanningList.remove(data.bz_id)
+                                            if (nonScanningPopup != null) {
+                                                nonScanningPopup!!.update(nonScanningList)
+                                            }
                                         }
                                         var doneFlag = false
                                         for (item in xs.xsmx) {
@@ -218,6 +256,10 @@ class CpckActivity : BaseActivity(R.layout.activity_cpck), View.OnClickListener 
             receiverTag = false
             unregisterReceiver(mScanReceiver)
         }
+        if (nonScanningPopup != null) {
+            nonScanningPopup!!.dismiss()
+            nonScanningPopup = null
+        }
     }
 
     override fun isExit(): Boolean {
@@ -254,7 +296,12 @@ class CpckActivity : BaseActivity(R.layout.activity_cpck), View.OnClickListener 
                     ScanStatus.SCAN -> {
                         val isNotFinished = xs.xsmx.any { if (it.package_num != null) it.check_num < it.package_num else false }
                         if (isNotFinished) {
-                            Toast.makeText(this@CpckActivity, "有包装未扫描", Toast.LENGTH_SHORT).show()
+                            if (nonScanningPopup == null) {
+                                nonScanningPopup = NonScanningPopup(this@CpckActivity)
+                            }
+                            nonScanningPopup!!.showPopupWindow()
+                            nonScanningPopup!!.update(nonScanningList)
+//                            Toast.makeText(this@CpckActivity, "有包装未扫描", Toast.LENGTH_SHORT).show()
                         } else {
                             status = ScanStatus.FINISH
                             DialogUtil.showDialog(this, null, "包装已全部扫描,是否出库?",

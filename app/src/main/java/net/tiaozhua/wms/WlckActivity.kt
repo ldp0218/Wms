@@ -153,7 +153,7 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                     }
                     else -> Toast.makeText(this@WlckActivity, "请选择领料单", Toast.LENGTH_SHORT).show()
                 }
-                if (flag) {     // 扫描新的
+                if (flag && wlPopup != null) {     // 扫描新的
                     val view = wlPopup!!.popupView
                     view.editText_tm.setText(barcodeStr)
                     LoadingDialog.show(this@WlckActivity)

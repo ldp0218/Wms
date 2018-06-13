@@ -11,14 +11,14 @@
 
     <TextView
         android:id="@+id/textView_nolabel"
-        android:layout_width="wrap_content"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="5dp"
         android:text="卡号" />
 
     <TextView
         android:id="@+id/textView_no"
-        android:layout_width="150dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:layout_toEndOf="@+id/textView_nolabel"
@@ -28,27 +28,30 @@
 
     <TextView
         android:id="@+id/textView_namelabel"
-        android:layout_width="wrap_content"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/textView_no"
         android:layout_marginBottom="5dp"
         android:layout_marginEnd="5dp"
-        android:layout_toStartOf="@+id/textView_name"
         android:text="名称" />
 
     <TextView
         android:id="@+id/textView_name"
-        android:layout_width="110dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/textView_no"
+        android:layout_toEndOf="@+id/textView_namelabel"
         android:ellipsize="end"
         android:singleLine="true"
         android:textColor="@android:color/black" />
 
     <TextView
         android:id="@+id/textView_bzlabel"
-        android:layout_width="wrap_content"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/textView_namelabel"
+        android:layout_marginBottom="5dp"
+        android:layout_marginEnd="5dp"
         android:paddingEnd="5dp"
         android:text="包装编码" />
 
@@ -56,25 +59,25 @@
         android:id="@+id/textView_bzcode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView_no"
+        android:layout_below="@+id/textView_namelabel"
         android:layout_toEndOf="@+id/textView_bzlabel"
+        android:ellipsize="end"
         android:textColor="@android:color/black" />
 
     <TextView
         android:id="@+id/textView_numlabel"
-        android:layout_width="wrap_content"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView_no"
+        android:layout_below="@+id/textView_bzlabel"
         android:layout_marginEnd="5dp"
-        android:layout_toStartOf="@+id/textView_num"
         android:text="数量" />
 
     <TextView
         android:id="@+id/textView_num"
-        android:layout_width="110dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@+id/textView_no"
+        android:layout_below="@+id/textView_bzlabel"
+        android:layout_toEndOf="@+id/textView_numlabel"
         android:textColor="@android:color/black" />
 
 </RelativeLayout>

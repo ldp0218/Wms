@@ -50,7 +50,7 @@ class RetrofitManager private constructor() {
 
         mRetrofit = Retrofit.Builder()
                 // 192.168.0.254   bj.jpw.cn:9999
-                .baseUrl("http://192.168.0.254")
+                .baseUrl("http://192.168.1.165/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build()
