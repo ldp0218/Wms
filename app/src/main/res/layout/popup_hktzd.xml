@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/click_to_dismiss"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/popup_bg">
+
+    <LinearLayout
+        android:id="@+id/popup_anima"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="50dp"
+        android:background="@android:color/white"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/textView10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="5dp"
+                android:text="汇款通知单"
+                android:textColor="@color/theme_blue"
+                android:textSize="18dp" />
+
+            <Button
+                android:id="@+id/button_close"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/close" />
+        </RelativeLayout>
+
+        <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="400dp"-->
+        <!--android:divider="@drawable/separator"-->
+        <!--android:orientation="vertical"-->
+        <!--android:showDividers="middle">-->
+        <ScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true"
+            android:paddingBottom="20dp"
+            android:paddingTop="20dp">
+
+            <net.tiaozhua.wms.view.CustomListView
+                android:id="@+id/listView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:listSelector="@android:color/transparent"
+                android:paddingStart="20dp" />
+
+        </ScrollView>
+    </LinearLayout>
+</RelativeLayout>

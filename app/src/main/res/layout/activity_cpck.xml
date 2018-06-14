@@ -23,35 +23,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingEnd="0dp"
-                android:paddingStart="20dp">
-
-                <TextView
-                    android:id="@+id/textView_nolabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:labelFor="@id/editText_no"
-                    android:text="单据编号" />
-
-                <EditText
-                    android:id="@+id/editText_no"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="20dp"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
-                    android:inputType="text"
-                    android:textSize="12sp" />
-
-            </LinearLayout>
-
             <!--<LinearLayout-->
                 <!--android:layout_width="match_parent"-->
                 <!--android:layout_height="wrap_content"-->
@@ -110,6 +81,16 @@
             <!--app:layout_constraintLeft_toLeftOf="parent" />-->
 
         <Button
+            android:id="@+id/btn_hktzd"
+            style="?android:buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="汇款通知单"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+
+        <Button
             android:id="@+id/btn_chuku"
             style="?android:buttonBarButtonStyle"
             android:layout_width="wrap_content"
@@ -118,6 +99,7 @@
             android:text="出库"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent" />
+
     </LinearLayout>
 
 </LinearLayout>

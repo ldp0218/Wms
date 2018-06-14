@@ -71,4 +71,4 @@ data class Xsmx(val xsmx_id: Int, val pro_id: Int, val xsdmx_id: Int, val mx_num
 
 data class Jiediao(val jxsdmx_id: Int, val hxsdmx_id: Int, val j_num: Int)
 
-data class Bz(val bz_id: Int, val bz_code: String, val bz_ratio: Int, val total: Int, var num: Int = 0)
+data class Bz(val bz_id: Int, val bz_code: String, val bz_ratio: Int, val total: Int, var num: Int = 0, val xsd_bz_id: Int)

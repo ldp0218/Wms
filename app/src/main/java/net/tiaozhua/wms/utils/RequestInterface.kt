@@ -98,5 +98,5 @@ interface RequestInterface {
 
     @Headers("Domain-Name: domain")
     @POST("action/pda/cpck")
-    fun cpck(@Body xs: RequestBody): Call<ApiBean<String>>
+    fun cpck(@Body xs: RequestBody): Call<ApiBean<List<Xs>>>
 }
