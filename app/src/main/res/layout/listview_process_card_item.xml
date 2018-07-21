@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable name="lld" type="net.tiaozhua.wms.bean.Scdpl" />
+    </data>
+
+    <com.mcxtzhang.swipemenulib.SwipeMenuLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:ios="false"
+        app:leftSwipe="true"
+        app:swipeEnable="true"
+        android:focusable="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:paddingStart="10dp"
+            android:paddingTop="10dp"
+            app:ios="false"
+            app:leftSwipe="true"
+            app:swipeEnable="true"
+            tools:ignore="RtlSymmetry">
+
+            <TextView
+                android:id="@+id/textView_namelabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginEnd="10dp"
+                android:text="物料名称"
+                android:textSize="14sp"
+                tools:ignore="RtlHardcoded" />
+
+            <TextView
+                android:id="@+id/textView_name"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/textView_namelabel"
+                android:singleLine="true"
+                android:text="@{lld.ma_name}"
+                android:textColor="@android:color/black" />
+
+            <TextView
+                android:id="@+id/textView_dwlabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_toStartOf="@+id/textView_unit"
+                android:text="单位" />
+
+            <TextView
+                android:id="@+id/textView_unit"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:text="@{lld.ma_unit}" />
+
+            <TextView
+                android:id="@+id/textView_kcnumlabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textView_namelabel"
+                android:layout_marginEnd="10dp"
+                android:layout_marginTop="20dp"
+                android:text="库存数量" />
+
+            <TextView
+                android:id="@+id/textView_kcnum"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textView_name"
+                android:layout_marginTop="20dp"
+                android:layout_toEndOf="@+id/textView_kcnumlabel"
+                android:text="@{String.valueOf(lld.kc_num)}" />
+
+            <TextView
+                android:id="@+id/textView_cklabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textView_namelabel"
+                android:layout_marginEnd="10dp"
+                android:layout_marginTop="20dp"
+                android:layout_toStartOf="@+id/editText_cknum"
+                android:text="出库数量"
+                android:labelFor="@id/editText_cknum" />
+
+            <EditText
+                android:id="@+id/editText_cknum"
+                android:layout_width="60dp"
+                android:layout_height="50dp"
+                android:layout_alignParentEnd="true"
+                android:layout_below="@id/textView_namelabel"
+                android:imeOptions="actionDone"
+                android:inputType="numberDecimal"
+                android:singleLine="true"
+                android:text="@={`` + lld.num}" />
+
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:background="@color/red_ff4a57"
+            android:text="删除"
+            android:textColor="@android:color/white"/>
+
+    </com.mcxtzhang.swipemenulib.SwipeMenuLayout>
+
+</layout>

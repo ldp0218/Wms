@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".utils.App"
         android:icon="@mipmap/logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -26,12 +27,17 @@
         <activity android:name=".MaterialSelectActivity" />
         <activity android:name=".WlckActivity" />
         <activity android:name=".WlckdActivity" />
+        <activity android:name=".LldInfoActivity" />
         <activity android:name=".WlpdActivity" />
         <activity android:name=".KcpdActivity" />
         <activity android:name=".CppdActivity" />
         <activity android:name=".CprkActivity" />
+        <activity android:name=".CpbhActivity" />
         <activity android:name=".CpckActivity" />
         <activity android:name=".CppdmxActivity" />
+        <activity android:name=".UserSelectActivity" />
+        <activity android:name=".ProcessCardActivity" />
+        <activity android:name=".WlmxActivity" />
     </application>
 
 </manifest>

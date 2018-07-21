@@ -3,10 +3,7 @@ package net.tiaozhua.wms
 import android.annotation.SuppressLint
 import android.content.*
 import android.device.ScanManager
-import android.media.AudioManager
-import android.media.SoundPool
 import android.os.Bundle
-import android.os.Vibrator
 import android.view.View
 import android.widget.BaseAdapter
 import android.widget.Toast
@@ -15,10 +12,7 @@ import kotlinx.android.synthetic.main.popup_scan_material.view.*
 import net.tiaozhua.wms.adapter.CommonAdapter
 import net.tiaozhua.wms.adapter.ViewHolder
 import net.tiaozhua.wms.bean.*
-import net.tiaozhua.wms.utils.BaseCallback
-import net.tiaozhua.wms.utils.DialogUtil
-import net.tiaozhua.wms.utils.LoadingDialog
-import net.tiaozhua.wms.utils.RetrofitManager
+import net.tiaozhua.wms.utils.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -26,10 +20,7 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
 
     internal var ckId: Int = 1
     private var wlPopup: WlPopup? = null
-    private lateinit var mVibrator: Vibrator
     private lateinit var mScanManager: ScanManager
-    private val soundpool = SoundPool(1, AudioManager.STREAM_NOTIFICATION, 100)
-    private val soundid by lazy { soundpool.load("/etc/Scan_new.ogg", 1) }
     private lateinit var barcodeStr: String
     private var receiverTag: Boolean = false
     internal lateinit var pdmxList: MutableList<Pdmx>
@@ -39,8 +30,7 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
     private val mScanReceiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
-            soundpool.play(soundid, 1f, 1f, 0, 0, 1f)
-            mVibrator.vibrate(100)
+            (application as App).playAndVibrate(this@KcpdActivity)
             barcodeStr = String(intent.getByteArrayExtra("barocode"), 0, intent.getIntExtra("length", 0))
 
             if (wlPopup == null) {
@@ -101,7 +91,7 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
                                         pdmx.ck_id = ckId
                                         pdmx.txm = material.ma_txm
                                         pdmx.name = material.ma_name
-                                        pdmx.kind = material.ma_kind
+                                        pdmx.kind = material.ma_kind_name
                                         pdmx.spec = material.ma_spec ?: ""
                                         pdmx.hw = material.kc_hw_name
                                         pdmx.comment = material.comment ?: ""
@@ -110,7 +100,6 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
                                         popupView.textView_name.text = pdmx.name
                                         popupView.textView_kcnum.text = pdmx.kc_num.toString()
                                         popupView.textView_kind.text = pdmx.kind
-                                        popupView.textView_spec.text = pdmx.spec
                                         popupView.textView_hw.text = pdmx.hw
                                         popupView.textView_remark.text = pdmx.comment
                                         popupView.editText_num.requestFocus()
@@ -130,22 +119,17 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         toolbarTitle.text = "物料盘点"
-        mVibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         scan.setOnClickListener(this)
         finish.setOnClickListener(this)
 
         scrollView.smoothScrollTo(0, 0)
-        if (!receiverTag) {     //在注册广播接受者的时候 判断是否已被注册,避免重复多次注册广播
-            receiverTag = true
-            registerReceiver(mScanReceiver, IntentFilter(SCAN_ACTION))
-        }
 
         val finish = intent.getIntExtra("finish", -1)
         if (finish == 1) {
             imageView_line.visibility = View.GONE
             layout_menu.visibility = View.GONE
         }
-        pdmx = Pdmx(0, null, null, 0, 0, null, 0,
+        pdmx = Pdmx(0, null, null, 0.0, 0.0, null, 0,
                 "", "", "", "", "", "", "","","",0)     // 初始化pdmx
 //        ckId = when {
 //            intent.hasExtra("ckId") -> intent.getIntExtra("ckId", -1)
@@ -222,6 +206,10 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
         mScanManager = ScanManager()
         mScanManager.openScanner()
         mScanManager.switchOutputMode(0)
+        if (!receiverTag) {     //在注册广播接受者的时候 判断是否已被注册,避免重复多次注册广播
+            receiverTag = true
+            registerReceiver(mScanReceiver, IntentFilter(SCAN_ACTION))
+        }
     }
 
     override fun onDestroy() {
@@ -276,13 +264,13 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         when (resultCode) {
             1 -> {      // 选择了物料
-                val material = intent?.getSerializableExtra("material") as Material
+                val material = intent?.getParcelableExtra("material") as Material
                 pdmx.iid = material.ma_id
                 pdmx.kc_num = material.kc_num
                 pdmx.hao = material.ma_code
                 pdmx.txm = material.ma_txm
                 pdmx.name = material.ma_name
-                pdmx.kind = material.ma_kind
+                pdmx.kind = material.ma_kind_name
                 pdmx.spec = material.ma_spec ?: ""
                 pdmx.hw = material.kc_hw_name
                 pdmx.comment = material.comment ?: ""
@@ -290,8 +278,7 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
                 view.editText_tm.setText(material.ma_txm)
                 view.textView_name.text = material.ma_name
                 view.textView_kcnum.text = material.kc_num.toString()
-                view.textView_kind.text = material.ma_kind
-                view.textView_spec.text = material.ma_spec
+                view.textView_kind.text = material.ma_kind_name
                 view.textView_hw.text = material.kc_hw_name
                 view.textView_remark.text = material.comment
             }

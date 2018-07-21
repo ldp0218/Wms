@@ -2,13 +2,13 @@ package net.tiaozhua.wms
 
 import android.content.DialogInterface
 import android.content.Intent
-import android.widget.TextView
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
 import net.tiaozhua.wms.utils.DialogUtil
 
 /**
@@ -82,10 +82,12 @@ abstract class BaseActivity(private val layoutId: Int) : AppCompatActivity() {
                 DialogUtil.showDialog(this, null, "数据未保存,是否离开?",
                         null,
                         DialogInterface.OnClickListener { _, _ ->
+                            this.finish()
                             onBackPressed()
                         }
                 )
             } else {
+                this.finish()
                 onBackPressed()
             }
         }
@@ -103,12 +105,14 @@ abstract class BaseActivity(private val layoutId: Int) : AppCompatActivity() {
                     DialogUtil.showDialog(this, null, "数据未保存,是否离开?",
                             null,
                             DialogInterface.OnClickListener { _, _ ->
+                                this.finish()
                                 val intent = Intent(this, MainActivity::class.java)
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                                 startActivity(intent)
                             }
                     )
                 } else {
+                    this.finish()
                     val intent = Intent(this, MainActivity::class.java)
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     startActivity(intent)
@@ -119,14 +123,14 @@ abstract class BaseActivity(private val layoutId: Int) : AppCompatActivity() {
                     DialogUtil.showDialog(this, null, "数据未保存,是否离开?",
                             null,
                             DialogInterface.OnClickListener { _, _ ->
+                                this.finish()
                                 val intent = Intent(this, LoginActivity::class.java)
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                                 startActivity(intent)
                             }
                     )
                 } else {
+                    this.finish()
                     val intent = Intent(this, LoginActivity::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     startActivity(intent)
                 }
             }

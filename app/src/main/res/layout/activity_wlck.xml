@@ -32,170 +32,62 @@
 
                 <TextView
                     android:id="@+id/textView_no"
-                    android:layout_width="wrap_content"
+                    android:layout_width="50dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
                     android:layout_weight="1"
                     android:labelFor="@id/editText_no"
-                    android:text="单据编号" />
+                    android:text="领料人" />
 
                 <EditText
-                    android:id="@+id/editText_no"
+                    android:id="@+id/editText_llr"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="20dp"
-                    android:layout_weight="1"
+                    android:layout_marginEnd="10dp"
+                    android:layout_weight="4"
                     android:ems="10"
                     android:focusable="false"
                     android:focusableInTouchMode="false"
                     android:inputType="text"
                     android:textSize="12sp" />
 
+                <Button
+                    android:id="@+id/button_selectLlr"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:layout_weight="1"
+                    android:text="选择" />
+
             </LinearLayout>
 
-            <!--<LinearLayout-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:orientation="horizontal"-->
-                <!--android:paddingEnd="0dp"-->
-                <!--android:paddingStart="20dp">-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingEnd="0dp"
+                android:paddingStart="20dp">
 
-                <!--<TextView-->
-                    <!--android:id="@+id/textView_date"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:labelFor="@id/editText_date"-->
-                    <!--android:text="单据日期" />-->
+                <TextView
+                    android:id="@+id/textView_ck"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="25dp"
+                    android:layout_weight="0"
+                    android:labelFor="@id/editText_no"
+                    android:text="仓库" />
 
-                <!--<EditText-->
-                    <!--android:id="@+id/editText_date"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginEnd="20dp"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:ems="10"-->
-                    <!--android:focusable="false"-->
-                    <!--android:focusableInTouchMode="false"-->
-                    <!--android:inputType="date"-->
-                    <!--android:textSize="12sp" />-->
-            <!--</LinearLayout>-->
+                <EditText
+                    android:id="@+id/editText_wlck_ck"
+                    android:layout_width="133dp"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:inputType="text"
+                    android:textSize="12sp" />
 
-            <!--<LinearLayout-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:orientation="horizontal"-->
-                <!--android:paddingStart="20dp">-->
-
-                <!--<TextView-->
-                    <!--android:id="@+id/textView_llr"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginEnd="15dp"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:labelFor="@id/editText_llr"-->
-                    <!--android:text="领料人" />-->
-
-                <!--<EditText-->
-                    <!--android:id="@+id/editText_llr"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginEnd="20dp"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:ems="10"-->
-                    <!--android:focusable="false"-->
-                    <!--android:focusableInTouchMode="false"-->
-                    <!--android:inputType="text"-->
-                    <!--android:textSize="12sp" />-->
-            <!--</LinearLayout>-->
-
-            <!--<LinearLayout-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:orientation="horizontal"-->
-                <!--android:paddingEnd="0dp"-->
-                <!--android:paddingStart="20dp">-->
-
-                <!--<TextView-->
-                    <!--android:id="@+id/textView_bm"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:labelFor="@id/editText_bm"-->
-                    <!--android:paddingEnd="25dp"-->
-                    <!--android:text="部门" />-->
-
-                <!--<EditText-->
-                    <!--android:id="@+id/editText_bm"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginEnd="20dp"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:ems="10"-->
-                    <!--android:focusable="false"-->
-                    <!--android:focusableInTouchMode="false"-->
-                    <!--android:inputType="text"-->
-                    <!--android:textSize="12sp" />-->
-
-            <!--</LinearLayout>-->
-
-            <!--<LinearLayout-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:orientation="horizontal"-->
-                <!--android:paddingEnd="0dp"-->
-                <!--android:paddingStart="20dp">-->
-
-                <!--<TextView-->
-                    <!--android:id="@+id/textView_ck"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:labelFor="@id/editText_ck"-->
-                    <!--android:text="领料仓库" />-->
-
-                <!--<EditText-->
-                    <!--android:id="@+id/editText_ck"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginEnd="20dp"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:ems="10"-->
-                    <!--android:focusable="false"-->
-                    <!--android:focusableInTouchMode="false"-->
-                    <!--android:inputType="text"-->
-                    <!--android:textSize="12sp" />-->
-            <!--</LinearLayout>-->
-
-            <!--<LinearLayout-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:orientation="horizontal"-->
-                <!--android:paddingEnd="0dp"-->
-                <!--android:paddingStart="20dp">-->
-
-                <!--<TextView-->
-                    <!--android:id="@+id/textView_beizhu"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:labelFor="@id/editText_beizhu"-->
-                    <!--android:paddingEnd="25dp"-->
-                    <!--android:paddingStart="0dp"-->
-                    <!--android:text="备注" />-->
-
-                <!--<EditText-->
-                    <!--android:id="@+id/editText_beizhu"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginEnd="20dp"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:ems="10"-->
-                    <!--android:focusable="false"-->
-                    <!--android:focusableInTouchMode="false"-->
-                    <!--android:inputType="text"-->
-                    <!--android:textSize="12sp" />-->
-
-            <!--</LinearLayout>-->
+            </LinearLayout>
 
             <net.tiaozhua.wms.view.CustomListView
                 android:id="@+id/listView_wlck"
@@ -222,9 +114,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="扫描"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent" />
+            android:text="扫描" />
 
         <Button
             android:id="@+id/lld"
@@ -234,11 +124,7 @@
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:text="领料单"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@+id/button_close"
-            app:layout_constraintRight_toLeftOf="@+id/button4"
-            app:layout_constraintStart_toEndOf="@+id/saomiao" />
+            android:text="流程卡" />
 
         <Button
             android:id="@+id/ck"
@@ -246,9 +132,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="出库"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toRightOf="parent" />
+            android:text="出库" />
     </LinearLayout>
 
 </LinearLayout>

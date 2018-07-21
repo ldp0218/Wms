@@ -3,22 +3,16 @@ package net.tiaozhua.wms
 import android.annotation.SuppressLint
 import android.content.*
 import android.device.ScanManager
-import android.media.AudioManager
-import android.media.SoundPool
 import android.os.Bundle
-import android.os.Vibrator
 import android.view.View
 import android.widget.BaseAdapter
 import android.widget.Toast
-import com.google.gson.Gson
+import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.android.synthetic.main.activity_cppd.*
 import net.tiaozhua.wms.adapter.CommonAdapter
 import net.tiaozhua.wms.adapter.ViewHolder
 import net.tiaozhua.wms.bean.*
-import net.tiaozhua.wms.utils.BaseCallback
-import net.tiaozhua.wms.utils.DialogUtil
-import net.tiaozhua.wms.utils.LoadingDialog
-import net.tiaozhua.wms.utils.RetrofitManager
+import net.tiaozhua.wms.utils.*
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -30,10 +24,7 @@ import java.util.*
 class CppdmxActivity : BaseActivity(R.layout.activity_cppd), View.OnClickListener {
 
     private var ckId: Int = 1
-    private lateinit var mVibrator: Vibrator
     private lateinit var mScanManager: ScanManager
-    private val soundpool = SoundPool(1, AudioManager.STREAM_NOTIFICATION, 100)
-    private val soundid by lazy { soundpool.load("/etc/Scan_new.ogg", 1) }
     private lateinit var barcodeStr: String
     private var receiverTag: Boolean = false
     internal lateinit var pdmxList: MutableList<Pdmx>
@@ -44,40 +35,36 @@ class CppdmxActivity : BaseActivity(R.layout.activity_cppd), View.OnClickListene
     private val mScanReceiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
-            soundpool.play(soundid, 1f, 1f, 0, 0, 1f)
-            mVibrator.vibrate(100)
+            (application as App).playAndVibrate(this@CppdmxActivity)
             barcodeStr = String(intent.getByteArrayExtra("barocode"), 0, intent.getIntExtra("length", 0))
-
-            val id = try {
-                if (productList.contains(barcodeStr)) {
-                    Toast.makeText(context, "请勿重复扫描", Toast.LENGTH_SHORT).show()
-                    return
-                }
-                barcodeStr.substring(0, barcodeStr.indexOf("#")).toInt()
-            } catch (e: NumberFormatException) {
-                0
+            val code = parseProductQRCode(context, barcodeStr, productList)
+            if (code.xsd_bz_id == 0 && code.bz_id == 0 && code.check_num == 0) return
+            if (receiverTag) {   //判断广播是否注册
+                receiverTag = false
+                unregisterReceiver(this)
             }
-            if (id == 0) {
-                Toast.makeText(context, "未查询到相关信息", Toast.LENGTH_SHORT).show()
-                return
-            }
+            val that = this
             LoadingDialog.show(this@CppdmxActivity)
-            RetrofitManager.instance.getProductInfo(id)
-                    .enqueue(object : BaseCallback<Bzmx>(this@CppdmxActivity) {
-                        override fun successData(data: Bzmx) {
-                            if (data.pro_type == 0) {    // 常规记录重复件数
+            RetrofitManager.instance.getProductInfo(code.xsd_bz_id)
+                    .enqueue(object : BaseCallback<Baozhuang>(this@CppdmxActivity) {
+                        override fun successData(data: Baozhuang) {
+//                            if (data.pro_type == 0) {    // 常规记录重复件数
                                 var find = false
                                 for (item in pdmxList) {
                                     if (item.iid == data.bz_id) {
-                                        item.pd_num++
+                                        item.pd_num += code.check_num
                                         pdmx = item
                                         find = true
                                         break
                                     }
                                 }
                                 if (find) {     // list中存在
+                                    if (receiverTag) {   //判断广播是否注册
+                                        receiverTag = false
+                                        unregisterReceiver(that)
+                                    }
                                     LoadingDialog.show(context)
-                                    val requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), Gson().toJson(pdmx))
+                                    val requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), ObjectMapper().writeValueAsBytes(pdmx))
                                     RetrofitManager.instance.updatePdmx(requestBody).enqueue(object : Callback<PdResult> {
                                         override fun onResponse(call: Call<PdResult>?, response: Response<PdResult>?) {
                                             LoadingDialog.dismiss()
@@ -97,7 +84,7 @@ class CppdmxActivity : BaseActivity(R.layout.activity_cppd), View.OnClickListene
                                                             }
                                                         }
                                                         pdAdapter.notifyDataSetChanged()
-                                                        pdmx = Pdmx(0, result.pd_id, null, 0, 0, null, 0, "", "",
+                                                        pdmx = Pdmx(0, result.pd_id, null, 0.0, 0.0, null, 0, "", "",
                                                                 "", "", "", "", "","","",0)
                                                     }
                                                     2 -> { // 登录超时
@@ -125,14 +112,14 @@ class CppdmxActivity : BaseActivity(R.layout.activity_cppd), View.OnClickListene
                                 } else {        // list中不存在
                                     pdmx.iid = data.bz_id
                                     pdmx.xsd_bz_id = data.xsd_bz_id
-                                    pdmx.pd_num = 1
-                                    pdmx.kc_num = data.kc_num
-                                    pdmx.bz_code = data.bz_code
-                                    pdmx.scd_no = data.scd_no
-                                    pdmx.hao = data.pro_model ?: ""
+                                    pdmx.pd_num = code.check_num.toDouble()
+//                                    pdmx.kc_num = data.kc_num
+//                                    pdmx.bz_code = data.bz_code
+//                                    pdmx.scd_no = data.scd_no
+//                                    pdmx.hao = data.pro_model ?: ""
                                     pdmx.ck_id = ckId
                                     LoadingDialog.show(context)
-                                    val requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), Gson().toJson(pdmx))
+                                    val requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), ObjectMapper().writeValueAsBytes(pdmx))
                                     RetrofitManager.instance.updatePdmx(requestBody).enqueue(object : Callback<PdResult> {
                                         override fun onResponse(call: Call<PdResult>?, response: Response<PdResult>?) {
                                             LoadingDialog.dismiss()
@@ -148,7 +135,7 @@ class CppdmxActivity : BaseActivity(R.layout.activity_cppd), View.OnClickListene
                                                         pdmx.id = result.id
                                                         pdmxList.add(pdmx)
                                                         pdAdapter.notifyDataSetChanged()
-                                                        pdmx = Pdmx(0, result.pd_id, null, 0, 0, null, 0, "", "",
+                                                        pdmx = Pdmx(0, result.pd_id, null, 0.0, 0.0, null, 0, "", "",
                                                                 "", "", "", "", "","","",0)
                                                     }
                                                     2 -> { // 登录超时
@@ -175,7 +162,7 @@ class CppdmxActivity : BaseActivity(R.layout.activity_cppd), View.OnClickListene
                                     })
                                 }
                             }
-                        }
+//                        }
                     })
         }
 
@@ -185,21 +172,16 @@ class CppdmxActivity : BaseActivity(R.layout.activity_cppd), View.OnClickListene
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         toolbarTitle.text = "成品盘点"
-        mVibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         finish.setOnClickListener(this)
 
         scrollView.smoothScrollTo(0, 0)
-        if (!receiverTag) {     //在注册广播接受者的时候 判断是否已被注册,避免重复多次注册广播
-            receiverTag = true
-            registerReceiver(mScanReceiver, IntentFilter(SCAN_ACTION))
-        }
 
         val finish = intent.getIntExtra("finish", -1)
         if (finish == 1) {
             imageView_line.visibility = View.GONE
             layout_menu.visibility = View.GONE
         }
-        pdmx = Pdmx(1, null, null, 0, 0, null, 0,
+        pdmx = Pdmx(1, null, null, 0.0, 0.0, null, 0,
                 "", "", "", "", "", "", "","","",0)     // 初始化pdmx
 //        ckId = when {
 //            intent.hasExtra("ckId") -> intent.getIntExtra("ckId", -1)
@@ -258,6 +240,10 @@ class CppdmxActivity : BaseActivity(R.layout.activity_cppd), View.OnClickListene
         mScanManager = ScanManager()
         mScanManager.openScanner()
         mScanManager.switchOutputMode(0)
+        if (!receiverTag) {     //在注册广播接受者的时候 判断是否已被注册,避免重复多次注册广播
+            receiverTag = true
+            registerReceiver(mScanReceiver, IntentFilter(SCAN_ACTION))
+        }
     }
 
     override fun onDestroy() {

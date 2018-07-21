@@ -11,12 +11,9 @@ import android.view.animation.Animation
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import com.google.gson.Gson
+import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.android.synthetic.main.popup_scan_material.view.*
-import net.tiaozhua.wms.bean.Material
-import net.tiaozhua.wms.bean.PdResult
-import net.tiaozhua.wms.bean.Pdmx
-import net.tiaozhua.wms.bean.ResponseList
+import net.tiaozhua.wms.bean.*
 import net.tiaozhua.wms.utils.BaseCallback
 import net.tiaozhua.wms.utils.DialogUtil
 import net.tiaozhua.wms.utils.LoadingDialog
@@ -54,31 +51,30 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
         when (activity) {
             is WlrkActivity -> {
                 val m = activity.jhmx
-                popupView.editText_tm.setText(m.ma_txm)
+                popupView.editText_tm.setText(m.ma_code)
                 popupView.textView_name.text = m.ma_name
                 popupView.editText_num.setText(m.mx_num.toString())
                 popupView.editText_num.requestFocus()
-                if (m.mx_price > 0) {
-                    popupView.editText_price.setText(m.mx_price.toString())
-                }
                 popupView.textView_kcnum.text = m.kcnum.toString()
+                popupView.editText_price.setText(m.mx_price.toString())
                 popupView.textView_kind.text = m.ma_kind
-                popupView.textView_spec.text = m.ma_spec
                 popupView.textView_hw.text = m.hj_name
                 popupView.textView_remark.text = m.mx_remark
             }
             is WlckActivity -> {
-                val m = activity.ckdmx
-                popupView.editText_tm.setText(m.ma_txm)
-                popupView.textView_name.text = m.ma_name
-                popupView.editText_num.setText(m.ck_num.toString())
-                popupView.editText_num.requestFocus()
-                popupView.editText_num.setSelection(popupView.editText_num.text.toString().trim().length)
-                popupView.textView_kcnum.text = m.kc_num.toString()
-                popupView.textView_kind.text = m.ma_kind
-                popupView.textView_spec.text = m.ma_spec
-                popupView.textView_hw.text = m.hj_name
-                popupView.textView_remark.text = m.mx_remark
+                popupView.button_commit.text = "确认"
+                val wl = activity.material
+                if (wl != null) {
+                    popupView.editText_tm.setText(wl.ma_code)
+                    popupView.textView_name.text = wl.ma_name
+                    popupView.textView_kcnum.text = wl.kc_num.toString()
+                    popupView.textView_cknum.text = wl.ck_num.toString()
+                    popupView.textView_kind.text = wl.ma_kind_name
+                    popupView.textView_hw.text = wl.kc_hw_name
+                    popupView.textView_remark.text = wl.comment
+                    popupView.editText_num.requestFocus()
+                    popupView.editText_num.setSelection(popupView.editText_num.text.toString().trim().length)
+                }
             }
             is KcpdActivity -> {
                 val m = activity.pdmx
@@ -89,7 +85,6 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                 popupView.editText_num.setSelection(popupView.editText_num.text.toString().trim().length)
                 popupView.textView_kcnum.text = m.kc_num.toString()
                 popupView.textView_kind.text = m.kind
-                popupView.textView_spec.text = m.spec
                 popupView.textView_hw.text = m.hw
                 popupView.textView_remark.text = m.comment
             }
@@ -119,9 +114,23 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
     }
 
     private fun bindEvent() {
+        when (activity) {
+            is WlrkActivity -> {
+                popupView.layout_cknum.visibility = View.GONE
+                popupView.layout_price.visibility = View.VISIBLE
+            }
+            is WlckActivity -> {
+                popupView.layout_cknum.visibility = View.VISIBLE
+                popupView.layout_price.visibility = View.GONE
+            }
+            is KcpdActivity -> {
+                popupView.layout_cknum.visibility = View.GONE
+                popupView.layout_price.visibility = View.GONE
+            }
+        }
         popupView.button_close.setOnClickListener(this)
         popupView.button_commit.setOnClickListener(this)
-        popupView.editText_tm.setOnEditorActionListener({ _, code, _ ->
+        popupView.editText_tm.setOnEditorActionListener { _, code, _ ->
             when (code) {
                 EditorInfo.IME_ACTION_DONE, EditorInfo.IME_ACTION_UNSPECIFIED -> {  // 点击完成按钮或虚拟键
                     val barcode = popupView.editText_tm.text.toString()
@@ -147,8 +156,7 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                                     popupView.editText_tm.setText(material.ma_txm)
                                                     popupView.textView_name.text = material.ma_name
                                                     popupView.textView_kcnum.text = material.kc_num.toString()
-                                                    popupView.textView_kind.text = material.ma_kind
-                                                    popupView.textView_spec.text = material.ma_spec
+                                                    popupView.textView_kind.text = material.ma_kind_name
                                                     popupView.textView_hw.text = material.kc_hw_name
                                                     popupView.textView_remark.text = material.comment
                                                     popupView.editText_num.requestFocus()
@@ -159,36 +167,7 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                     })
                         }
                         is WlckActivity -> {
-                            val ckId = activity.ckd.ck_id
-                            LoadingDialog.show(activity)
-                            RetrofitManager.instance.materialList(barcode, ckId)
-                                    .enqueue(object : BaseCallback<ResponseList<Material>>(context) {
-                                        override fun successData(data: ResponseList<Material>) {
-                                            when {
-                                                data.totalCount == 0 -> Toast.makeText(context, "未查询到相关信息", Toast.LENGTH_SHORT).show()
-                                                data.totalCount > 1 -> {
-                                                    val intent = Intent(context, MaterialSelectActivity::class.java)
-                                                    intent.putExtra("code", barcode)
-                                                    intent.putExtra("ckId", ckId)
-                                                    intent.putExtra("data", data)
-                                                    activity.startActivityForResult(intent, 0)
-                                                }
-                                                else -> {
-                                                    val material = data.items[0]
-                                                    activity.material = material
-                                                    popupView.editText_tm.setText(material.ma_txm)
-                                                    popupView.textView_name.text = material.ma_name
-                                                    popupView.textView_kcnum.text = material.kc_num.toString()
-                                                    popupView.textView_kind.text = material.ma_kind
-                                                    popupView.textView_spec.text = material.ma_spec
-                                                    popupView.textView_hw.text = material.kc_hw_name
-                                                    popupView.textView_remark.text = material.comment
-                                                    popupView.editText_num.requestFocus()
-                                                    popupView.editText_num.setSelection(popupView.editText_num.text.toString().trim().length)
-                                                }
-                                            }
-                                        }
-                                    })
+
                         }
                         is KcpdActivity -> {
                             val ckId = activity.ckId
@@ -212,15 +191,14 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                                     activity.pdmx.hao = material.ma_code
                                                     activity.pdmx.txm = material.ma_txm
                                                     activity.pdmx.name = material.ma_name
-                                                    activity.pdmx.kind = material.ma_kind
+                                                    activity.pdmx.kind = material.ma_kind_name
                                                     activity.pdmx.spec = material.ma_spec ?: ""
                                                     activity.pdmx.hw = material.kc_hw_name
                                                     activity.pdmx.comment = material.comment ?: ""
                                                     popupView.editText_tm.setText(material.ma_txm)
                                                     popupView.textView_name.text = material.ma_name
                                                     popupView.textView_kcnum.text = material.kc_num.toString()
-                                                    popupView.textView_kind.text = material.ma_kind
-                                                    popupView.textView_spec.text = material.ma_spec
+                                                    popupView.textView_kind.text = material.ma_kind_name
                                                     popupView.textView_hw.text = material.kc_hw_name
                                                     popupView.textView_remark.text = material.comment
                                                     popupView.editText_num.requestFocus()
@@ -229,7 +207,7 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                                     // 先查询是否已盘点
                                                     if (activity.pdmx.pd_id != null) {
                                                         LoadingDialog.show(activity)
-                                                        val json = Gson().toJson(activity.pdmx)
+                                                        val json = ObjectMapper().writeValueAsBytes(activity.pdmx)
                                                         val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
                                                         RetrofitManager.instance.selPdmx(requestBody)
                                                                 .enqueue(object : BaseCallback<Pdmx>(context) {
@@ -252,8 +230,8 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                 else -> Toast.makeText(context, code.toString(), Toast.LENGTH_SHORT).show()
             }
             return@setOnEditorActionListener false      // 防止响应两次
-        })
-        popupView.editText_num.setOnEditorActionListener({ _, code, _ ->
+        }
+        popupView.editText_num.setOnEditorActionListener { _, code, _ ->
             when (code) {
                 EditorInfo.IME_ACTION_DONE, EditorInfo.IME_ACTION_UNSPECIFIED -> {  // 点击完成按钮或虚拟键
                     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -263,7 +241,7 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                 else -> Toast.makeText(context, code.toString(), Toast.LENGTH_SHORT).show()
             }
             return@setOnEditorActionListener true
-        })
+        }
     }
 
     override fun onClick(v: View) {
@@ -281,16 +259,16 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                             for (item in activity.jhd.jhmx) {
                                 if (item.ma_id == activity.material?.ma_id) {
                                     val numStr = popupView.editText_num.text.toString()
+                                    val priceStr = popupView.editText_price.text.toString()
                                     if (numStr.isBlank()) {
                                         Toast.makeText(context, "请输入数量", Toast.LENGTH_SHORT).show()
                                         return
                                     }
-                                    val priceStr = popupView.editText_price.text.toString()
                                     if (priceStr.isBlank()) {
-                                        Toast.makeText(context, "请录入进价", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, "请输入进价", Toast.LENGTH_SHORT).show()
                                         return
                                     }
-                                    val num = numStr.toInt()
+                                    val num = numStr.toDouble()
                                     if (num > item.mx_wwcnum) {
                                         Toast.makeText(context, "不能超过未入库数量", Toast.LENGTH_SHORT).show()
                                         return
@@ -314,31 +292,33 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                 Toast.makeText(context, "请扫描物料", Toast.LENGTH_SHORT).show()
                                 return
                             }
+                            val numStr = popupView.editText_num.text.toString()
+                            val num = numStr.toDouble()
                             var hasMaterial = false
-                            for (item in activity.ckd.ckdmx) {
-                                if (item.ma_id == activity.material?.ma_id) {
-                                    val numStr = popupView.editText_num.text.toString()
-                                    if (numStr.isBlank() || numStr.toInt() == 0) {
+                            for (item in activity.wlckList) {
+                                if (item.ma_id == activity.material!!.ma_id) {
+                                    if (numStr.isBlank() || numStr.toDouble() == 0.0) {
                                         Toast.makeText(context, "请输入数量", Toast.LENGTH_SHORT).show()
                                         return
                                     }
-                                    val num = numStr.toInt()
-                                    if (num > item.mx_num - item.wc_num) {
-                                        Toast.makeText(context, "不能超过未领数量", Toast.LENGTH_SHORT).show()
+                                    if (num != item.num) {
+                                        Toast.makeText(context, "数量不一致", Toast.LENGTH_SHORT).show()
                                         return
                                     }
-                                    Toast.makeText(context, "数量清点完毕", Toast.LENGTH_SHORT).show()
-                                    item.ck_num = num
-                                    // 重新加载数据
-                                    activity.wlAdapter.notifyDataSetChanged()
-                                    clearData()
+                                    item.scanNum = num
                                     hasMaterial = true
                                     break
                                 }
                             }
                             if (!hasMaterial) {
-                                Toast.makeText(context, "领料单不包含该物料，请扫描其它物料", Toast.LENGTH_SHORT).show()
+                                val ma = activity.material!!
+                                activity.wlckList.add(Wlck(ma.ma_id, ma.kc_num, ma.kc_hw_name, num, num, "", ma.ma_name, ma.ma_code,
+                                        ma.ma_spec, ma.ma_kind_name, ma.ma_unit, 0, 0, null))
                             }
+                            // 重新加载数据
+                            activity.adapter.notifyDataSetChanged()
+                            clearData()
+                            dismiss()
                         }
                         is KcpdActivity -> {
                             if (popupView.editText_tm.text.toString().isBlank()) {
@@ -352,8 +332,8 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                             }
                             LoadingDialog.show(context)
                             activity.pdmx.id = null
-                            activity.pdmx.pd_num = numStr.toInt()
-                            val json = Gson().toJson(activity.pdmx)
+                            activity.pdmx.pd_num = numStr.toDouble()
+                            val json = ObjectMapper().writeValueAsBytes(activity.pdmx)
                             val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
                             RetrofitManager.instance.updatePdmx(requestBody)
                                     .enqueue(object : Callback<PdResult> {
@@ -376,7 +356,7 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                                     activity.pdmx.id = data.id
                                                     activity.pdmxList.add(activity.pdmx)
                                                     activity.pdAdapter.notifyDataSetChanged()
-                                                    activity.pdmx = Pdmx(0, activity.pdmx.pd_id, null, 0, 0, null, 0, "", "",
+                                                    activity.pdmx = Pdmx(0, activity.pdmx.pd_id, null, 0.0, 0.0, null, 0, "", "",
                                                             "", "", "", "", "","","",0)
                                                     clearData()
                                                 }
@@ -403,38 +383,32 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                     }
                 } else if (popupView.button_commit.text == "修改") {      // 点击修改按钮执行
                     val numStr = popupView.editText_num.text.toString()
-                    if (numStr.trim().isBlank() || numStr.toInt() == 0) {
+                    if (numStr.trim().isBlank() || numStr.toDouble() == 0.0) {
                         Toast.makeText(context, "请输入数量", Toast.LENGTH_SHORT).show()
                         return
                     }
-                    val num = numStr.toInt()
+                    val num = numStr.toDouble()
                     when (activity) {
                         is WlrkActivity -> {
                             if (num > activity.jhmx.mx_wwcnum) {
                                 Toast.makeText(context, "不能超过未入库数量", Toast.LENGTH_SHORT).show()
                                 return
                             }
-                            val priceStr = popupView.editText_price.text.toString()
-                            if (priceStr.isBlank()) {
-                                Toast.makeText(context, "请录入进价", Toast.LENGTH_SHORT).show()
-                                return
-                            }
                             activity.jhmx.mx_num = num
-                            activity.jhmx.mx_price = priceStr.toDouble()
                             activity.wlAdapter.notifyDataSetChanged()
                         }
                         is WlckActivity -> {
-                            if (num > activity.ckdmx.mx_num - activity.ckdmx.wc_num) {
-                                Toast.makeText(context, "不能超过未领数量", Toast.LENGTH_SHORT).show()
-                                return
-                            }
-                            activity.ckdmx.ck_num = num
-                            activity.wlAdapter.notifyDataSetChanged()
+//                            if (num > activity.ckdmx.mx_num - activity.ckdmx.wc_num) {
+//                                Toast.makeText(context, "不能超过未领数量", Toast.LENGTH_SHORT).show()
+//                                return
+//                            }
+//                            activity.ckdmx.ck_num = num
+//                            activity.wlAdapter.notifyDataSetChanged()
                         }
                         is KcpdActivity -> {
                             LoadingDialog.show(context)
                             activity.pdmx.pd_num = num
-                            val json = Gson().toJson(activity.pdmx)
+                            val json = ObjectMapper().writeValueAsBytes(activity.pdmx)
                             val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
                             RetrofitManager.instance.updatePdmx(requestBody)
                                     .enqueue(object : Callback<PdResult> {
@@ -457,7 +431,7 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                                         activity.pdmxList.add(activity.pdmx)
                                                     }
                                                     activity.pdAdapter.notifyDataSetChanged()
-                                                    activity.pdmx = Pdmx(0, activity.pdmx.pd_id, null, 0, 0, null, 0, "", "",
+                                                    activity.pdmx = Pdmx(0, activity.pdmx.pd_id, null, 0.0, 0.0, null, 0, "", "",
                                                             "", "", "", "", "","","",0)
                                                     clearData()
                                                 }
@@ -496,10 +470,11 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
         popupView.editText_tm.text.clear()
         popupView.textView_name.text = ""
         popupView.editText_num.text.clear()
-        popupView.editText_price.text.clear()
+        popupView.textView_cknum.text = ""
         popupView.textView_kcnum.text = ""
+        popupView.editText_num.text.clear()
+        popupView.editText_price.text.clear()
         popupView.textView_kind.text = ""
-        popupView.textView_spec.text = ""
         popupView.textView_hw.text = ""
         popupView.textView_remark.text = ""
     }

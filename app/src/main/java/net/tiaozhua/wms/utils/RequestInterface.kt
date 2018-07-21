@@ -11,7 +11,7 @@ import retrofit2.http.*
 interface RequestInterface {
     @Headers("Domain-Name: domain")
     @GET("action/admin/login?type=1")
-    fun login(@Query("a_name") name: String, @Query("a_pwd") password: String): Call<ApiBean<String>>
+    fun login(@Query("a_name") name: String, @Query("a_pwd") password: String): Call<ApiBean<User>>
 
     @Headers("Domain-Name: domain")
     @GET("action/jhd/jhdPage?check_flag=1&finish_flag=0&orderByProp=jhd_id&descOrAsc=desc")
@@ -22,8 +22,12 @@ interface RequestInterface {
     fun jhdInfo(@Query("id") id: Int): Call<ApiBean<Jhd>>
 
     @Headers("Domain-Name: domain")
-    @GET("action/material/materialList?selectValue=4&isShowAll=1")
+    @GET("action/material/materialList?selectValue=2&isShowAll=1")
     fun materialList(@Query("searchValue") txm: String, @Query("ckid") ckid: Int, @Query("page") page: Int = 1): Call<ApiBean<ResponseList<Material>>>
+
+    @Headers("Domain-Name: domain")
+    @GET("action/material/materialInfo")
+    fun materialInfo(@Query("code") code: String, @Query("ckId") ckId: Int): Call<ApiBean<Material>>
 
     @Headers("Domain-Name: domain")
     @GET("action/jh/getJh_no")
@@ -49,8 +53,8 @@ interface RequestInterface {
     @GET("action/ckd/lldInfo")
     fun lldInfo(@Query("id") id: Int): Call<ApiBean<Ckd>>
 
-//    @GET("action/ck/ckList")
-//    fun ckList(): Call<ApiBean<ResponseList<Ck>>>
+    @GET("action/ck/ckList")
+    fun ckList(): Call<ApiBean<ResponseList<Ck>>>
 
     @Headers("Domain-Name: domain")
     @GET("action/kc/pdList")
@@ -83,7 +87,7 @@ interface RequestInterface {
 
     @Headers("Domain-Name: domain")
     @GET("action/pda/getProductInfo")
-    fun getProductInfo(@Query("id") id: Int): Call<ApiBean<Bzmx>>
+    fun getProductInfo(@Query("id") id: Int): Call<ApiBean<Baozhuang>>
 
     @Headers("Domain-Name: domain")
     @POST("action/rk/insert_rk")
@@ -93,10 +97,30 @@ interface RequestInterface {
 //    fun productList(@Query("id") id: Int, @Query("ckid") ckid: Int): Call<ApiBean<ResponseList<Product>>>
 
     @Headers("Domain-Name: domain")
+    @GET("action/pda/productStock")
+    fun productStock(@Query("id") id: Int): Call<ApiBean<Xs>>
+
+    @Headers("Domain-Name: domain")
     @GET("action/pda/hktzd")
     fun hktzd(@Query("id") id: Int): Call<ApiBean<Xs>>
 
     @Headers("Domain-Name: domain")
+    @POST("action/pda/cpbh")
+    fun cpbh(@Body xs: RequestBody): Call<ApiBean<List<Xs>>>
+
+    @Headers("Domain-Name: domain")
     @POST("action/pda/cpck")
-    fun cpck(@Body xs: RequestBody): Call<ApiBean<List<Xs>>>
+    fun cpck(@Body productXs: RequestBody): Call<ApiBean<List<Xs>>>
+
+    @Headers("Domain-Name: domain")
+    @GET("action/admin/adminList")
+    fun adminList(@Query("value") query: String, @Query("page") page: Int = 1): Call<ApiBean<ResponseList<User>>>
+
+    @Headers("Domain-Name: domain")
+    @GET("action/pda/scdmxInfo")
+    fun scdmxInfo(@Query("scdmxId") scdmxId: Int, @Query("ckId") ckId: Int, @Query("gzId") gzId: Int): Call<ApiBean<Scdmx>>
+
+    @Headers("Domain-Name: domain")
+    @GET("action/ckd/getCkd_no")
+    fun getCkdNo(): Call<ApiBean<String>>
 }

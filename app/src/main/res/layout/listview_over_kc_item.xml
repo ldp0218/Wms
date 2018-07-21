@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:paddingStart="10dp"
+    android:paddingTop="10dp"
+    tools:ignore="RtlSymmetry">
+
+    <TextView
+        android:id="@+id/textView_namelabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:text="物料名称" />
+
+    <TextView
+        android:id="@+id/textView_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/textView_namelabel" />
+
+    <TextView
+        android:id="@+id/textView_kclabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView_namelabel"
+        android:layout_marginEnd="10dp"
+        android:text="库存数量" />
+
+    <TextView
+        android:id="@+id/textView_kc"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView_namelabel"
+        android:layout_toEndOf="@+id/textView_kclabel"
+        android:textColor="@android:color/black" />
+
+    <TextView
+        android:id="@+id/textView_cknumlabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView_namelabel"
+        android:layout_marginEnd="10dp"
+        android:layout_toStartOf="@+id/textView_cknum"
+        android:text="领取数量" />
+
+    <TextView
+        android:id="@+id/textView_cknum"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/textView_namelabel"
+        android:textColor="@android:color/black" />
+
+</RelativeLayout>

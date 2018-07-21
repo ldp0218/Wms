@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:paddingBottom="10dp"
+    android:paddingStart="10dp"
+    android:paddingTop="10dp">
+
+    <RadioButton
+        android:id="@+id/rb_item"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="false"
+        android:layout_marginTop="5dp"
+        android:clickable="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/rb_item"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView_namelabel"
+            android:layout_width="65dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:text="职工名称" />
+
+        <TextView
+            android:id="@+id/textView_name"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/textView_namelabel"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/textView_nolabel"
+            android:layout_width="65dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_toStartOf="@+id/textView_no"
+            android:text="职工编号" />
+
+        <TextView
+            android:id="@+id/textView_no"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:id="@+id/textView_bmlabel"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_nolabel"
+            android:text="部门" />
+
+        <TextView
+            android:id="@+id/textView_bm"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_nolabel"
+            android:layout_toEndOf="@+id/textView_bmlabel"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/textView_gzlabel"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_nolabel"
+            android:layout_toStartOf="@+id/textView_gz"
+            android:text="工种" />
+
+        <TextView
+            android:id="@+id/textView_gz"
+            android:layout_width="75dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/textView_nolabel"
+            android:textColor="@android:color/black" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

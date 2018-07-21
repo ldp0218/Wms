@@ -34,7 +34,7 @@
         android:layout_marginBottom="5dp"
         android:layout_marginEnd="10dp"
         android:layout_toStartOf="@+id/textView_bz"
-        android:text="备注" />
+        android:text="卡号" />
 
     <TextView
         android:id="@+id/textView_bz"

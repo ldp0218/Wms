@@ -5,8 +5,9 @@ import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.Animation
-import android.widget.ArrayAdapter
 import kotlinx.android.synthetic.main.popup_nonscanning.view.*
+import net.tiaozhua.wms.adapter.NonScanningAdapter
+import net.tiaozhua.wms.bean.Bz
 import razerdp.basepopup.BasePopupWindow
 
 
@@ -15,21 +16,24 @@ import razerdp.basepopup.BasePopupWindow
 */
 class NonScanningPopup(private val activity: Activity) : BasePopupWindow(activity), View.OnClickListener {
 
-    lateinit var popupView: View
-    lateinit var adapter: ArrayAdapter<String>
+    private lateinit var popupView: View
+    lateinit var adapter: NonScanningAdapter
 
     init {
-        if (activity is CpckActivity) {
-            adapter = ArrayAdapter<String>(activity,
-                    android.R.layout.simple_list_item_1, activity.nonScanningList.values.toMutableList())
-            popupView.listView.adapter = adapter
+        when(activity) {
+            is CpbhActivity -> {
+                adapter = NonScanningAdapter(activity.nonScanningList.values.toMutableList(), context)
+            }
+            is CpckActivity -> {
+                adapter = NonScanningAdapter(activity.nonScanningList.values.toMutableList(), context)
+            }
         }
+        popupView.listView.adapter = adapter
         popupView.button_close.setOnClickListener(this)
     }
 
-    fun update(list: HashMap<Int, String>) {
-        adapter = ArrayAdapter<String>(activity,
-                android.R.layout.simple_list_item_1, list.values.toMutableList())
+    fun update(list: HashMap<Int, Bz>) {
+        adapter = NonScanningAdapter(list.values.toMutableList(), context)
         popupView.listView.adapter = adapter
     }
 

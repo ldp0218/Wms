@@ -21,12 +21,12 @@
         android:textColor="@android:color/black"
         android:textSize="14sp" />
 
-    <ImageView
-        android:id="@+id/imageView_delete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="10dp"
-        app:srcCompat="@android:drawable/ic_delete" />
+    <!--<ImageView-->
+        <!--android:id="@+id/imageView_delete"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentEnd="true"-->
+        <!--android:layout_marginEnd="10dp"-->
+        <!--app:srcCompat="@android:drawable/ic_delete" />-->
 
 </RelativeLayout>

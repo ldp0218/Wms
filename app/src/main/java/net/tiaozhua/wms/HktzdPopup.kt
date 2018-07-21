@@ -2,7 +2,6 @@ package net.tiaozhua.wms
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.Animation
@@ -10,10 +9,6 @@ import kotlinx.android.synthetic.main.popup_hktzd.view.*
 import net.tiaozhua.wms.adapter.CommonAdapter
 import net.tiaozhua.wms.adapter.ViewHolder
 import net.tiaozhua.wms.bean.Xs
-import net.tiaozhua.wms.bean.Xsmx
-import net.tiaozhua.wms.utils.BaseCallback
-import net.tiaozhua.wms.utils.DialogUtil
-import net.tiaozhua.wms.utils.RetrofitManager
 import razerdp.basepopup.BasePopupWindow
 
 /**
@@ -21,83 +16,167 @@ import razerdp.basepopup.BasePopupWindow
 */
 class HktzdPopup(private val activity: Activity) : BasePopupWindow(activity), View.OnClickListener {
 
-    lateinit var popupView: View
+    private lateinit var popupView: View
     lateinit var adapter: CommonAdapter<String>
 
     init {
-        if (activity is CpckActivity) {
-            val datas = mutableListOf<String>()
-            activity.xsList.mapTo(datas) { it.xs_no }
-            adapter = object : CommonAdapter<String>(datas, R.layout.listview_hktzd_item) {
-                override fun convert(holder: ViewHolder, t: String, position: Int) {
-                    holder.setText(R.id.textView_no, t ?: "")
-                    holder.setOnClickListener(R.id.imageView_delete, View.OnClickListener {
-                        DialogUtil.showDialog(activity, null, "是否删除?",
-                                null,
-                                DialogInterface.OnClickListener { _, _ ->
-                                    val xs = activity.xsList.find { it.xs_no == datas[position] }
-                                    val iterator = activity.xsmxList.iterator()
-                                    lateinit var xsmx: Xsmx
-                                    while (iterator.hasNext()) {
-                                        xsmx = iterator.next()
-                                        for (xsmx2 in xs!!.xsmx) {
-                                            if (xsmx.xsmx_id == xsmx2.xsmx_id) {
-                                                iterator.remove()
-                                                break
-                                            }
-                                        }
-                                    }
-                                    activity.cpAdapter.notifyDataSetChanged()
-                                    activity.xsList.remove(xs)
-                                    datas.removeAt(position)
-                                    notifyDataSetChanged()
-                                }
-                        )
-                    })
+        when(activity) {
+            is CpbhActivity -> {
+                val datas = mutableListOf<String>()
+                activity.xsList.mapTo(datas) { it.xs_no }
+                adapter = object : CommonAdapter<String>(datas, R.layout.listview_hktzd_item) {
+                    override fun convert(holder: ViewHolder, t: String, position: Int) {
+                        holder.setText(R.id.textView_no, t)
+//                        holder.setOnClickListener(R.id.imageView_delete, View.OnClickListener {
+//                            DialogUtil.showDialog(activity, null, "是否删除?",
+//                                    null,
+//                                    DialogInterface.OnClickListener { _, _ ->
+//                                        val xs = activity.xsList.find { it.xs_no == datas[position] }
+//                                        val iterator = activity.xsmxList.iterator()
+//                                        lateinit var xsmx: Xsmx
+//                                        while (iterator.hasNext()) {
+//                                            xsmx = iterator.next()
+//                                            for (xsmx2 in xs!!.xsmx) {
+//                                                if (xsmx.xsmx_id == xsmx2.xsmx_id) {
+//                                                    iterator.remove()
+//                                                    break
+//                                                }
+//                                            }
+//                                        }
+//                                        activity.cpAdapter.notifyDataSetChanged()
+//                                        activity.xsList.remove(xs)
+//                                        datas.removeAt(position)
+//                                        notifyDataSetChanged()
+//                                    }
+//                            )
+//                        })
+                    }
                 }
+                popupView.listView.adapter = adapter
             }
-            popupView.listView.adapter = adapter
+            is CpckActivity -> {
+                val datas = mutableListOf<String>()
+                activity.xsList.mapTo(datas) { it.xs_no }
+                adapter = object : CommonAdapter<String>(datas, R.layout.listview_hktzd_item) {
+                    override fun convert(holder: ViewHolder, t: String, position: Int) {
+                        holder.setText(R.id.textView_no, t)
+//                        holder.setOnClickListener(R.id.imageView_delete, View.OnClickListener {
+//                            DialogUtil.showDialog(activity, null, "是否删除?",
+//                                    null,
+//                                    DialogInterface.OnClickListener { _, _ ->
+//                                        val xs = activity.xsList.find { it.xs_no == datas[position] }
+//                                        val iterator = activity.xsmxList.iterator()
+//                                        lateinit var xsmx: Xsmx
+//                                        while (iterator.hasNext()) {
+//                                            xsmx = iterator.next()
+//                                            for (xsmx2 in xs!!.xsmx) {
+//                                                if (xsmx.xsmx_id == xsmx2.xsmx_id) {
+//                                                    iterator.remove()
+//                                                    break
+//                                                }
+//                                            }
+//                                        }
+//                                        activity.cpAdapter.notifyDataSetChanged()
+//                                        activity.xsList.remove(xs)
+//                                        datas.removeAt(position)
+//                                        notifyDataSetChanged()
+//                                    }
+//                            )
+//                        })
+                    }
+                }
+                popupView.listView.adapter = adapter
+            }
         }
         popupView.button_close.setOnClickListener(this)
     }
 
     fun update(list: List<Xs>) {
-        if (activity is CpckActivity) {
-            val datas = mutableListOf<String>()
-            list.mapTo(datas) { it.xs_no }
-            adapter = object : CommonAdapter<String>(datas, R.layout.listview_hktzd_item) {
-                override fun convert(holder: ViewHolder, t: String, position: Int) {
-                    holder.setText(R.id.textView_no, t ?: "")
-                    holder.setOnClickListener(R.id.imageView_delete, View.OnClickListener {
-                        DialogUtil.showDialog(activity, null, "是否删除?",
-                                null,
-                                DialogInterface.OnClickListener { _, _ ->
-                                    val xs = list.find { it.xs_no == datas[position] }
-                                    val iterator = activity.xsmxList.iterator()
-                                    lateinit var xsmx: Xsmx
-                                    while (iterator.hasNext()) {
-                                        xsmx = iterator.next()
-                                        for (xsmx2 in xs!!.xsmx) {
-                                            if (xsmx.xsmx_id == xsmx2.xsmx_id) {
-                                                activity.productList.values.remove(xsmx)
-                                                xsmx.bzList.forEach {
-                                                    activity.nonScanningList.remove(it.xsd_bz_id)
-                                                }
-                                                iterator.remove()
-                                                break
-                                            }
-                                        }
-                                    }
-                                    activity.cpAdapter.notifyDataSetChanged()
-                                    activity.xsList.remove(xs)
-                                    datas.removeAt(position)
-                                    notifyDataSetChanged()
-                                }
-                        )
-                    })
+        when(activity) {
+            is CpbhActivity -> {
+                val datas = mutableListOf<String>()
+                list.mapTo(datas) { it.xs_no }
+                adapter = object : CommonAdapter<String>(datas, R.layout.listview_hktzd_item) {
+                    override fun convert(holder: ViewHolder, t: String, position: Int) {
+                        holder.setText(R.id.textView_no, t)
+//                        holder.setOnClickListener(R.id.imageView_delete, View.OnClickListener {
+//                            DialogUtil.showDialog(activity, null, "是否删除?",
+//                                    null,
+//                                    DialogInterface.OnClickListener { _, _ ->
+//                                        val xs = list.find { it.xs_no == datas[position] }
+//                                        val iterator = activity.xsmxList.iterator()
+//                                        lateinit var xsmx: Xsmx
+//                                        while (iterator.hasNext()) {
+//                                            xsmx = iterator.next()
+//                                            for (xsmx2 in xs!!.xsmx) {
+//                                                if (xsmx.xsmx_id == xsmx2.xsmx_id) {
+//                                                    for (item in activity.productList) {
+//                                                        if (item.value == xsmx) {
+//                                                            activity.productList.remove(item.key)
+//                                                            break
+//                                                        }
+//                                                    }
+//                                                    xsmx.bzList.forEach {
+//                                                        activity.nonScanningList.remove(it.xsd_bz_id)
+//                                                    }
+//                                                    iterator.remove()
+//                                                    break
+//                                                }
+//                                            }
+//                                        }
+//                                        activity.cpAdapter.notifyDataSetChanged()
+//                                        activity.xsList.remove(xs)
+//                                        datas.removeAt(position)
+//                                        notifyDataSetChanged()
+//                                    }
+//                            )
+//                        })
+                    }
                 }
+                popupView.listView.adapter = adapter
             }
-            popupView.listView.adapter = adapter
+            is CpckActivity -> {
+                val datas = mutableListOf<String>()
+                list.mapTo(datas) { it.xs_no }
+                adapter = object : CommonAdapter<String>(datas, R.layout.listview_hktzd_item) {
+                    override fun convert(holder: ViewHolder, t: String, position: Int) {
+                        holder.setText(R.id.textView_no, t)
+//                        holder.setOnClickListener(R.id.imageView_delete, View.OnClickListener {
+//                            DialogUtil.showDialog(activity, null, "是否删除?",
+//                                    null,
+//                                    DialogInterface.OnClickListener { _, _ ->
+//                                        val xs = list.find { it.xs_no == datas[position] }
+//                                        val iterator = activity.xsmxList.iterator()
+//                                        lateinit var xsmx: Xsmx
+//                                        while (iterator.hasNext()) {
+//                                            xsmx = iterator.next()
+//                                            for (xsmx2 in xs!!.xsmx) {
+//                                                if (xsmx.xsmx_id == xsmx2.xsmx_id) {
+//                                                    for (item in activity.productList) {
+//                                                        if (item.value == xsmx) {
+//                                                            activity.productList.remove(item.key)
+//                                                            break
+//                                                        }
+//                                                    }
+//                                                    xsmx.bzList.forEach {
+//                                                        activity.nonScanningList.remove(it.xsd_bz_id)
+//                                                    }
+//                                                    iterator.remove()
+//                                                    break
+//                                                }
+//                                            }
+//                                        }
+//                                        activity.cpAdapter.notifyDataSetChanged()
+//                                        activity.xsList.remove(xs)
+//                                        datas.removeAt(position)
+//                                        notifyDataSetChanged()
+//                                    }
+//                            )
+//                        })
+                    }
+                }
+                popupView.listView.adapter = adapter
+            }
         }
     }
 

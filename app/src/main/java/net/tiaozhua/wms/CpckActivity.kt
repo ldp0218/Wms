@@ -1,49 +1,40 @@
 package net.tiaozhua.wms
 
+import android.app.AlertDialog
 import android.content.*
 import android.device.ScanManager
-import android.media.AudioManager
-import android.media.SoundPool
 import android.os.Bundle
-import android.os.Vibrator
 import android.view.KeyEvent
 import android.view.View
 import android.widget.BaseAdapter
 import android.widget.Toast
-import com.google.gson.Gson
+import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.android.synthetic.main.activity_cpck.*
 import net.tiaozhua.wms.adapter.CommonAdapter
 import net.tiaozhua.wms.adapter.ViewHolder
 import net.tiaozhua.wms.bean.*
-import net.tiaozhua.wms.utils.BaseCallback
-import net.tiaozhua.wms.utils.DialogUtil
-import net.tiaozhua.wms.utils.LoadingDialog
-import net.tiaozhua.wms.utils.RetrofitManager
+import net.tiaozhua.wms.utils.*
 import okhttp3.MediaType
 import okhttp3.RequestBody
 
 @Suppress("DEPRECATION")
 class CpckActivity : BaseActivity(R.layout.activity_cpck), View.OnClickListener {
-    private lateinit var mVibrator: Vibrator
     private lateinit var mScanManager: ScanManager
-    private val soundpool = SoundPool(1, AudioManager.STREAM_NOTIFICATION, 100)
-    private val soundid by lazy { soundpool.load("/etc/Scan_new.ogg", 1) }
     private lateinit var barcodeStr: String
-    private var receiverTag: Boolean = false
+    internal var receiverTag: Boolean = false
     private var status = ScanStatus.EMPTY
     internal var xsList = mutableListOf<Xs>()   // 汇款通知单List
     internal var xsmxList = mutableListOf<Xsmx>()    //销售明细List，用于显示
     internal lateinit var cpAdapter: BaseAdapter
     internal var productList: HashMap<String, Xsmx> = hashMapOf()
-    internal var nonScanningList: HashMap<Int, String> = hashMapOf()
+    internal var nonScanningList: HashMap<Int, Bz> = hashMapOf()
     private var nonScanningPopup: NonScanningPopup? = null
     private var hktzdPopup: HktzdPopup? = null
 
-    private val mScanReceiver = object : BroadcastReceiver() {
+    internal val mScanReceiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
-            soundpool.play(soundid, 1f, 1f, 0, 0, 1f)
-            mVibrator.vibrate(100)
+            (application as App).playAndVibrate(this@CpckActivity)
             barcodeStr = String(intent.getByteArrayExtra("barocode"), 0, intent.getIntExtra("length", 0))
 
             if (barcodeStr.startsWith(DjFlag.HKTZD.value)) {  //  以此标志判断扫描的是单据还是产品
@@ -78,45 +69,94 @@ class CpckActivity : BaseActivity(R.layout.activity_cpck), View.OnClickListener 
                 //判断汇款通知单是否已扫描
                 when {
                     xsList.find { it.xs_id == id } == null -> {
+                        if (receiverTag) {   //判断广播是否注册
+                            receiverTag = false
+                            unregisterReceiver(this)
+                        }
                         LoadingDialog.show(this@CpckActivity)
                         RetrofitManager.instance.hktzd(id)
                                 .enqueue(object : BaseCallback<Xs>(context = this@CpckActivity) {
                                     override fun successData(data: Xs) {
-                                        if (data.pdacode == 0) {    // 判断是否已出库
-                                            Toast.makeText(this@CpckActivity, "此单已完成", Toast.LENGTH_SHORT).show()
-                                            return
-                                        } else if (data.pdacode == 2) {     // 是否存在该单据
-                                            Toast.makeText(this@CpckActivity, "此单不存在", Toast.LENGTH_SHORT).show()
-                                            return
-                                        }
-                                        xsList.add(data)
-                                        if (hktzdPopup != null) {
-                                            hktzdPopup!!.update(xsList)
-                                        }
-                                        data.xsmx.forEach { xsmxList.add(it) }
+                                        //记录未扫描的包装
+                                        when (data.pdacode) {
+                                            -1 -> {
+                                                Toast.makeText(this@CpckActivity, "此单不存在", Toast.LENGTH_SHORT).show()
+                                                return
+                                            }
+                                            0 -> {
+                                                Toast.makeText(this@CpckActivity, "草稿单无法使用", Toast.LENGTH_SHORT).show()
+                                                return
+                                            }
+                                            1 -> {
+                                                AlertDialog.Builder(this@CpckActivity)
+                                                        .setTitle("提示")
+                                                        .setMessage("此单还未备货")
+                                                        .setPositiveButton("确定", null)
+                                                        .show()
+                                                return
+                                            }
+                                            3 -> {
+                                                Toast.makeText(this@CpckActivity, "此单已完成", Toast.LENGTH_SHORT).show()
+                                                return
+                                            }
+
                                         //productList.clear()
-                                        for (item in xsmxList) {
-                                            item.xsdbzList = mutableListOf()
-                                        }
-                                        if (xsmxList.size > 0) {
-                                            //记录未扫描的包装
-                                            xsmxList.forEach {
-                                                if (it.bzList.isNotEmpty()) {
-                                                    it.bzList.forEach { bz ->
-                                                        nonScanningList[bz.xsd_bz_id] = it.pro_model + bz.bz_code
+                                            else -> {
+                                                xsList.add(data)
+                                                if (hktzdPopup != null) {
+                                                    hktzdPopup!!.update(xsList)
+                                                }
+                                                for (item in data.xsmx) {
+                                                    if (item.yx == 0) {
+                                                        val x = xsmxList.find { xsmx ->
+                                                            xsmx.yx == 0 && xsmx.pro_id == item.pro_id    //找出同一套常规产品
+                                                        }
+                                                        if (x != null) {
+                                                            for (bao in x.bzList) {
+                                                                for (bz in item.bzList) {
+                                                                    if (bao.bz_id == bz.bz_id) {
+                                                                        bao.total += bz.total
+                                                                        break
+                                                                    }
+                                                                }
+                                                            }
+                                                            x.package_num = x.package_num?.plus(item.package_num!!)
+                                                            continue
+                                                        }
                                                     }
+                                                    xsmxList.add(item)
+                                                }
+                                                //productList.clear()
+                                                for (item in xsmxList) {
+                                                    item.xsdbzList = mutableListOf()
+                                                }
+                                                if (xsmxList.size > 0) {
+                                                    //记录未扫描的包装
+                                                    xsmxList.forEach {
+                                                        if (it.bzList.isNotEmpty()) {
+                                                            it.bzList.forEach { bz ->
+                                                                //扫描完的包装不再添加
+                                                                if (bz.total - bz.num > 0) {
+                                                                    bz.scd_no = it.scd_no
+                                                                    nonScanningList[bz.bz_id] = bz
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    status = ScanStatus.SCAN
+                                                    cpAdapter = object : CommonAdapter<Xsmx>(xsmxList, R.layout.listview_cpck_item) {
+                                                        override fun convert(holder: ViewHolder, t: Xsmx, position: Int) {
+                                                            holder.setText(R.id.textView_model, t.pro_model
+                                                                    ?: "")
+                                                            holder.setText(R.id.textView_bz, t.scd_no ?: "")
+                                                            holder.setText(R.id.textView_num, (t.package_num
+                                                                    ?: "").toString())
+                                                            holder.setText(R.id.textView_scan, t.check_num.toString())
+                                                        }
+                                                    }
+                                                    listView_cpck.adapter = cpAdapter
                                                 }
                                             }
-                                            status = ScanStatus.SCAN
-                                            cpAdapter = object : CommonAdapter<Xsmx>(xsmxList, R.layout.listview_cpck_item) {
-                                                override fun convert(holder: ViewHolder, t: Xsmx, position: Int) {
-                                                    holder.setText(R.id.textView_model, t.pro_model ?: "")
-                                                    holder.setText(R.id.textView_bz, if (t.pro_type == 0) t.mx_remark ?: "" else t.scd_no ?: "")
-                                                    holder.setText(R.id.textView_num, (t.package_num ?: "").toString())
-                                                    holder.setText(R.id.textView_scan, t.check_num.toString())
-                                                }
-                                            }
-                                            listView_cpck.adapter = cpAdapter
                                         }
                                     }
                                 })
@@ -127,95 +167,54 @@ class CpckActivity : BaseActivity(R.layout.activity_cpck), View.OnClickListener 
                 when (status) {
                     ScanStatus.EMPTY -> Toast.makeText(this@CpckActivity, "请扫描汇款通知单", Toast.LENGTH_SHORT).show()
                     ScanStatus.SCAN -> {
-                        val id = try {
-                            if (productList.contains(barcodeStr)) {
-                                Toast.makeText(context, "请勿重复扫描", Toast.LENGTH_SHORT).show()
+                        val code = parseProductQRCode(context, barcodeStr, productList.keys.toHashSet())
+                        if (code.xsd_bz_id == 0 && code.bz_id == 0 && code.check_num == 0) return
+
+                        var findFlag: Xsmx? = null  //是否找到
+                        var overFlag = false        //超量标志
+                        for (item in xsmxList) {
+                            for (it in item.bzList) {
+                                if (it.bz_id == code.bz_id) {
+                                    findFlag = item
+                                    val xsdbz = item.xsdbzList.find { it.xsd_bz_id == code.xsd_bz_id }
+                                    if (it.num < it.total) {
+                                        it.num += code.check_num    //已扫包装数量
+                                        item.check_num += code.check_num    //已扫总包装数量
+                                        if (xsdbz == null) {
+                                            item.xsdbzList.add(code)
+                                        } else {
+                                            xsdbz.check_num += code.check_num
+                                        }
+                                    } else {
+                                        overFlag = true
+                                    }
+                                    break
+                                }
+                            }
+                        }
+
+                        if (nonScanningList.containsKey(code.bz_id)) {
+                            val bz = nonScanningList[code.bz_id]
+                            if (bz!!.total - bz.num == 0) {
+                                //移除扫描完的包装
+                                nonScanningList.remove(code.bz_id)
+                            }
+                            if (nonScanningPopup != null) {
+                                nonScanningPopup!!.update(nonScanningList)
+                            }
+                        }
+
+                        cpAdapter.notifyDataSetChanged()
+                        if (findFlag != null) {     // 处理完毕
+                            if (overFlag) {
+                                Toast.makeText(context, "超过此类包装的可出库数量", Toast.LENGTH_SHORT).show()
                                 return
                             }
-                            barcodeStr.substring(0, barcodeStr.indexOf("#")).toInt()
-                        } catch (e: NumberFormatException) {
-                            0
+                            productList[barcodeStr] = findFlag     // 记录扫描的二维码
+                            Toast.makeText(context, "已扫描", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "此包装不在汇款通知单内，请核实", Toast.LENGTH_SHORT).show()
                         }
-                        if (id == 0) {
-                            Toast.makeText(context, "未查询到相关信息", Toast.LENGTH_SHORT).show()
-                            return
-                        }
-                        LoadingDialog.show(this@CpckActivity)
-                        RetrofitManager.instance.getProductInfo(id)
-                                .enqueue(object : BaseCallback<Bzmx>(this@CpckActivity) {
-                                    override fun successData(data: Bzmx) {
-                                        if (data.kc_num == 0) {
-                                            Toast.makeText(context, "此包装还未入库", Toast.LENGTH_SHORT).show()
-                                            return
-                                        }
-                                        if (nonScanningList.containsKey(data.xsd_bz_id)) {
-                                            nonScanningList.remove(data.xsd_bz_id)
-                                            if (nonScanningPopup != null) {
-                                                nonScanningPopup!!.update(nonScanningList)
-                                            }
-                                        }
-                                        var doneFlag: Xsmx? = null
-                                        for (item in xsmxList) {
-                                            if (item.bz_id != null && item.bz_id == data.bz_id) {   // 单件
-                                                if (item.package_num != null && item.check_num < item.package_num) {
-                                                    item.check_num++
-                                                    item.xsdbzList.add(data)
-                                                    doneFlag = item
-                                                    break
-                                                }
-                                            }
-                                        }
-                                        if (doneFlag == null) {    // 如果没找到单件找整套
-                                            xsmxList
-                                                    .asSequence()
-                                                    .filter { it.bz_id == null } // 筛选出整套的
-                                                    .forEach { item ->
-                                                        if (data.pro_type == 0) {       // 常规处理
-                                                            for (it in item.bzList) {
-                                                                if (it.bz_id == data.bz_id) {
-                                                                    if (it.num < it.total) {
-                                                                        it.num++
-                                                                        item.check_num++
-                                                                        item.xsdbzList.add(data)
-                                                                        doneFlag = item
-                                                                        break
-                                                                    }
-                                                                }
-                                                            }
-                                                        } else if (data.pro_type == 1) {    // 异形处理
-                                                            if (item.package_num != null) {     // 有件数
-                                                                if (item.xsdmx_id == data.xsdmx_id) {
-                                                                    item.check_num++
-                                                                    item.xsdbzList.add(data)
-                                                                    doneFlag = item
-                                                                }
-                                                            } else {    // 无件数(借调)
-                                                                for (it in item.jdList) {
-                                                                    if (it.hxsdmx_id == data.xsdmx_id) {    // 查找是否是借调的包装
-                                                                        item.check_num++
-                                                                        item.xsdbzList.add(data)
-                                                                        doneFlag = item
-                                                                        break
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                        }
-
-                                        cpAdapter.notifyDataSetChanged()
-                                        if (doneFlag != null) {     // 处理完毕
-                                            productList[barcodeStr] = doneFlag!!     // 记录扫描的二维码
-                                            Toast.makeText(context, "已扫描", Toast.LENGTH_SHORT).show()
-                                        } else {
-                                            Toast.makeText(context, "此包装不在汇款通知单内，请核实", Toast.LENGTH_SHORT).show()
-                                        }
-                                    }
-
-                                    override fun successInfo(info: String) {
-                                        Toast.makeText(context, "未查询到相关信息", Toast.LENGTH_SHORT).show()
-                                    }
-                                })
                     }
                     ScanStatus.FINISH -> {
                         checkOut()
@@ -227,7 +226,6 @@ class CpckActivity : BaseActivity(R.layout.activity_cpck), View.OnClickListener 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mVibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         toolbarTitle.text = "成品出库"
 
         if (xsList.size > 0) {
@@ -242,10 +240,6 @@ class CpckActivity : BaseActivity(R.layout.activity_cpck), View.OnClickListener 
         btn_chuku.setOnClickListener(this)
 
         scrollView_cpck.smoothScrollTo(0, 0)
-        if (!receiverTag) {     //在注册广播接受者的时候 判断是否已被注册,避免重复多次注册广播
-            receiverTag = true
-            registerReceiver(mScanReceiver, IntentFilter(SCAN_ACTION))
-        }
     }
 
     override fun onResume() {
@@ -253,6 +247,10 @@ class CpckActivity : BaseActivity(R.layout.activity_cpck), View.OnClickListener 
         mScanManager = ScanManager()
         mScanManager.openScanner()
         mScanManager.switchOutputMode(0)
+        if (!receiverTag) {     //在注册广播接受者的时候 判断是否已被注册,避免重复多次注册广播
+            receiverTag = true
+            registerReceiver(mScanReceiver, IntentFilter(SCAN_ACTION))
+        }
     }
 
     override fun onDestroy() {
@@ -320,7 +318,7 @@ class CpckActivity : BaseActivity(R.layout.activity_cpck), View.OnClickListener 
                             Toast.makeText(this@CpckActivity, "请扫描汇款通知单", Toast.LENGTH_SHORT).show()
                             return
                         }
-                        val isNotFinished = xsmxList.any { if (it.package_num != null) it.check_num < it.package_num else false }
+                        val isNotFinished = xsmxList.any { if (it.package_num != null) it.check_num < it.package_num!! else false }
                         if (isNotFinished) {
                             if (nonScanningPopup == null) {
                                 nonScanningPopup = NonScanningPopup(this@CpckActivity)
@@ -346,8 +344,16 @@ class CpckActivity : BaseActivity(R.layout.activity_cpck), View.OnClickListener 
         DialogUtil.showDialog(this, null, "包装已全部扫描,是否出库?",
                 null,
                 DialogInterface.OnClickListener { _, _ ->
+                    val bzmxList = mutableListOf<Bzmx>()
+                    for (item in xsmxList) {
+                        for (it in item.xsdbzList) {
+                            bzmxList.add(it)
+                        }
+                    }
+                    val productXs = ProductXs(xsList, bzmxList)
+//                    println(Gson().toJson(productXs))
                     LoadingDialog.show(this@CpckActivity)
-                    val requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), Gson().toJson(xsList.toTypedArray()))
+                    val requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), ObjectMapper().writeValueAsBytes(productXs))
                     RetrofitManager.instance.cpck(requestBody)
                             .enqueue(object : BaseCallback<List<Xs>>(context = this) {
                                 override fun successInfo(info: String) {
@@ -370,6 +376,7 @@ class CpckActivity : BaseActivity(R.layout.activity_cpck), View.OnClickListener 
         status = ScanStatus.EMPTY
         xsList.clear()
         xsmxList.clear()
+        productList.clear()
         cpAdapter.notifyDataSetChanged()
     }
 }

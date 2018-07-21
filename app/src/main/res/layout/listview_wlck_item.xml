@@ -9,7 +9,7 @@
     app:swipeEnable="true"
     android:focusable="true">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <RelativeLayout
         android:id="@+id/layout_wl"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -19,82 +19,101 @@
         tools:ignore="RtlSymmetry">
 
         <TextView
-            android:id="@+id/textView_no"
+            android:id="@+id/textView_namelabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_marginBottom="5dp"
+            android:layout_marginEnd="10dp"
             android:text="物料名称"
-            android:textColor="@android:color/black"
             android:textSize="14sp"
             tools:ignore="RtlHardcoded" />
 
         <TextView
-            android:id="@+id/textView_wcknumlabel"
+            android:id="@+id/textView_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/textView_no"
-            android:layout_marginBottom="5dp"
-            android:layout_marginEnd="10dp"
-            android:text="未领数量" />
+            android:layout_toEndOf="@+id/textView_namelabel"
+            android:textColor="@android:color/black" />
 
         <TextView
-            android:id="@+id/textView_wcknum"
+            android:id="@+id/textView_dwlabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/textView_no"
-            android:layout_toEndOf="@+id/textView_wcknumlabel" />
+            android:layout_toStartOf="@+id/textView_unit"
+            android:paddingEnd="10dp"
+            android:text="单位" />
+
+        <TextView
+            android:id="@+id/textView_unit"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:id="@+id/textView_kclabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textView_namelabel"
+            android:layout_marginBottom="5dp"
+            android:layout_marginEnd="10dp"
+            android:text="库存数量" />
+
+        <TextView
+            android:id="@+id/textView_hwlabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_namelabel"
+            android:layout_marginEnd="10dp"
+            android:layout_toStartOf="@+id/textView_hw"
+            android:text="仓库货位" />
+
+        <TextView
+            android:id="@+id/textView_hw"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/textView_namelabel" />
+
+        <TextView
+            android:id="@+id/textView_kcnum"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textView_namelabel"
+            android:layout_toEndOf="@+id/textView_kclabel" />
 
         <TextView
             android:id="@+id/textView_cklabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/textView_no"
+            android:layout_below="@+id/textView_kclabel"
             android:layout_marginEnd="10dp"
-            android:layout_marginStart="10dp"
-            android:layout_toStartOf="@+id/textView_cknum"
             android:text="出库数量" />
 
         <TextView
             android:id="@+id/textView_cknum"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_below="@+id/textView_no" />
+            android:layout_below="@+id/textView_kclabel"
+            android:layout_toEndOf="@+id/textView_cklabel" />
 
         <TextView
-            android:id="@+id/textView_hwlabel"
+            android:id="@+id/textView_smnumlabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/textView_wcknumlabel"
+            android:layout_below="@+id/textView_kclabel"
             android:layout_marginEnd="10dp"
-            android:text="仓库货位" />
+            android:layout_toStartOf="@+id/textView_scanNum"
+            android:text="清点数量" />
 
         <TextView
-            android:id="@+id/textView_hw"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/textView_wcknumlabel"
-            android:layout_toEndOf="@+id/textView_hwlabel" />
-
-        <TextView
-            android:id="@+id/textView_dwlabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/textView_wcknumlabel"
-            android:layout_toStartOf="@+id/textView_dw"
-            android:paddingEnd="38dp"
-            android:text="单位" />
-
-        <TextView
-            android:id="@+id/textView_dw"
+            android:id="@+id/textView_scanNum"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_below="@+id/textView_wcknumlabel" />
+            android:layout_below="@+id/textView_kclabel" />
 
     </RelativeLayout>
 

@@ -4,26 +4,20 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.*
 import android.device.ScanManager
-import android.media.AudioManager
-import android.media.SoundPool
 import android.os.Bundle
-import android.os.Vibrator
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.widget.BaseAdapter
 import android.widget.Toast
-import com.google.gson.Gson
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.mcxtzhang.swipemenulib.SwipeMenuLayout
 import kotlinx.android.synthetic.main.activity_wlrk.*
 import kotlinx.android.synthetic.main.popup_scan_material.view.*
 import net.tiaozhua.wms.adapter.CommonAdapter
 import net.tiaozhua.wms.adapter.ViewHolder
 import net.tiaozhua.wms.bean.*
-import net.tiaozhua.wms.utils.BaseCallback
-import net.tiaozhua.wms.utils.DialogUtil
-import net.tiaozhua.wms.utils.LoadingDialog
-import net.tiaozhua.wms.utils.RetrofitManager
+import net.tiaozhua.wms.utils.*
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import java.text.SimpleDateFormat
@@ -32,10 +26,7 @@ import java.util.*
 class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener {
 
     private var wlPopup: WlPopup? = null
-    private lateinit var mVibrator: Vibrator
     private lateinit var mScanManager: ScanManager
-    private val soundpool = SoundPool(1, AudioManager.STREAM_NOTIFICATION, 100)
-    private val soundid by lazy { soundpool.load("/etc/Scan_new.ogg", 1) }
     private lateinit var barcodeStr: String
     private var receiverTag: Boolean = false
     private var status = ScanStatus.EMPTY
@@ -43,12 +34,12 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
     internal lateinit var jhmx: Jhdmx
     internal var material: Material? = null
     internal lateinit var wlAdapter: BaseAdapter
+    private var ckListPopup: CkListPopup? = null
 
     private val mScanReceiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
-            soundpool.play(soundid, 1f, 1f, 0, 0, 1f)
-            mVibrator.vibrate(100)
+            (application as App).playAndVibrate(this@WlrkActivity)
             barcodeStr = String(intent.getByteArrayExtra("barocode"), 0, intent.getIntExtra("length", 0))
 
             if (barcodeStr.startsWith(DjFlag.JHD.value)) {  //  以此标志判断扫描的是单据还是物料
@@ -63,6 +54,15 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                 RetrofitManager.instance.jhdInfo(id)
                         .enqueue(object : BaseCallback<Jhd>(context = this@WlrkActivity) {
                             override fun successData(data: Jhd) {
+                                jhd.pdacode = data.pdacode
+                                if (jhd.pdacode == 0) {    // 判断是否已入库
+                                    Toast.makeText(this@WlrkActivity, "该进货单已入库", Toast.LENGTH_SHORT).show()
+                                    return
+                                } else if (jhd.pdacode == 2) {     // 是否存在该单据
+                                    Toast.makeText(this@WlrkActivity, "该进货单未审核", Toast.LENGTH_SHORT).show()
+                                    return
+                                }
+
                                 jhd.client_id = data.client_id
                                 jhd.client_name = data.client_name
                                 jhd.handler_id = data.handler_id
@@ -72,23 +72,16 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                                 jhd.jhd_no = data.jhd_no
                                 jhd.jhd_wwcnum = data.jhd_wwcnum
                                 jhd.jhmx = data.jhmx
-                                jhd.pdacode = data.pdacode
-                                if (jhd.pdacode == 0) {    // 判断是否已入库
-                                    Toast.makeText(this@WlrkActivity, "该进货单已入库", Toast.LENGTH_SHORT).show()
-                                    return
-                                } else if (jhd.pdacode == 2) {     // 是否存在该单据
-                                    Toast.makeText(this@WlrkActivity, "该进货单不存在", Toast.LENGTH_SHORT).show()
-                                    return
-                                }
                                 editText_no.setText(jhd.jhd_no)
-//                                editText_date.setText(jhd.jh_ldrq)
-//                                editText_ghdw.setText(jhd.client_name)
-//                                editText_jsr.setText(jhd.handler_name)
-//                                editText_ck.setText(jhd.ck_name)
-//                                editText_beizhu.setText(jhd.remark)
                                 val jhmxList = jhd.jhmx
                                 if (jhmxList.size > 0) {
                                     status = ScanStatus.SCAN
+                                    val iterator = jhmxList.iterator()
+                                    while (iterator.hasNext()) {
+                                        if (iterator.next().mx_wwcnum == 0.0) {
+                                            iterator.remove()
+                                        }
+                                    }
                                     wlAdapter = object : CommonAdapter<Jhdmx>(jhmxList, R.layout.listview_wlrk_item) {
                                         override fun convert(holder: ViewHolder, t: Jhdmx, position: Int) {
                                             holder.setText(R.id.textView_no, t.ma_name)
@@ -103,11 +96,11 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                                                 notifyDataSetChanged()
                                             })
                                             holder.setOnClickListener(R.id.layout_wl, View.OnClickListener { _ ->
-                                                if (jhmxList[position].mx_num > 0) {
+                                                if (t.mx_num > 0) {
                                                     if (wlPopup == null) {
                                                         wlPopup = WlPopup(this@WlrkActivity)
                                                     }
-                                                    jhmx = jhmxList[position]
+                                                    jhmx = t
                                                     wlPopup!!.setUpdate()     // 设置为修改界面
                                                     wlPopup!!.showPopupWindow()
                                                 }
@@ -129,7 +122,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                         }
                         if (!wlPopup!!.isShowing) {
                             for (item in jhd.jhmx) {
-                                if (item.ma_txm == barcodeStr) {
+                                if (item.ma_code == barcodeStr) {
                                     if (item.mx_num > 0) {
                                         jhmx = item
                                         wlPopup!!.setUpdate()
@@ -146,7 +139,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                             wlPopup!!.showPopupWindow()
                         } else {
                             for (item in jhd.jhmx) {
-                                if (item.ma_txm == barcodeStr) {
+                                if (item.ma_code == barcodeStr) {
                                     if (item.mx_num > 0) {
                                         jhmx = item
                                         wlPopup!!.setUpdate()
@@ -158,7 +151,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                         }
                     }
                     else -> {
-                        Toast.makeText(this@WlrkActivity, "请选择入库单", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@WlrkActivity, "请选择进货单", Toast.LENGTH_SHORT).show()
                         return
                     }
                 }
@@ -180,14 +173,13 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                                         else -> {
                                             material = data.items[0]
                                             val popupView = wlPopup!!.popupView
-                                            popupView.editText_tm.setText(material!!.ma_txm)
+                                            popupView.editText_tm.setText(material!!.ma_code)
                                             popupView.textView_name.text = material!!.ma_name
-                                            if (material!!.ma_inprice > 0) {
-                                                popupView.editText_price.setText(material!!.ma_inprice.toString())
-                                            }
+//                                            if (material!!.ma_inprice > 0) {
+//                                                popupView.editText_price.setText(material!!.ma_inprice.toString())
+//                                            }
                                             popupView.textView_kcnum.text = material!!.kc_num.toString()
-                                            popupView.textView_kind.text = material!!.ma_kind
-                                            popupView.textView_spec.text = material!!.ma_spec
+                                            popupView.textView_kind.text = material!!.ma_kind_name
                                             popupView.textView_hw.text = material!!.kc_hw_name
                                             popupView.textView_remark.text = material!!.comment
                                             popupView.editText_num.requestFocus()
@@ -203,36 +195,28 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
 
     }
 
+    @SuppressLint("SimpleDateFormat")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mVibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         toolbarTitle.text = "物料入库"
+        val user = (application as App).user
+        editText_ck.setText(user?.ck_name)
 
         // 为按钮设置点击监听事件
         scan.setOnClickListener(this)
         btn_jhd.setOnClickListener(this)
         rk.setOnClickListener(this)
+        editText_ck.setOnClickListener(this)
 
         jhd = Jhd(0,"",0,"","",0,0,"", "",
                 "",0,"",0,0,"","", mutableListOf())
-        jhd.ck_id = 1
-        jhd.ck_name = "贾家仓库"
-        //        RetrofitManager.instance.ckList()
-        //                .enqueue(object : BaseCallback<ResponseList<Ck>>(context = this) {
-        //                    override fun successData(data: ResponseList<Ck>) {
-        //                        jhd.ck_id = data.items[0].ck_id
-        //                        jhd.ck_name = data.items[0].ck_name
-        //                    }
-        //                })
+        jhd.ck_id = user?.ck_id ?: 0
+        jhd.ck_name = user?.ck_name ?: ""
 
         jhd.jh_ldrq = SimpleDateFormat("yyyy-MM-dd").format(Date())
         refreshNo()
 
         scrollView_wlrk.smoothScrollTo(0, 0)
-        if (!receiverTag) {     //在注册广播接受者的时候 判断是否已被注册,避免重复多次注册广播
-            receiverTag = true
-            registerReceiver(mScanReceiver, IntentFilter(SCAN_ACTION))
-        }
     }
 
     override fun onResume() {
@@ -240,6 +224,10 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
         mScanManager = ScanManager()
         mScanManager.openScanner()
         mScanManager.switchOutputMode(0)
+        if (!receiverTag) {     //在注册广播接受者的时候 判断是否已被注册,避免重复多次注册广播
+            receiverTag = true
+            registerReceiver(mScanReceiver, IntentFilter(SCAN_ACTION))
+        }
     }
 
     override fun onDestroy() {
@@ -301,14 +289,15 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                                     return
                                 }
                                 editText_no.setText(jhd.jhd_no)
-//                                editText_date.setText(jhd.jh_ldrq)
-//                                editText_ghdw.setText(jhd.client_name)
-//                                editText_jsr.setText(jhd.handler_name)
-//                                editText_ck.setText(jhd.ck_name)
-//                                editText_beizhu.setText(jhd.remark)
                                 val jhmxList = jhd.jhmx
                                 if (jhmxList.size > 0) {
                                     status = ScanStatus.SCAN
+                                    val iterator = jhmxList.iterator()
+                                    while (iterator.hasNext()) {
+                                        if (iterator.next().mx_wwcnum == 0.0) {
+                                            iterator.remove()
+                                        }
+                                    }
                                     wlAdapter = object : CommonAdapter<Jhdmx>(jhmxList, R.layout.listview_wlrk_item) {
                                         override fun convert(holder: ViewHolder, t: Jhdmx, position: Int) {
                                             holder.setText(R.id.textView_no, t.ma_name)
@@ -319,8 +308,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                                             holder.setOnClickListener(R.id.btnDelete, View.OnClickListener { _ ->
                                                 //在ListView里，点击侧滑菜单上的选项时，如果想让擦花菜单同时关闭，调用这句话
                                                 (holder.getConvertView() as SwipeMenuLayout).quickClose()
-                                                val obj = jhmxList[position]
-                                                if (obj.mx_num == 0) {
+                                                if (t.mx_num == 0.0) {
                                                     jhmxList.removeAt(position)
                                                     notifyDataSetChanged()
                                                 } else {
@@ -328,11 +316,11 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                                                 }
                                             })
                                             holder.setOnClickListener(R.id.layout_wl, View.OnClickListener { _ ->
-                                                if (jhmxList[position].mx_num > 0) {
+                                                if (t.mx_num > 0) {
                                                     if (wlPopup == null) {
                                                         wlPopup = WlPopup(this@WlrkActivity)
                                                     }
-                                                    jhmx = jhmxList[position]
+                                                    jhmx = t
                                                     wlPopup!!.setUpdate()     // 设置为修改界面
                                                     wlPopup!!.showPopupWindow()
                                                 }
@@ -345,13 +333,12 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                         })
             }
             1 -> {      // 选择了物料
-                material = intent!!.getSerializableExtra("material") as Material
+                material = intent!!.getParcelableExtra("material") as Material
                 val view = wlPopup!!.popupView
                 view.editText_tm.setText(material!!.ma_txm)
                 view.textView_name.text = material!!.ma_name
                 view.textView_kcnum.text = material!!.kc_num.toString()
-                view.textView_kind.text = material!!.ma_kind
-                view.textView_spec.text = material!!.ma_spec
+                view.textView_kind.text = material!!.ma_kind_name
                 view.textView_hw.text = material!!.kc_hw_name
                 view.textView_remark.text = material!!.comment
             }
@@ -362,7 +349,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
         when (v.id) {
             R.id.scan -> {      // 扫描
                 when (status) {
-                    ScanStatus.EMPTY -> Toast.makeText(this@WlrkActivity, "请选择入库单", Toast.LENGTH_SHORT).show()
+                    ScanStatus.EMPTY -> Toast.makeText(this@WlrkActivity, "请选择进货单", Toast.LENGTH_SHORT).show()
                     ScanStatus.SCAN, ScanStatus.FINISH -> {
                         wlPopup = WlPopup(this@WlrkActivity)
                         wlPopup!!.setScan()     // 设置为扫描界面
@@ -376,9 +363,13 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
             }
             R.id.rk -> {    // 入库
                 when (status) {
-                    ScanStatus.EMPTY -> Toast.makeText(this@WlrkActivity, "请选择入库单", Toast.LENGTH_SHORT).show()
+                    ScanStatus.EMPTY -> Toast.makeText(this@WlrkActivity, "请选择进货单", Toast.LENGTH_SHORT).show()
                     ScanStatus.SCAN -> {
-                        val isNotFinished = jhd.jhmx.any { it.mx_num == 0 }
+                        if (jhd.ck_id == 0) {
+                            Toast.makeText(this@WlrkActivity, "请选择仓库", Toast.LENGTH_SHORT).show()
+                            return
+                        }
+                        val isNotFinished = jhd.jhmx.any { it.mx_num == 0.0 }
                         if (isNotFinished) {
                             Toast.makeText(this@WlrkActivity, "有物料未扫描", Toast.LENGTH_SHORT).show()
                         } else {
@@ -387,7 +378,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                                     null,
                                     DialogInterface.OnClickListener { _, _ ->
                                         LoadingDialog.show(this@WlrkActivity)
-                                        val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), Gson().toJson(jhd))
+                                        val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), ObjectMapper().writeValueAsBytes(jhd))
                                         RetrofitManager.instance.insertJh(requestBody)
                                                 .enqueue(object : BaseCallback<List<Jhdmx>>(context = this) {
                                                     override fun successInfo(info: String) {
@@ -408,7 +399,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                                 null,
                                 DialogInterface.OnClickListener { _, _ ->
                                     LoadingDialog.show(this@WlrkActivity)
-                                    val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), Gson().toJson(jhd))
+                                    val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), ObjectMapper().writeValueAsBytes(jhd))
                                     RetrofitManager.instance.insertJh(requestBody)
                                             .enqueue(object : BaseCallback<List<Jhdmx>>(context = this) {
                                                 override fun successInfo(info: String) {
@@ -423,6 +414,10 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                         )
                     }
                 }
+            }
+            R.id.editText_ck -> {   //更换仓库
+                ckListPopup = ckListPopup ?: CkListPopup(this@WlrkActivity)
+                ckListPopup!!.showPopupWindow()
             }
         }
     }
@@ -443,11 +438,6 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
         status = ScanStatus.EMPTY
         editText_no.text.clear()
         refreshNo()
-//        editText_date.text.clear()
-//        editText_ghdw.text.clear()
-//        editText_jsr.text.clear()
-//        editText_ck.text.clear()
-//        editText_beizhu.text.clear()
         jhd.jhmx.clear()
         wlAdapter.notifyDataSetChanged()
     }

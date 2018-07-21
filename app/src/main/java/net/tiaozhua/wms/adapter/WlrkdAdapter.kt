@@ -2,11 +2,11 @@ package net.tiaozhua.wms.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.widget.TextView
-import android.view.ViewGroup
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.TextView
 import net.tiaozhua.wms.R
 import net.tiaozhua.wms.bean.Jhd
 import net.tiaozhua.wms.utils.findViewOften

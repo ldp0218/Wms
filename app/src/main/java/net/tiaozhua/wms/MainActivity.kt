@@ -2,18 +2,13 @@ package net.tiaozhua.wms
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.KeyEvent
 import android.widget.AdapterView
 import android.widget.SimpleAdapter
-import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
-import android.view.KeyEvent.KEYCODE_BACK
-
-
 
 class MainActivity : BaseActivity(R.layout.activity_main) {
-    private var mExitTime: Long = 0
+//    private var mExitTime: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,26 +24,32 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
         })
         itemList.add(object : HashMap<String, Any>() {
             init {
-                put("image", R.mipmap.cprk)
-                put("text", "成品入库")
-            }
-        })
-        itemList.add(object : HashMap<String, Any>() {
-            init {
                 put("image", R.mipmap.wlck)
                 put("text", "物料出库")
             }
         })
         itemList.add(object : HashMap<String, Any>() {
             init {
-                put("image", R.mipmap.cpck)
-                put("text", "成品出库")
+                put("image", R.mipmap.wlpd)
+                put("text", "物料盘点")
             }
         })
         itemList.add(object : HashMap<String, Any>() {
             init {
-                put("image", R.mipmap.wlpd)
-                put("text", "物料盘点")
+                put("image", R.mipmap.cprk)
+                put("text", "成品入库")
+            }
+        })
+        itemList.add(object : HashMap<String, Any>() {
+            init {
+                put("image", R.mipmap.cppd)
+                put("text", "成品备货")
+            }
+        })
+        itemList.add(object : HashMap<String, Any>() {
+            init {
+                put("image", R.mipmap.cpck)
+                put("text", "成品出库")
             }
         })
         itemList.add(object : HashMap<String, Any>() {
@@ -75,6 +76,7 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
                 "物料出库" -> startActivity(Intent(this@MainActivity, WlckActivity::class.java))
                 "物料盘点" -> startActivity(Intent(this@MainActivity, WlpdActivity::class.java))
                 "成品入库" -> startActivity(Intent(this@MainActivity, CprkActivity::class.java))
+                "成品备货" -> startActivity(Intent(this@MainActivity, CpbhActivity::class.java))
                 "成品出库" -> startActivity(Intent(this@MainActivity, CpckActivity::class.java))
                 "成品盘点" -> startActivity(Intent(this@MainActivity, CppdActivity::class.java))
             }
@@ -102,7 +104,7 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
 //        return false
 //    }
 
-    override fun onBackPressed() {
+//    override fun onBackPressed() {
         //1.点击的时间差如果大于2000，则提示用户点击两次退出
 //        if(System.currentTimeMillis() - mExitTime > 2000) {
 //            //2.保存当前时间
@@ -113,5 +115,5 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
 //            //4.点击的时间差小于2000，调用父类onBackPressed方法执行退出。
 //            super.onBackPressed()
 //        }
-    }
+//    }
 }

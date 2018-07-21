@@ -48,8 +48,8 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:fillViewport="true"
-            android:paddingBottom="20dp"
-            android:paddingTop="20dp">
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp">
 
             <net.tiaozhua.wms.view.CustomListView
                 android:id="@+id/listView"
