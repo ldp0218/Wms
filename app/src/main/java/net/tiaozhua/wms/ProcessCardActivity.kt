@@ -42,8 +42,8 @@ class ProcessCardActivity : BaseActivity(R.layout.activity_lld_info), View.OnCli
             RetrofitManager.instance.materialInfo(barcodeStr, ckId)
                     .enqueue(object : BaseCallback<Material>(this@ProcessCardActivity) {
                         override fun successData(data: Material) {
-                            if (scdmx.plList.find { it.ma_id == data.ma_id } == null) {
-                                scdmx.plList.add(Scdpl(null, data.ma_id, scdmx.scdmx_id, data.kc_num, 0.0, data.kc_hw_name,
+                            if (scdmx.plList?.find { it.ma_id == data.ma_id } == null) {
+                                scdmx.plList?.add(Scdpl(null, data.ma_id, scdmx.scdmx_id, data.kc_num, 0.0, data.kc_hw_name,
                                         0.0, 0.0, "", data.ma_name, data.ma_code,
                                         data.ma_spec, data.ma_kind_name, data.ma_unit, gzId, 1, "", "", ""))
                                 adapter.notifyDataSetChanged()
@@ -69,10 +69,10 @@ class ProcessCardActivity : BaseActivity(R.layout.activity_lld_info), View.OnCli
 
         scdmx = intent.getParcelableExtra("scdmx")
         val app = (application as App)
-        ckId = app.user?.ck_id!!
+        ckId = app.user?.ck_id ?: 0
         gzId = app.gzId
         editText_scdno.setText(scdmx.scd_no)
-        val list = scdmx.plList.filter { it.checked && it.num > 0 }
+        val list = scdmx.plList?.filter { it.checked && it.num > 0 }
         adapter = ProcessCardAdapter(list as MutableList<Scdpl>, this@ProcessCardActivity)
         listView_lld.adapter = adapter
     }
@@ -122,7 +122,7 @@ class ProcessCardActivity : BaseActivity(R.layout.activity_lld_info), View.OnCli
 //                    scdmx.plList[i].checked = cb.isChecked
 //                }
                 //已勾选且超领没填说明的物料
-                overList = scdmx.plList.filter { it.checked && it.num > 0.0 && it.num > it.mx_num - it.mx_wcnum && it.mx_remark == null }
+                overList = scdmx.plList!!.filter { it.checked && it.num > 0.0 && it.num > it.mx_num - it.mx_wcnum && it.mx_remark == null }
                 if (overList.isNotEmpty()) {
                     if (overUsePopup == null) {
                         overUsePopup = OverUsePopup(this@ProcessCardActivity)

@@ -63,7 +63,7 @@ class WlmxAdapter(private val list: MutableList<Scdpl>, private val context: Con
                         // 取消流程卡中物料的选择
                         for (scdmx in WlckActivity.self.scdmxList) {
                             if (scdmx.scd_no == item.scd_no) {
-                                for (pl in scdmx.plList) {
+                                for (pl in scdmx.plList!!) {
                                     if (pl.ma_id == item.ma_id) {
                                         pl.checked = false
                                         break

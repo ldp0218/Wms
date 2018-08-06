@@ -25,25 +25,29 @@ class LldInfoActivity : BaseActivity(R.layout.activity_lld_info), View.OnClickLi
     internal lateinit var scdmx: Scdmx
     private lateinit var mScanManager: ScanManager
     private lateinit var barcodeStr: String
-    private var receiverTag: Boolean = false
+    internal var receiverTag: Boolean = false
     private lateinit var adapter: LldInfoAdapter
     private var ckId = 0
     private var gzId = 0
     private var overUsePopup: OverUsePopup? = null
     internal lateinit var overList: List<Scdpl>
 
-    private val mScanReceiver = object : BroadcastReceiver() {
+    internal val mScanReceiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
             (application as App).playAndVibrate(this@LldInfoActivity)
             barcodeStr = String(intent.getByteArrayExtra("barocode"), 0, intent.getIntExtra("length", 0))
 
+            if (receiverTag) {   //判断广播是否注册
+                receiverTag = false
+                unregisterReceiver(this)
+            }
             LoadingDialog.show(this@LldInfoActivity)
             RetrofitManager.instance.materialInfo(barcodeStr, ckId)
                     .enqueue(object : BaseCallback<Material>(this@LldInfoActivity) {
                         override fun successData(data: Material) {
-                            if (scdmx.plList.find { it.ma_id == data.ma_id } == null) {
-                                scdmx.plList.add(Scdpl(null, data.ma_id, scdmx.scdmx_id, data.kc_num, 0.0, data.kc_hw_name,
+                            if (scdmx.plList?.find { it.ma_id == data.ma_id } == null) {
+                                scdmx.plList?.add(Scdpl(null, data.ma_id, scdmx.scdmx_id, data.kc_num, 0.0, data.kc_hw_name,
                                         0.0, 0.0, null, data.ma_name, data.ma_code,
                                         data.ma_spec, data.ma_kind_name, data.ma_unit, gzId, 1, scdmx.scd_no, "", ""))
                                 adapter.notifyDataSetChanged()
@@ -69,11 +73,11 @@ class LldInfoActivity : BaseActivity(R.layout.activity_lld_info), View.OnClickLi
 
         scdmx = intent.getParcelableExtra("scdmx")
         val app = (application as App)
-        ckId = app.user?.ck_id!!
+        ckId = app.user?.ck_id ?: 0
         gzId = app.gzId
         editText_scdno.setText(scdmx.scd_no)
-        scdmx.plList.forEach { it.scd_no = scdmx.scd_no }
-        adapter = LldInfoAdapter(scdmx.plList, this@LldInfoActivity)
+        scdmx.plList?.forEach { it.scd_no = scdmx.scd_no }
+        adapter = LldInfoAdapter(scdmx.plList!!, this@LldInfoActivity)
         listView_lld.adapter = adapter
 //        LoadingDialog.show(this@LldInfoActivity)
 //        RetrofitManager.instance.wlckd().enqueue(object : BaseCallback<ResponseList<Ckd>>(context = this@LldInfoActivity) {
@@ -140,12 +144,12 @@ class LldInfoActivity : BaseActivity(R.layout.activity_lld_info), View.OnClickLi
 //                    scdmx.plList[i].num = editText.text.toString().toDouble()
 //                    scdmx.plList[i].checked = cb.isChecked
 //                }
-                if ((scdmx.plList.count {it.checked}) == 0) {
+                if ((scdmx.plList?.count {it.checked}) == 0) {
                     Toast.makeText(this, "请选择物料", Toast.LENGTH_SHORT).show()
                     return
                 }
                 //已勾选且超领没填说明的物料
-                overList = scdmx.plList.filter { it.checked
+                overList = scdmx.plList!!.filter { it.checked
                         && it.num > 0.0 && it.num > it.mx_num - it.mx_wcnum
                         && (it.mx_remark == null || it.mx_remark!!.trim() == "")}
                 if (overList.isNotEmpty()) {

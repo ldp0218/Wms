@@ -18,19 +18,24 @@ import java.util.*
 
 class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener {
 
-    internal var ckId: Int = 1
+    internal var ckId: Int = -1
     private var wlPopup: WlPopup? = null
     private lateinit var mScanManager: ScanManager
     private lateinit var barcodeStr: String
-    private var receiverTag: Boolean = false
+    internal var receiverTag: Boolean = false
     internal lateinit var pdmxList: MutableList<Pdmx>
     internal lateinit var pdmx: Pdmx
     internal lateinit var pdAdapter: BaseAdapter
+    private var ckListPopup: CkListPopup? = null
 
-    private val mScanReceiver = object : BroadcastReceiver() {
+    internal val mScanReceiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
             (application as App).playAndVibrate(this@KcpdActivity)
+            if (ckId == -1) {
+                Toast.makeText(this@KcpdActivity, "请选择仓库", Toast.LENGTH_SHORT).show()
+                return
+            }
             barcodeStr = String(intent.getByteArrayExtra("barocode"), 0, intent.getIntExtra("length", 0))
 
             if (wlPopup == null) {
@@ -70,6 +75,10 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
             if (wlPopup != null && wlPopup!!.isShowing) {
                 val view = wlPopup!!.popupView
                 view.editText_tm.setText(barcodeStr)
+                if (receiverTag) {
+                    receiverTag = false
+                    unregisterReceiver(this)
+                }
                 LoadingDialog.show(this@KcpdActivity)
                 RetrofitManager.instance.materialList(barcodeStr, ckId)
                         .enqueue(object : BaseCallback<ResponseList<Material>>(this@KcpdActivity) {
@@ -89,14 +98,13 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
                                         pdmx.kc_num = material.kc_num
                                         pdmx.hao = material.ma_code
                                         pdmx.ck_id = ckId
-                                        pdmx.txm = material.ma_txm
                                         pdmx.name = material.ma_name
                                         pdmx.kind = material.ma_kind_name
                                         pdmx.spec = material.ma_spec ?: ""
                                         pdmx.hw = material.kc_hw_name
                                         pdmx.comment = material.comment ?: ""
                                         val popupView = wlPopup!!.popupView
-                                        popupView.editText_tm.setText(pdmx.txm)
+                                        popupView.editText_tm.setText(pdmx.hao)
                                         popupView.textView_name.text = pdmx.name
                                         popupView.textView_kcnum.text = pdmx.kc_num.toString()
                                         popupView.textView_kind.text = pdmx.kind
@@ -121,6 +129,7 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
         toolbarTitle.text = "物料盘点"
         scan.setOnClickListener(this)
         finish.setOnClickListener(this)
+        button_selectCk.setOnClickListener(this)
 
         scrollView.smoothScrollTo(0, 0)
 
@@ -129,25 +138,11 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
             imageView_line.visibility = View.GONE
             layout_menu.visibility = View.GONE
         }
-        pdmx = Pdmx(0, null, null, 0.0, 0.0, null, 0,
-                "", "", "", "", "", "", "","","",0)     // 初始化pdmx
-//        ckId = when {
-//            intent.hasExtra("ckId") -> intent.getIntExtra("ckId", -1)
-//            else -> 79
-//        }
-//        val ckName = when {
-//            intent.hasExtra("ckName") -> intent.getStringExtra("ckName")
-//            else -> "物料仓库"
-//        }
-//        textView_ck.text = ckName
-//        RetrofitManager.instance.ckList()
-//                .enqueue(object : BaseCallback<ResponseList<Ck>>(context = this) {
-//                    override fun successData(data: ResponseList<Ck>) {
-//                        ckId = data.items[0].ck_id
-//                        textView_ck.text = data.items[0].ck_name
-//                    }
-//                })
+        ckId = intent.getIntExtra("ckId", -1)
+        pdmx = Pdmx(0, null, null, 0.0, 0.0, null, ckId,
+                "", "", "", "", "", "", "","", "","",0)     // 初始化pdmx
 
+        textView_pdck.text = intent.getStringExtra("ckName")
         val pdDate = if (intent.hasExtra("pdDate")) {
             intent.getStringExtra("pdDate")
         } else SimpleDateFormat("yyyy-MM-dd").format(Date())
@@ -227,15 +222,23 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
     override fun onClick(v: View) {
         when (v.id) {
             R.id.scan -> {  // 扫描
+                if (ckId == -1) {
+                    Toast.makeText(this, "请选择仓库", Toast.LENGTH_SHORT).show()
+                    return
+                }
                 wlPopup = WlPopup(this@KcpdActivity)
                 wlPopup!!.setScan()     // 设置为扫描界面
                 wlPopup!!.showPopupWindow()
             }
             R.id.finish -> {    // 完成盘点
+                if (ckId == -1) {
+                    Toast.makeText(this, "请选择仓库", Toast.LENGTH_SHORT).show()
+                    return
+                }
                 if (pdmxList.size == 0) {
                     Toast.makeText(this, "请先盘点", Toast.LENGTH_SHORT).show()
                 } else {
-                    DialogUtil.showDialog(this, null, "系统将库存数量和盘点数量做比较, 若两者存在差异，则自动作盘盈盘亏处理。",
+                    DialogUtil.showDialog(this, null, "系统将库存数量和盘点数量做比较, 若两者存在差异，则自动做盘盈盘亏处理。",
                             null,
                             DialogInterface.OnClickListener { _, _ ->
                                 LoadingDialog.show(this)
@@ -257,6 +260,10 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
                             }
                     )
                 }
+            }
+            R.id.button_selectCk -> {
+                ckListPopup = ckListPopup ?: CkListPopup(this)
+                ckListPopup!!.showPopupWindow()
             }
         }
     }

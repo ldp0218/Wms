@@ -1,14 +1,12 @@
 package net.tiaozhua.wms.utils
 
+import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
 import android.widget.Toast
-import net.tiaozhua.wms.CpbhActivity
-import net.tiaozhua.wms.CpckActivity
-import net.tiaozhua.wms.CprkActivity
-import net.tiaozhua.wms.LoginActivity
+import net.tiaozhua.wms.*
 import net.tiaozhua.wms.bean.ApiBean
 import net.tiaozhua.wms.bean.SCAN_ACTION
 import retrofit2.Call
@@ -22,19 +20,37 @@ abstract class BaseCallback<T>(private val context: Context?) : Callback<ApiBean
 
     override fun onResponse(call: Call<ApiBean<T>>?, response: Response<ApiBean<T>>?) {
         when(context) {
+            is WlrkActivity -> {
+                if (!context.receiverTag) {
+                    context.receiverTag = true
+                    context.registerReceiver(context.mScanReceiver, IntentFilter(SCAN_ACTION))
+                }
+            }
+            is WlckActivity -> {
+                if (!context.receiverTag) {
+                    context.receiverTag = true
+                    context.registerReceiver(context.mScanReceiver, IntentFilter(SCAN_ACTION))
+                }
+            }
+            is LldInfoActivity -> {
+                if (!context.receiverTag) {
+                    context.receiverTag = true
+                    context.registerReceiver(context.mScanReceiver, IntentFilter(SCAN_ACTION))
+                }
+            }
+            is KcpdActivity -> {
+                if (!context.receiverTag) {
+                    context.receiverTag = true
+                    context.registerReceiver(context.mScanReceiver, IntentFilter(SCAN_ACTION))
+                }
+            }
             is CprkActivity -> {
                 if (!context.receiverTag) {
                     context.receiverTag = true
                     context.registerReceiver(context.mScanReceiver, IntentFilter(SCAN_ACTION))
                 }
             }
-            is CpbhActivity -> {
-                if (!context.receiverTag) {
-                    context.receiverTag = true
-                    context.registerReceiver(context.mScanReceiver, IntentFilter(SCAN_ACTION))
-                }
-            }
-            is CpckActivity -> {
+            is CppdmxActivity -> {
                 if (!context.receiverTag) {
                     context.receiverTag = true
                     context.registerReceiver(context.mScanReceiver, IntentFilter(SCAN_ACTION))
@@ -64,6 +80,7 @@ abstract class BaseCallback<T>(private val context: Context?) : Callback<ApiBean
                         context?.let { c ->
                             DialogUtil.showAlert(c, "请重新登录",
                                     DialogInterface.OnClickListener { _, _ ->
+                                        (context as Activity).finish()
                                         c.startActivity(Intent(c, LoginActivity::class.java))
                                     }
                             )
@@ -81,19 +98,37 @@ abstract class BaseCallback<T>(private val context: Context?) : Callback<ApiBean
 
     override fun onFailure(call: Call<ApiBean<T>>?, t: Throwable?) {
         when(context) {
+            is WlrkActivity -> {
+                if (!context.receiverTag) {
+                    context.receiverTag = true
+                    context.registerReceiver(context.mScanReceiver, IntentFilter(SCAN_ACTION))
+                }
+            }
+            is WlckActivity -> {
+                if (!context.receiverTag) {
+                    context.receiverTag = true
+                    context.registerReceiver(context.mScanReceiver, IntentFilter(SCAN_ACTION))
+                }
+            }
+            is LldInfoActivity -> {
+                if (!context.receiverTag) {
+                    context.receiverTag = true
+                    context.registerReceiver(context.mScanReceiver, IntentFilter(SCAN_ACTION))
+                }
+            }
+            is KcpdActivity -> {
+                if (!context.receiverTag) {
+                    context.receiverTag = true
+                    context.registerReceiver(context.mScanReceiver, IntentFilter(SCAN_ACTION))
+                }
+            }
             is CprkActivity -> {
                 if (!context.receiverTag) {
                     context.receiverTag = true
                     context.registerReceiver(context.mScanReceiver, IntentFilter(SCAN_ACTION))
                 }
             }
-            is CpbhActivity -> {
-                if (!context.receiverTag) {
-                    context.receiverTag = true
-                    context.registerReceiver(context.mScanReceiver, IntentFilter(SCAN_ACTION))
-                }
-            }
-            is CpckActivity -> {
+            is CppdmxActivity -> {
                 if (!context.receiverTag) {
                     context.receiverTag = true
                     context.registerReceiver(context.mScanReceiver, IntentFilter(SCAN_ACTION))

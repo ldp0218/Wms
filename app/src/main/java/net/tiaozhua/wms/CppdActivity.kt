@@ -48,6 +48,7 @@ class CppdActivity : BaseActivity(R.layout.activity_pd) {
                                     DialogUtil.showDialog(this@CppdActivity, null, "是否删除?",
                                             null,
                                             DialogInterface.OnClickListener { _, _ ->
+                                                LoadingDialog.show(this@CppdActivity)
                                                 RetrofitManager.instance.delPd(type, t.id)
                                                         .enqueue(object : BaseCallback<String>(this@CppdActivity) {
                                                             override fun successInfo(info: String) {

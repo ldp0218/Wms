@@ -8,7 +8,7 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.BaseAdapter
 import android.widget.Toast
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_cpck.*
 import net.tiaozhua.wms.adapter.CommonAdapter
 import net.tiaozhua.wms.adapter.ViewHolder
@@ -353,7 +353,8 @@ class CpckActivity : BaseActivity(R.layout.activity_cpck), View.OnClickListener 
                     val productXs = ProductXs(xsList, bzmxList)
 //                    println(Gson().toJson(productXs))
                     LoadingDialog.show(this@CpckActivity)
-                    val requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), ObjectMapper().writeValueAsBytes(productXs))
+                    val json = Gson().toJson(productXs)
+                    val requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
                     RetrofitManager.instance.cpck(requestBody)
                             .enqueue(object : BaseCallback<List<Xs>>(context = this) {
                                 override fun successInfo(info: String) {

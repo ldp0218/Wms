@@ -96,7 +96,7 @@ class OverUsePopup(private val activity: Activity) : BasePopupWindow(activity), 
                             return
                         }
                         for (item in activity.scdmxList) {
-                            for (it in item.plList) {
+                            for (it in item.plList!!) {
                                 for (i in activity.overList) {
                                     if (it.scdpl_id == i.scdpl_id) {
                                         it.mx_remark = i.mx_remark

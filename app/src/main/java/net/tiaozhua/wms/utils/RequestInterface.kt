@@ -57,7 +57,7 @@ interface RequestInterface {
     fun ckList(): Call<ApiBean<ResponseList<Ck>>>
 
     @Headers("Domain-Name: domain")
-    @GET("action/kc/pdList")
+    @GET("action/kc/pdList?pda=1")
     fun pdList(@Query("type") type: Int, @Query("page") page: Int = 1, @Query("limit") limit: Int = 10): Call<ApiBean<ResponseList<Pd>>>
 
     @Headers("Domain-Name: domain")
@@ -87,7 +87,7 @@ interface RequestInterface {
 
     @Headers("Domain-Name: domain")
     @GET("action/pda/getProductInfo")
-    fun getProductInfo(@Query("id") id: Int): Call<ApiBean<Baozhuang>>
+    fun getProductInfo(@Query("id") id: Int, @Query("bz_id") bz_id: Int): Call<ApiBean<Baozhuang>>
 
     @Headers("Domain-Name: domain")
     @POST("action/rk/insert_rk")
@@ -123,4 +123,12 @@ interface RequestInterface {
     @Headers("Domain-Name: domain")
     @GET("action/ckd/getCkd_no")
     fun getCkdNo(): Call<ApiBean<String>>
+
+    @Headers("Domain-Name: domain")
+    @GET("action/pda/getBcpInfo")
+    fun getBcpInfo(@Query("code") code: String): Call<ApiBean<SemiProduct>>
+
+    @Headers("Domain-Name: domain")
+    @POST("action/pda/bcpRk")
+    fun bcpRk(@Body bcpRkd: RequestBody): Call<ApiBean<List<BcpRkmx>>>
 }

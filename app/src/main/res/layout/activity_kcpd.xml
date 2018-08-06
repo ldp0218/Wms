@@ -20,28 +20,35 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!--<LinearLayout-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginBottom="5dp"-->
-                <!--android:layout_marginTop="5dp"-->
-                <!--android:orientation="horizontal"-->
-                <!--android:paddingEnd="0dp"-->
-                <!--android:paddingStart="20dp">-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal"
+                android:paddingEnd="0dp"
+                android:paddingStart="20dp">
 
-                <!--<TextView-->
-                    <!--android:id="@+id/textView_cklabel"-->
-                    <!--android:layout_width="100dp"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:text="盘点仓库" />-->
+                <TextView
+                    android:id="@+id/textView_cklabel"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:text="盘点仓库" />
 
-                <!--<TextView-->
-                    <!--android:id="@+id/textView_ck"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:textColor="#333" />-->
+                <TextView
+                    android:id="@+id/textView_pdck"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="#333" />
 
-            <!--</LinearLayout>-->
+                <Button
+                    android:id="@+id/button_selectCk"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="选择" />
+
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -52,7 +59,7 @@
 
                 <TextView
                     android:id="@+id/textView_datelabel"
-                    android:layout_width="100dp"
+                    android:layout_width="80dp"
                     android:layout_height="wrap_content"
                     android:text="盘点日期" />
 

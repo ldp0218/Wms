@@ -11,7 +11,7 @@ import android.view.animation.Animation
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.popup_scan_material.view.*
 import net.tiaozhua.wms.bean.*
 import net.tiaozhua.wms.utils.BaseCallback
@@ -207,7 +207,8 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                                     // 先查询是否已盘点
                                                     if (activity.pdmx.pd_id != null) {
                                                         LoadingDialog.show(activity)
-                                                        val json = ObjectMapper().writeValueAsBytes(activity.pdmx)
+                                                        val json = Gson().toJson(activity.pdmx)
+//                                                        val json = ObjectMapper().writeValueAsBytes(activity.pdmx)
                                                         val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
                                                         RetrofitManager.instance.selPdmx(requestBody)
                                                                 .enqueue(object : BaseCallback<Pdmx>(context) {
@@ -246,7 +247,7 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.button_close -> this.dismiss()
+            R.id.button_close -> dismiss()
             R.id.button_commit -> {
                 if (popupView.button_commit.text == "确认") {     // 点击确认按钮执行
                     when (activity) {
@@ -256,7 +257,7 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                 return
                             }
                             var hasMaterial = false
-                            for (item in activity.jhd.jhmx) {
+                            for (item in activity.jhd.jhmx!!) {
                                 if (item.ma_id == activity.material?.ma_id) {
                                     val numStr = popupView.editText_num.text.toString()
                                     val priceStr = popupView.editText_price.text.toString()
@@ -293,7 +294,6 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                 return
                             }
                             val numStr = popupView.editText_num.text.toString()
-                            val num = numStr.toDouble()
                             var hasMaterial = false
                             for (item in activity.wlckList) {
                                 if (item.ma_id == activity.material!!.ma_id) {
@@ -301,6 +301,7 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                         Toast.makeText(context, "请输入数量", Toast.LENGTH_SHORT).show()
                                         return
                                     }
+                                    val num = numStr.toDouble()
                                     if (num != item.num) {
                                         Toast.makeText(context, "数量不一致", Toast.LENGTH_SHORT).show()
                                         return
@@ -312,6 +313,7 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                             }
                             if (!hasMaterial) {
                                 val ma = activity.material!!
+                                val num = numStr.toDouble()
                                 activity.wlckList.add(Wlck(ma.ma_id, ma.kc_num, ma.kc_hw_name, num, num, "", ma.ma_name, ma.ma_code,
                                         ma.ma_spec, ma.ma_kind_name, ma.ma_unit, 0, 0, null))
                             }
@@ -333,7 +335,8 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                             LoadingDialog.show(context)
                             activity.pdmx.id = null
                             activity.pdmx.pd_num = numStr.toDouble()
-                            val json = ObjectMapper().writeValueAsBytes(activity.pdmx)
+                            val json = Gson().toJson(activity.pdmx)
+//                            val json = ObjectMapper().writeValueAsBytes(activity.pdmx)
                             val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
                             RetrofitManager.instance.updatePdmx(requestBody)
                                     .enqueue(object : Callback<PdResult> {
@@ -352,17 +355,18 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                                 }
                                                 1 -> { // 正常
                                                     Toast.makeText(context, "已记录", Toast.LENGTH_SHORT).show()
-                                                    activity.pdmx.pd_id = data.pd_id
+                                                    activity.pdmx.pd_id = activity.pdmx.pd_id ?: data.pd_id
                                                     activity.pdmx.id = data.id
                                                     activity.pdmxList.add(activity.pdmx)
                                                     activity.pdAdapter.notifyDataSetChanged()
-                                                    activity.pdmx = Pdmx(0, activity.pdmx.pd_id, null, 0.0, 0.0, null, 0, "", "",
-                                                            "", "", "", "", "","","",0)
+                                                    activity.pdmx = Pdmx(0, activity.pdmx.pd_id, null, 0.0, 0.0, null, activity.pdmx.ck_id, "", "",
+                                                            "", "", "", "", "", "","","",0)
                                                     clearData()
                                                 }
                                                 2 -> { // 登录超时
                                                     DialogUtil.showAlert(context, "请重新登录",
                                                             DialogInterface.OnClickListener { _, _ ->
+                                                                (context as Activity).finish()
                                                                 context.startActivity(Intent(context, LoginActivity::class.java))
                                                             }
                                                     )
@@ -408,7 +412,8 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                         is KcpdActivity -> {
                             LoadingDialog.show(context)
                             activity.pdmx.pd_num = num
-                            val json = ObjectMapper().writeValueAsBytes(activity.pdmx)
+                            val json = Gson().toJson(activity.pdmx)
+//                            val json = ObjectMapper().writeValueAsBytes(activity.pdmx)
                             val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
                             RetrofitManager.instance.updatePdmx(requestBody)
                                     .enqueue(object : Callback<PdResult> {
@@ -431,13 +436,14 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                                         activity.pdmxList.add(activity.pdmx)
                                                     }
                                                     activity.pdAdapter.notifyDataSetChanged()
-                                                    activity.pdmx = Pdmx(0, activity.pdmx.pd_id, null, 0.0, 0.0, null, 0, "", "",
-                                                            "", "", "", "", "","","",0)
+                                                    activity.pdmx = Pdmx(0, activity.pdmx.pd_id, null, 0.0, 0.0, null, activity.pdmx.ck_id, "", "",
+                                                            "", "", "", "", "", "","","",0)
                                                     clearData()
                                                 }
                                                 2 -> { // 登录超时
                                                     DialogUtil.showAlert(context, "请重新登录",
                                                             DialogInterface.OnClickListener { _, _ ->
+                                                                (context as Activity).finish()
                                                                 context.startActivity(Intent(context, LoginActivity::class.java))
                                                             }
                                                     )
@@ -457,7 +463,7 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                         }
                     }
                     clearData()
-                    this.dismiss()
+                    dismiss()
                 }
             }
         }
@@ -469,7 +475,6 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
     private fun clearData() {
         popupView.editText_tm.text.clear()
         popupView.textView_name.text = ""
-        popupView.editText_num.text.clear()
         popupView.textView_cknum.text = ""
         popupView.textView_kcnum.text = ""
         popupView.editText_num.text.clear()

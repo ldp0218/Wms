@@ -42,6 +42,12 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
         })
         itemList.add(object : HashMap<String, Any>() {
             init {
+                put("image", R.mipmap.cprk)
+                put("text", "半成品入库")
+            }
+        })
+        itemList.add(object : HashMap<String, Any>() {
+            init {
                 put("image", R.mipmap.cppd)
                 put("text", "成品备货")
             }
@@ -76,6 +82,7 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
                 "物料出库" -> startActivity(Intent(this@MainActivity, WlckActivity::class.java))
                 "物料盘点" -> startActivity(Intent(this@MainActivity, WlpdActivity::class.java))
                 "成品入库" -> startActivity(Intent(this@MainActivity, CprkActivity::class.java))
+                "半成品入库" -> startActivity(Intent(this@MainActivity, BcprkActivity::class.java))
                 "成品备货" -> startActivity(Intent(this@MainActivity, CpbhActivity::class.java))
                 "成品出库" -> startActivity(Intent(this@MainActivity, CpckActivity::class.java))
                 "成品盘点" -> startActivity(Intent(this@MainActivity, CppdActivity::class.java))

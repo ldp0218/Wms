@@ -38,6 +38,7 @@
         <activity android:name=".UserSelectActivity" />
         <activity android:name=".ProcessCardActivity" />
         <activity android:name=".WlmxActivity" />
+        <activity android:name=".BcprkActivity" />
     </application>
 
 </manifest>

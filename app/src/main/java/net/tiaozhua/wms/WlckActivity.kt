@@ -9,7 +9,7 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_wlck.*
 import kotlinx.android.synthetic.main.popup_scan_material.view.*
 import net.tiaozhua.wms.adapter.WlckAdapter
@@ -24,7 +24,7 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
 
     private lateinit var mScanManager: ScanManager
     private lateinit var barcodeStr: String
-    private var receiverTag: Boolean = false
+    internal var receiverTag: Boolean = false
     private var status = ScanStatus.EMPTY
     internal var ckd = Ckd(0, "", 0, "", "", "", 0,
     null, 0, "", mutableListOf())
@@ -41,7 +41,7 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
     internal var overKcList = mutableListOf<Ckdmx>()
     private var ckListPopup: CkListPopup? = null
 
-    private val mScanReceiver = object : BroadcastReceiver() {
+    internal val mScanReceiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
             (application as App).playAndVibrate(this@WlckActivity)
@@ -63,6 +63,10 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                     Toast.makeText(this@WlckActivity, "请选择仓库", Toast.LENGTH_SHORT).show()
                     return
                 }
+                if (receiverTag) {
+                    receiverTag = false
+                    unregisterReceiver(this)
+                }
                 LoadingDialog.show(this@WlckActivity)
                 RetrofitManager.instance.scdmxInfo(id, ckd.ck_id, gzId!!)
                         .enqueue(object : BaseCallback<Scdmx>(context = this@WlckActivity) {
@@ -77,7 +81,7 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                                 // 查找是否已扫描该流程卡
                                 var scdmx = scdmxList.find { it.scdmx_id == data.scdmx_id }
                                 if (scdmx == null) {
-                                    data.plList.forEach {
+                                    data.plList?.forEach {
                                         it.checked = true
                                         val klnum = it.mx_num - it.mx_wcnum
                                         if (klnum < 0.0) {
@@ -163,6 +167,10 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                         }
                         wlPopup!!.setUpdate()
                         wlPopup!!.showPopupWindow()
+                        if (receiverTag) {
+                            receiverTag = false
+                            unregisterReceiver(this)
+                        }
                         LoadingDialog.show(this@WlckActivity)
                         RetrofitManager.instance.materialList(barcodeStr, ckd.ck_id)
                                 .enqueue(object : BaseCallback<ResponseList<Material>>(this@WlckActivity) {
@@ -413,7 +421,7 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                                         }
                                     }
                                     for (item in scdmxList) {
-                                        for (it in item.plList) {
+                                        for (it in item.plList!!) {
                                             if (it.checked) {
                                                 ckd.ckdmx.add(Ckdmx(it.scdpl_id, it.scdmx_id, it.ma_code, it.ma_id, it.ma_kind, it.ma_name, it.ma_spec,
                                                         it.ma_unit, 0, it.mx_remark, it.mx_num, it.mx_wcnum, 0.0, it.num,
@@ -422,7 +430,8 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                                         }
                                     }
                                     LoadingDialog.show(this@WlckActivity)
-                                    val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), ObjectMapper().writeValueAsBytes(ckd))
+                                    val json = Gson().toJson(ckd)
+                                    val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
                                     RetrofitManager.instance.lldCk(requestBody)
                                             .enqueue(object : BaseCallback<CkdFailureData>(context = this) {
                                                 override fun successInfo(info: String) {
@@ -432,11 +441,11 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
 
                                                 override fun successData(data: CkdFailureData) {
                                                     Log.i("result", data.toString())
-                                                    if (data.clData!= null && data.clData!!.isNotEmpty()) {
+                                                    if (data.clData!= null && data.clData.isNotEmpty()) {
                                                         //修改生产单明细配料中的mx_num和mx_wcnum
                                                         for (item in scdmxList) {
-                                                            for (it in item.plList) {
-                                                                for (i in data.clData!!) {
+                                                            for (it in item.plList!!) {
+                                                                for (i in data.clData) {
                                                                     if (it.scdpl_id == i.scdpl_id) {
                                                                         it.mx_num = i.mx_num
                                                                         it.mx_wcnum = i.wc_num
@@ -446,7 +455,7 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                                                                 }
                                                             }
                                                         }
-                                                        for (item in data.clData!!) {
+                                                        for (item in data.clData) {
                                                             overList.add(Scdpl(item.scdpl_id, item.ma_id, 0, 0.0, item.mx_num, "",
                                                                     item.wc_num, item.ck_num, null, item.ma_name, item.ma_code,
                                                                     "", "", "", 0, 0, item.scd_no, "", ""))
@@ -458,10 +467,10 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                                                         }
                                                         overUsePopup!!.showPopupWindow()
                                                     }
-                                                    if (data.kcData!= null && data.kcData!!.isNotEmpty()) {
+                                                    if (data.kcData!= null && data.kcData.isNotEmpty()) {
                                                         for (item in scdmxList) {
-                                                            for (it in item.plList) {
-                                                                for (kc in data.kcData!!) {
+                                                            for (it in item.plList!!) {
+                                                                for (kc in data.kcData) {
                                                                     if (it.ma_id == kc.ma_id) {
                                                                         it.kc_num = kc.kc_num
                                                                         break
@@ -469,7 +478,7 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                                                                 }
                                                             }
                                                         }
-                                                        overKcList = data.kcData!!.toMutableList()
+                                                        overKcList = data.kcData.toMutableList()
                                                         if (overKcPopup == null) {
                                                             overKcPopup = OverKcPopup(this@WlckActivity)
                                                         } else {
@@ -517,13 +526,13 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
             if (d == null) {
                 self.scdmxList.add(scdmx)    //添加新流程卡
             } else {
-                d.plList.clear()
-                d.plList.addAll(scdmx.plList)
+                d.plList?.clear()
+                d.plList?.addAll(scdmx.plList!!)
             }
             val wlList = mutableListOf<Wlck>()
             // 找出已选物料，合并相同物料数量
             for (item in self.scdmxList) {
-                for (it in item.plList) {
+                for (it in item.plList!!) {
                     if (it.checked && it.num > 0.0) {
                         var flag = false
                         for (i in wlList) {

@@ -61,7 +61,7 @@ class WlckAdapter(private val wlckList: List<Wlck>, private val context: WlckAct
                     DialogInterface.OnClickListener { _, _ ->
                         // 取消流程卡中物料的选择
                         for (scdmx in context.scdmxList) {
-                            for (pl in scdmx.plList) {
+                            for (pl in scdmx.plList!!) {
                                 if (pl.ma_id == item.ma_id) {
                                     pl.checked = false
                                 }

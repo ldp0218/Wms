@@ -15,31 +15,29 @@ android:orientation="horizontal">
         android:paddingEnd="0dp"
         android:paddingStart="20dp" />
 
-<TextView
-    android:id="@+id/textView_bzcode"
-    android:layout_width="120dp"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="5dp"
-    android:layout_marginTop="5dp"
-    android:gravity="start"
-    android:paddingEnd="0dp"
-    android:paddingStart="20dp" />
-
-<TextView
-    android:id="@+id/textView_kcnum"
-    android:layout_width="50dp"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="5dp"
-    android:layout_marginTop="5dp"
-    android:gravity="start"
-    android:paddingStart="20dp" />
-
     <TextView
-        android:id="@+id/textView_pdnum"
-        android:layout_width="50dp"
+        android:id="@+id/textView_bzcode"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:layout_marginTop="5dp"
         android:gravity="start"
-        android:paddingStart="30dp" />
+        android:paddingEnd="0dp"
+        android:paddingStart="20dp" />
+
+    <TextView
+        android:id="@+id/textView_kcnum"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:gravity="start"
+        android:paddingStart="20dp" />
+
+    <TextView
+        android:id="@+id/textView_pdnum"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:gravity="start" />
 </LinearLayout>

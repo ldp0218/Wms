@@ -9,6 +9,8 @@ import android.view.animation.Animation
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_bcprk.*
+import kotlinx.android.synthetic.main.activity_kcpd.*
 import kotlinx.android.synthetic.main.activity_wlck.*
 import kotlinx.android.synthetic.main.activity_wlrk.*
 import kotlinx.android.synthetic.main.popup_ck_list.view.*
@@ -27,28 +29,34 @@ import razerdp.basepopup.BasePopupWindow
 class CkListPopup(private val activity: Activity) : BasePopupWindow(activity), View.OnClickListener {
 
     private lateinit var popupView: View
-    private lateinit var list: List<Ck>
+    private var list = listOf<Ck>()
     lateinit var adapter: ArrayAdapter<Ck>
 
     init {
-        LoadingDialog.show(activity)
-        RetrofitManager.instance.ckList()
-                .enqueue(object : BaseCallback<ResponseList<Ck>>(activity) {
-                    override fun successData(data: ResponseList<Ck>) {
-                        list = data.items
-                        adapter = object : ArrayAdapter<Ck>(activity, R.layout.listview_material, list) {
-                            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-                                val view = (convertView as ChoiceView?) ?: ChoiceView(context)
-                                view.setTextView(getItem(position).ck_name)
-                                return view
-                            }
-                        }
-                        popupView.listView_ck.adapter = adapter
-                    }
-                })
+        getCkList()
 
         popupView.button_close.setOnClickListener(this)
         popupView.button_ok.setOnClickListener(this)
+    }
+
+    fun getCkList() {
+        if (list.isEmpty()) {
+            LoadingDialog.show(activity)
+            RetrofitManager.instance.ckList()
+                    .enqueue(object : BaseCallback<ResponseList<Ck>>(activity) {
+                        override fun successData(data: ResponseList<Ck>) {
+                            list = data.items
+                            adapter = object : ArrayAdapter<Ck>(activity, R.layout.listview_material, list) {
+                                override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                                    val view = (convertView as ChoiceView?) ?: ChoiceView(context)
+                                    view.setTextView(getItem(position).ck_name)
+                                    return view
+                                }
+                            }
+                            popupView.listView_ck.adapter = adapter
+                        }
+                    })
+        }
     }
 
     override fun initShowAnimation(): Animation {
@@ -81,16 +89,26 @@ class CkListPopup(private val activity: Activity) : BasePopupWindow(activity), V
                 if (position == ListView.INVALID_POSITION) {
                     Toast.makeText(context, "请选择仓库", Toast.LENGTH_SHORT).show()
                 } else {
+                    val ck = list[position]
                     when(activity) {
                         is WlrkActivity -> {
-                            activity.jhd.ck_id = list[position].ck_id
-                            activity.jhd.ck_name = list[position].ck_name
-                            activity.editText_ck.setText(list[position].ck_name)
+                            activity.jhd.ck_id = ck.ck_id
+                            activity.jhd.ck_name = ck.ck_name
+                            activity.editText_ck.setText(ck.ck_name)
                         }
                         is WlckActivity -> {
-                            activity.ckd.ck_id = list[position].ck_id
-                            activity.ckd.ck_name = list[position].ck_name
-                            activity.editText_wlck_ck.setText(list[position].ck_name)
+                            activity.ckd.ck_id = ck.ck_id
+                            activity.ckd.ck_name = ck.ck_name
+                            activity.editText_wlck_ck.setText(ck.ck_name)
+                        }
+                        is KcpdActivity -> {
+                            activity.ckId = ck.ck_id
+                            activity.textView_pdck.text = ck.ck_name
+                        }
+                        is BcprkActivity -> {
+                            activity.bcpRkd.ck_id = ck.ck_id
+                            activity.bcpRkd.ck_name = ck.ck_name
+                            activity.editText_bcp_ck.setText(ck.ck_name)
                         }
                     }
                     dismiss()

@@ -7,7 +7,7 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.BaseAdapter
 import android.widget.Toast
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_cpck.*
 import net.tiaozhua.wms.adapter.CommonAdapter
 import net.tiaozhua.wms.adapter.ViewHolder
@@ -330,7 +330,8 @@ class CpbhActivity : BaseActivity(R.layout.activity_cpck), View.OnClickListener 
 
     private fun stockUp() {
         LoadingDialog.show(this@CpbhActivity)
-        val requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), ObjectMapper().writeValueAsBytes(xsList.toTypedArray()))
+        val json = Gson().toJson(xsList)
+        val requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
         RetrofitManager.instance.cpbh(requestBody)
                 .enqueue(object : BaseCallback<List<Xs>>(context = this) {
                     override fun successInfo(info: String) {

@@ -41,8 +41,8 @@ dependencies {
     // Okhttp库
     compile 'com.squareup.okhttp3:okhttp:3.9.0'
     // Gson解析库
-//    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
-    compile 'com.squareup.retrofit2:converter-jackson:2.3.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
+//    compile 'com.squareup.retrofit2:converter-jackson:2.3.0'
     // 侧滑删除控件库
     compile 'com.github.mcxtzhang:SwipeDelMenuLayout:V1.3.0'
     // 上拉加载，下拉刷新控件库

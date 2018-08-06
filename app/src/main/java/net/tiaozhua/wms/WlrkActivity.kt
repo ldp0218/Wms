@@ -10,7 +10,7 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.BaseAdapter
 import android.widget.Toast
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.gson.Gson
 import com.mcxtzhang.swipemenulib.SwipeMenuLayout
 import kotlinx.android.synthetic.main.activity_wlrk.*
 import kotlinx.android.synthetic.main.popup_scan_material.view.*
@@ -28,7 +28,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
     private var wlPopup: WlPopup? = null
     private lateinit var mScanManager: ScanManager
     private lateinit var barcodeStr: String
-    private var receiverTag: Boolean = false
+    internal var receiverTag: Boolean = false
     private var status = ScanStatus.EMPTY
     internal lateinit var jhd: Jhd
     internal lateinit var jhmx: Jhdmx
@@ -36,7 +36,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
     internal lateinit var wlAdapter: BaseAdapter
     private var ckListPopup: CkListPopup? = null
 
-    private val mScanReceiver = object : BroadcastReceiver() {
+    internal val mScanReceiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
             (application as App).playAndVibrate(this@WlrkActivity)
@@ -49,6 +49,10 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                 if (id == 0) {
                     Toast.makeText(this@WlrkActivity, "未识别的二维码", Toast.LENGTH_SHORT).show()
                     return
+                }
+                if (receiverTag) {
+                    receiverTag = false
+                    unregisterReceiver(this)
                 }
                 LoadingDialog.show(this@WlrkActivity)
                 RetrofitManager.instance.jhdInfo(id)
@@ -74,7 +78,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                                 jhd.jhmx = data.jhmx
                                 editText_no.setText(jhd.jhd_no)
                                 val jhmxList = jhd.jhmx
-                                if (jhmxList.size > 0) {
+                                if (jhmxList !== null && jhmxList.size > 0) {
                                     status = ScanStatus.SCAN
                                     val iterator = jhmxList.iterator()
                                     while (iterator.hasNext()) {
@@ -121,7 +125,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                             wlPopup!!.showPopupWindow()
                         }
                         if (!wlPopup!!.isShowing) {
-                            for (item in jhd.jhmx) {
+                            for (item in jhd.jhmx!!) {
                                 if (item.ma_code == barcodeStr) {
                                     if (item.mx_num > 0) {
                                         jhmx = item
@@ -138,7 +142,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                             }
                             wlPopup!!.showPopupWindow()
                         } else {
-                            for (item in jhd.jhmx) {
+                            for (item in jhd.jhmx!!) {
                                 if (item.ma_code == barcodeStr) {
                                     if (item.mx_num > 0) {
                                         jhmx = item
@@ -157,6 +161,10 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                 }
                 if (flag) {     // 扫描新的
                     wlPopup!!.popupView.editText_tm.setText(barcodeStr)
+                    if (receiverTag) {
+                        receiverTag = false
+                        unregisterReceiver(this)
+                    }
                     LoadingDialog.show(this@WlrkActivity)
                     RetrofitManager.instance.materialList(barcodeStr, jhd.ck_id)
                             .enqueue(object : BaseCallback<ResponseList<Material>>(this@WlrkActivity) {
@@ -290,7 +298,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                                 }
                                 editText_no.setText(jhd.jhd_no)
                                 val jhmxList = jhd.jhmx
-                                if (jhmxList.size > 0) {
+                                if (jhmxList != null && jhmxList.size > 0) {
                                     status = ScanStatus.SCAN
                                     val iterator = jhmxList.iterator()
                                     while (iterator.hasNext()) {
@@ -358,6 +366,10 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                 }
             }
             R.id.btn_jhd -> {   // 入库单
+                if (jhd.jhmx!!.size > 0) {
+                    Toast.makeText(this@WlrkActivity, "有进货单未完成", Toast.LENGTH_SHORT).show()
+                    return
+                }
                 val intent = Intent(this@WlrkActivity, WljhdActivity::class.java)
                 startActivityForResult(intent, 0)
             }
@@ -369,7 +381,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                             Toast.makeText(this@WlrkActivity, "请选择仓库", Toast.LENGTH_SHORT).show()
                             return
                         }
-                        val isNotFinished = jhd.jhmx.any { it.mx_num == 0.0 }
+                        val isNotFinished = jhd.jhmx!!.any { it.mx_num == 0.0 }
                         if (isNotFinished) {
                             Toast.makeText(this@WlrkActivity, "有物料未扫描", Toast.LENGTH_SHORT).show()
                         } else {
@@ -378,7 +390,9 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                                     null,
                                     DialogInterface.OnClickListener { _, _ ->
                                         LoadingDialog.show(this@WlrkActivity)
-                                        val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), ObjectMapper().writeValueAsBytes(jhd))
+                                        val json = Gson().toJson(jhd)
+//                                        val json = ObjectMapper().writeValueAsBytes(jhd)
+                                        val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
                                         RetrofitManager.instance.insertJh(requestBody)
                                                 .enqueue(object : BaseCallback<List<Jhdmx>>(context = this) {
                                                     override fun successInfo(info: String) {
@@ -395,11 +409,16 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                         }
                     }
                     ScanStatus.FINISH -> {
+                        if (jhd.ck_id == 0) {
+                            Toast.makeText(this@WlrkActivity, "请选择仓库", Toast.LENGTH_SHORT).show()
+                            return
+                        }
                         DialogUtil.showDialog(this, null, "物料已全部扫描,是否入库?",
                                 null,
                                 DialogInterface.OnClickListener { _, _ ->
                                     LoadingDialog.show(this@WlrkActivity)
-                                    val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), ObjectMapper().writeValueAsBytes(jhd))
+                                    val json = Gson().toJson(jhd)
+                                    val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
                                     RetrofitManager.instance.insertJh(requestBody)
                                             .enqueue(object : BaseCallback<List<Jhdmx>>(context = this) {
                                                 override fun successInfo(info: String) {
@@ -438,7 +457,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
         status = ScanStatus.EMPTY
         editText_no.text.clear()
         refreshNo()
-        jhd.jhmx.clear()
+        jhd.jhmx?.clear()
         wlAdapter.notifyDataSetChanged()
     }
 }

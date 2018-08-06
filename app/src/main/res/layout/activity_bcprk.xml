@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="net.tiaozhua.wms.WlrkActivity">
+
+    <include layout="@layout/toolbar_layout" />
+
+    <ScrollView
+        android:id="@+id/scrollView_wlrk"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="20dp"
+                tools:ignore="RtlSymmetry">
+
+                <TextView
+                    android:id="@+id/textView_ck"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:labelFor="@id/editText_ck"
+                    android:text="入库仓库" />
+
+                <EditText
+                    android:id="@+id/editText_bcp_ck"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:inputType="text"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:paddingStart="20dp"-->
+            <!--android:paddingEnd="0dp">-->
+
+            <!--<TextView-->
+            <!--android:id="@+id/textView_date"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:text="单据日期"-->
+            <!--android:labelFor="@id/editText_date"/>-->
+
+            <!--<EditText-->
+            <!--android:id="@+id/editText_date"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginEnd="20dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:ems="10"-->
+            <!--android:focusable="false"-->
+            <!--android:focusableInTouchMode="false"-->
+            <!--android:inputType="date"-->
+            <!--android:textSize="12sp" />-->
+            <!--</LinearLayout>-->
+
+            <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:paddingStart="20dp"-->
+            <!--android:paddingEnd="0dp">-->
+
+            <!--<TextView-->
+            <!--android:id="@+id/textView_ghdw"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:text="供货单位"-->
+            <!--android:labelFor="@id/editText_ghdw"/>-->
+
+            <!--<EditText-->
+            <!--android:id="@+id/editText_ghdw"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginEnd="20dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:ems="10"-->
+            <!--android:focusable="false"-->
+            <!--android:focusableInTouchMode="false"-->
+            <!--android:inputType="text"-->
+            <!--android:textSize="12sp" />-->
+            <!--</LinearLayout>-->
+
+            <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:paddingStart="20dp"-->
+            <!--android:paddingEnd="0dp">-->
+
+            <!--<TextView-->
+            <!--android:id="@+id/textView_jsr"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:paddingStart="0dp"-->
+            <!--android:paddingEnd="10dp"-->
+            <!--android:text="经手人"-->
+            <!--android:labelFor="@id/editText_jsr"/>-->
+
+            <!--<EditText-->
+            <!--android:id="@+id/editText_jsr"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginEnd="20dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:ems="10"-->
+            <!--android:focusable="false"-->
+            <!--android:focusableInTouchMode="false"-->
+            <!--android:inputType="text"-->
+            <!--android:textSize="12sp" />-->
+
+            <!--</LinearLayout>-->
+
+            <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:paddingStart="20dp"-->
+            <!--android:paddingEnd="0dp">-->
+
+            <!--<TextView-->
+            <!--android:id="@+id/textView_beizhu"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:paddingStart="0dp"-->
+            <!--android:paddingEnd="25dp"-->
+            <!--android:text="备注"-->
+            <!--android:labelFor="@id/editText_beizhu"/>-->
+
+            <!--<EditText-->
+            <!--android:id="@+id/editText_beizhu"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginEnd="20dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:ems="10"-->
+            <!--android:focusable="false"-->
+            <!--android:focusableInTouchMode="false"-->
+            <!--android:inputType="text"-->
+            <!--android:textSize="12sp" />-->
+
+            <!--</LinearLayout>-->
+
+            <net.tiaozhua.wms.view.CustomListView
+                android:id="@+id/listView_wl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:listSelector="@android:color/transparent" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:srcCompat="@android:color/darker_gray" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/rk"
+            style="?android:buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="入库"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+    </LinearLayout>
+
+</LinearLayout>
