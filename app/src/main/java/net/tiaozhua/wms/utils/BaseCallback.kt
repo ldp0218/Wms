@@ -56,6 +56,18 @@ abstract class BaseCallback<T>(private val context: Context?) : Callback<ApiBean
                     context.registerReceiver(context.mScanReceiver, IntentFilter(SCAN_ACTION))
                 }
             }
+            is CpbhActivity -> {
+                if (!context.receiverTag) {
+                    context.receiverTag = true
+                    context.registerReceiver(context.mScanReceiver, IntentFilter(SCAN_ACTION))
+                }
+            }
+            is CpckActivity -> {
+                if (!context.receiverTag) {
+                    context.receiverTag = true
+                    context.registerReceiver(context.mScanReceiver, IntentFilter(SCAN_ACTION))
+                }
+            }
         }
 
         LoadingDialog.dismiss()
@@ -129,6 +141,18 @@ abstract class BaseCallback<T>(private val context: Context?) : Callback<ApiBean
                 }
             }
             is CppdmxActivity -> {
+                if (!context.receiverTag) {
+                    context.receiverTag = true
+                    context.registerReceiver(context.mScanReceiver, IntentFilter(SCAN_ACTION))
+                }
+            }
+            is CpbhActivity -> {
+                if (!context.receiverTag) {
+                    context.receiverTag = true
+                    context.registerReceiver(context.mScanReceiver, IntentFilter(SCAN_ACTION))
+                }
+            }
+            is CpckActivity -> {
                 if (!context.receiverTag) {
                     context.receiverTag = true
                     context.registerReceiver(context.mScanReceiver, IntentFilter(SCAN_ACTION))
