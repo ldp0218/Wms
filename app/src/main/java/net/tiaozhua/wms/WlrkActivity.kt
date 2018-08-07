@@ -116,42 +116,31 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                             }
                         })
             } else {
-                var flag = true
                 when (status) {
                     ScanStatus.SCAN, ScanStatus.FINISH -> {
-                        if (wlPopup == null) {
-                            wlPopup = WlPopup(this@WlrkActivity)
-                            wlPopup!!.setScan()     // 设置为扫描界面
-                            wlPopup!!.showPopupWindow()
+                        var flag = true
+                        for (item in jhd.jhmx!!) {
+                            if (item.ma_code == barcodeStr) {
+                                if (wlPopup == null) {
+                                    wlPopup = WlPopup(this@WlrkActivity)
+                                    wlPopup!!.showPopupWindow()
+                                }
+                                if (!wlPopup!!.isShowing) {
+                                    wlPopup!!.showPopupWindow()
+                                }
+                                jhmx = item
+                                if (item.mx_num > 0) {
+                                    wlPopup!!.setUpdate()
+                                } else {
+                                    wlPopup!!.setScan()
+                                }
+                                flag = false
+                                break
+                            }
                         }
-                        if (!wlPopup!!.isShowing) {
-                            for (item in jhd.jhmx!!) {
-                                if (item.ma_code == barcodeStr) {
-                                    if (item.mx_num > 0) {
-                                        jhmx = item
-                                        wlPopup!!.setUpdate()
-                                    } else {
-                                        wlPopup!!.setScan()
-                                    }
-                                    flag = false
-                                    break
-                                }
-                            }
-                            if (flag) {
-                                wlPopup!!.setScan()
-                            }
-                            wlPopup!!.showPopupWindow()
-                        } else {
-                            for (item in jhd.jhmx!!) {
-                                if (item.ma_code == barcodeStr) {
-                                    if (item.mx_num > 0) {
-                                        jhmx = item
-                                        wlPopup!!.setUpdate()
-                                        flag = false
-                                    }
-                                    break
-                                }
-                            }
+                        if (flag) {
+                            Toast.makeText(this@WlrkActivity, "入库单不包含该物料，请扫描其它物料", Toast.LENGTH_SHORT).show()
+                            return
                         }
                     }
                     else -> {
@@ -159,45 +148,42 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                         return
                     }
                 }
-                if (flag) {     // 扫描新的
-                    wlPopup!!.popupView.editText_tm.setText(barcodeStr)
-                    if (receiverTag) {
-                        receiverTag = false
-                        unregisterReceiver(this)
-                    }
-                    LoadingDialog.show(this@WlrkActivity)
-                    RetrofitManager.instance.materialList(barcodeStr, jhd.ck_id)
-                            .enqueue(object : BaseCallback<ResponseList<Material>>(this@WlrkActivity) {
-                                override fun successData(data: ResponseList<Material>) {
-                                    when {
-                                        data.totalCount == 0 -> Toast.makeText(context, "未查询到相关信息", Toast.LENGTH_SHORT).show()
-                                        data.totalCount > 1 -> {
-                                            val activityIntent = Intent(this@WlrkActivity, MaterialSelectActivity::class.java)
-                                            activityIntent.putExtra("code", barcodeStr)
-                                            activityIntent.putExtra("ckId", jhd.ck_id)
-                                            intent.putExtra("data", data)
-                                            startActivityForResult(activityIntent, 0)
-                                        }
-                                        else -> {
-                                            material = data.items[0]
-                                            val popupView = wlPopup!!.popupView
-                                            popupView.editText_tm.setText(material!!.ma_code)
-                                            popupView.textView_name.text = material!!.ma_name
-//                                            if (material!!.ma_inprice > 0) {
-//                                                popupView.editText_price.setText(material!!.ma_inprice.toString())
-//                                            }
-                                            popupView.textView_kcnum.text = material!!.kc_num.toString()
-                                            popupView.textView_kind.text = material!!.ma_kind_name
-                                            popupView.textView_hw.text = material!!.kc_hw_name
-                                            popupView.textView_remark.text = material!!.comment
-                                            popupView.editText_num.requestFocus()
-                                            popupView.editText_num.setSelection(popupView.editText_num.text.toString().trim().length)
-                                            DialogUtil.showInputMethod(context, popupView.editText_num, true, 100)
-                                        }
-                                    }
-                                }
-                            })
-                }
+//                if (flag) {     // 扫描新的
+//                    wlPopup!!.popupView.editText_tm.setText(barcodeStr)
+//                    if (receiverTag) {
+//                        receiverTag = false
+//                        unregisterReceiver(this)
+//                    }
+//                    LoadingDialog.show(this@WlrkActivity)
+//                    RetrofitManager.instance.materialList(barcodeStr, jhd.ck_id)
+//                            .enqueue(object : BaseCallback<ResponseList<Material>>(this@WlrkActivity) {
+//                                override fun successData(data: ResponseList<Material>) {
+//                                    when {
+//                                        data.totalCount == 0 -> Toast.makeText(context, "未查询到相关信息", Toast.LENGTH_SHORT).show()
+//                                        data.totalCount > 1 -> {
+//                                            val activityIntent = Intent(this@WlrkActivity, MaterialSelectActivity::class.java)
+//                                            activityIntent.putExtra("code", barcodeStr)
+//                                            activityIntent.putExtra("ckId", jhd.ck_id)
+//                                            intent.putExtra("data", data)
+//                                            startActivityForResult(activityIntent, 0)
+//                                        }
+//                                        else -> {
+//                                            material = data.items[0]
+//                                            val popupView = wlPopup!!.popupView
+//                                            popupView.editText_tm.setText(material!!.ma_code)
+//                                            popupView.textView_name.text = material!!.ma_name
+//                                            popupView.textView_kcnum.text = material!!.kc_num.toString()
+//                                            popupView.textView_kind.text = material!!.ma_kind_name
+//                                            popupView.textView_hw.text = material!!.kc_hw_name
+//                                            popupView.textView_remark.text = material!!.comment
+//                                            popupView.editText_num.requestFocus()
+//                                            popupView.editText_num.setSelection(popupView.editText_num.text.toString().trim().length)
+//                                            DialogUtil.showInputMethod(context, popupView.editText_num, true, 100)
+//                                        }
+//                                    }
+//                                }
+//                            })
+//                }
             }
         }
 
@@ -217,7 +203,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
         editText_ck.setOnClickListener(this)
 
         jhd = Jhd(0,"",0,"","",0,0,"", "",
-                "",0,"",0,0,"","", mutableListOf())
+                "",0,"",0.0,0.0,"","", mutableListOf())
         jhd.ck_id = user?.ck_id ?: 0
         jhd.ck_name = user?.ck_name ?: ""
 

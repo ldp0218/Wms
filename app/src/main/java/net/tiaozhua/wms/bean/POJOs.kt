@@ -30,7 +30,7 @@ data class User(val a_id: Int, val a_no: String, val a_name: String, val bm_id: 
 //@JsonIgnoreProperties(ignoreUnknown = true)
 data class Jhd(var ck_id: Int, var ck_name: String, var client_id: Int, var client_name: String, val date: String,
                var pdacode: Int, var jhd_id: Int, var jhd_no: String, var jh_no: String, val remark: String?, var handler_id: Int,
-               var handler_name: String, val jhd_wcnum: Int, var jhd_wwcnum: Int, var jhd_ldrq: String, var jh_ldrq: String,
+               var handler_name: String, val jhd_wcnum: Double, var jhd_wwcnum: Double, var jhd_ldrq: String, var jh_ldrq: String,
                var jhmx: MutableList<Jhdmx>?, var isBill: Int = 1) : Parcelable
 
 @Parcelize

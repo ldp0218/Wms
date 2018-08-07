@@ -42,6 +42,22 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
         popupView.editText_tm.isFocusable = true
         popupView.button_commit.visibility = View.VISIBLE
         popupView.button_commit.text = "确认"
+        when (activity) {
+            is WlrkActivity -> {
+                val m = activity.jhmx
+                popupView.editText_tm.setText(m.ma_code)
+                popupView.textView_name.text = m.ma_name
+                val num = if(m.mx_num == 0.0) "" else m.mx_num.toString()
+                popupView.editText_num.setText(num)
+                popupView.editText_num.requestFocus()
+                popupView.textView_kcnum.text = m.kcnum.toString()
+                val price = if(m.mx_price == 0.0) "" else m.mx_price.toString()
+                popupView.editText_price.setText(price)
+                popupView.textView_kind.text = m.ma_kind
+                popupView.textView_hw.text = m.hj_name
+                popupView.textView_remark.text = m.mx_remark
+            }
+        }
     }
 
     fun setUpdate() {
@@ -258,7 +274,7 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                             }
                             var hasMaterial = false
                             for (item in activity.jhd.jhmx!!) {
-                                if (item.ma_id == activity.material?.ma_id) {
+                                if (item.ma_id == activity.jhmx.ma_id) {
                                     val numStr = popupView.editText_num.text.toString()
                                     val priceStr = popupView.editText_price.text.toString()
                                     if (numStr.isBlank()) {
