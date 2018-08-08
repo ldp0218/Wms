@@ -6,9 +6,13 @@ import android.media.AudioManager
 import android.media.SoundPool
 import android.os.Vibrator
 import net.tiaozhua.wms.bean.User
+import android.app.Activity
+
+
 
 @Suppress("DEPRECATION")
 class App : Application() {
+    private lateinit var activityList: MutableList<Activity>//用于存放所有启动的Activity的集合
     var user: User? = null
     var gzId: Int = 0
 
@@ -32,5 +36,41 @@ class App : Application() {
         mVibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         mVibrator.vibrate(100)
 //        mVibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        activityList = arrayListOf()
+    }
+
+    /**
+     * 添加Activity
+     */
+    fun addActivity(activity: Activity) {
+        // 判断当前集合中不存在该Activity
+        if (!activityList.contains(activity)) {
+            activityList.add(activity)//把当前Activity添加到集合中
+        }
+    }
+
+    /**
+     * 销毁单个Activity
+     */
+    fun removeActivity(activity: Activity) {
+        //判断当前集合中存在该Activity
+        if (activityList.contains(activity)) {
+            activityList.remove(activity)//从集合中移除
+            activity.finish()//销毁当前Activity
+        }
+    }
+
+    /**
+     * 销毁所有的Activity
+     */
+    fun removeALLActivity() {
+        //通过循环，把集合中的所有Activity销毁
+        for (activity in activityList) {
+            activity.finish()
+        }
     }
 }

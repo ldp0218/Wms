@@ -2,13 +2,15 @@ package net.tiaozhua.wms
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.KeyEvent
 import android.widget.AdapterView
 import android.widget.SimpleAdapter
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 
 class MainActivity : BaseActivity(R.layout.activity_main) {
-//    private var mExitTime: Long = 0
+    private var mExitTime: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,26 +92,25 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
         }
     }
 
-//    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-//        //1.点击返回键条件成立
-//        if (keyCode == KeyEvent.KEYCODE_BACK
-//                && event.action == KeyEvent.ACTION_DOWN
-//                && event.repeatCount == 0) {
-//            //2.点击的时间差如果大于2000，则提示用户点击两次退出
-//            if (System.currentTimeMillis() - mExitTime > 2000) {
-//                //3.保存当前时间
-//                mExitTime = System.currentTimeMillis()
-//                //4.提示
-//                Toast.makeText(this, "再按一次退出应用", Toast.LENGTH_SHORT).show()
-//            } else {
-//                //5.点击的时间差小于2000，退出。
-//                //finish()
-//                System.exit(0)
-//            }
-//            return true
-//        }
-//        return false
-//    }
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        //1.点击返回键条件成立
+        if (keyCode == KeyEvent.KEYCODE_BACK
+                && event.action == KeyEvent.ACTION_DOWN
+                && event.repeatCount == 0) {
+            //2.点击的时间差如果大于2000，则提示用户点击两次退出
+            if (System.currentTimeMillis() - mExitTime > 2000) {
+                //3.保存当前时间
+                mExitTime = System.currentTimeMillis()
+                //4.提示
+                Toast.makeText(this, "再按一次退出应用", Toast.LENGTH_SHORT).show()
+            } else {
+                //5.点击在两秒内，退出。
+                removeALLActivity();//执行移除所有Activity方法
+            }
+            return true
+        }
+        return false
+    }
 
 //    override fun onBackPressed() {
         //1.点击的时间差如果大于2000，则提示用户点击两次退出

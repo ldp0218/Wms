@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_login.*
 import net.tiaozhua.wms.bean.ApiBean
@@ -16,16 +15,14 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-
 /**
 * Created by ldp on 2017/11/7.
 */
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseActivity(R.layout.activity_login) {
     private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
 
         sharedPreferences = getSharedPreferences("user", Context.MODE_PRIVATE)
         editText_name.setText(sharedPreferences.getString("userName", ""))

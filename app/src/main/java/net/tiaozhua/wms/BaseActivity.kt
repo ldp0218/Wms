@@ -9,12 +9,15 @@ import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
+import net.tiaozhua.wms.utils.App
 import net.tiaozhua.wms.utils.DialogUtil
 
 /**
 * Created by ldp on 2017/11/7.
 */
 abstract class BaseActivity(private val layoutId: Int) : AppCompatActivity() {
+    private var application: App? = null
+    private lateinit var oContext: BaseActivity
     /**
      * 获取头部标题的TextView
      * @return
@@ -26,7 +29,7 @@ abstract class BaseActivity(private val layoutId: Int) : AppCompatActivity() {
      * 获取头部.
      * @return support.v7.widget.Toolbar.
      */
-    private lateinit var toolbar: Toolbar
+    private var toolbar: Toolbar? = null
 
     /**
      * 是否显示后退按钮,默认显示,可在子类重写该方法.
@@ -43,11 +46,17 @@ abstract class BaseActivity(private val layoutId: Int) : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (application == null) {
+            // 得到Application对象
+            application = getApplication() as App
+        }
+        oContext = this// 把当前的上下文对象赋值给BaseActivity
+        addActivity()// 调用添加方法
         setContentView(layoutId)
 
         toolbar = findViewById(R.id.toolbar)
-        toolbarTitle = findViewById(R.id.toolbar_title)
-        toolbar.overflowIcon = ContextCompat.getDrawable(this, R.mipmap.more)
+        toolbarTitle = findViewById(R.id.toolbar_title) ?: TextView(this)
+        toolbar?.overflowIcon = ContextCompat.getDrawable(this, R.mipmap.more)
         //将Toolbar显示到界面
         setSupportActionBar(toolbar)
 
@@ -55,6 +64,21 @@ abstract class BaseActivity(private val layoutId: Int) : AppCompatActivity() {
         toolbarTitle.text = title
         //设置默认的标题不显示
         supportActionBar?.setDisplayShowTitleEnabled(false)
+    }
+
+    // 添加Activity方法
+    fun addActivity() {
+        application!!.addActivity(oContext)// 调用myApplication的添加Activity方法
+    }
+
+    //销毁当个Activity方法
+    fun removeActivity() {
+        application!!.removeActivity(oContext)// 调用myApplication的销毁单个Activity方法
+    }
+
+    //销毁所有Activity方法
+    fun removeALLActivity() {
+        application!!.removeALLActivity()// 调用myApplication的销毁所有Activity方法
     }
 
     override fun onStart() {
@@ -76,8 +100,8 @@ abstract class BaseActivity(private val layoutId: Int) : AppCompatActivity() {
      */
     private fun showBack() {
         //setNavigationIcon必须在setSupportActionBar(toolbar);方法后面加入
-        toolbar.setNavigationIcon(R.mipmap.arrow_left)
-        toolbar.setNavigationOnClickListener {
+        toolbar?.setNavigationIcon(R.mipmap.arrow_left)
+        toolbar?.setNavigationOnClickListener {
             if (isExit()) {
                 DialogUtil.showDialog(this, null, "数据未保存,是否离开?",
                         null,
