@@ -329,20 +329,25 @@ class CpbhActivity : BaseActivity(R.layout.activity_cpck), View.OnClickListener 
     }
 
     private fun stockUp() {
-        LoadingDialog.show(this@CpbhActivity)
-        val json = Gson().toJson(xsList)
-        val requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
-        RetrofitManager.instance.cpbh(requestBody)
-                .enqueue(object : BaseCallback<List<Xs>>(context = this) {
-                    override fun successInfo(info: String) {
-                        Toast.makeText(this@CpbhActivity, "完成备货", Toast.LENGTH_SHORT).show()
-                        clearData()
-                    }
+        DialogUtil.showDialog(this, null, "是否完成备货?",
+                null,
+                DialogInterface.OnClickListener { _, _ ->
+                    LoadingDialog.show(this@CpbhActivity)
+                    val json = Gson().toJson(xsList)
+                    val requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
+                    RetrofitManager.instance.cpbh(requestBody)
+                            .enqueue(object : BaseCallback<List<Xs>>(context = this) {
+                                override fun successInfo(info: String) {
+                                    Toast.makeText(this@CpbhActivity, "完成备货", Toast.LENGTH_SHORT).show()
+                                    clearData()
+                                }
 
-                    override fun failureData(data: List<Xs>) {
-                        Toast.makeText(this@CpbhActivity, "有单据已完成备货，请重新审查", Toast.LENGTH_SHORT).show()
-                    }
-                })
+                                override fun failureData(data: List<Xs>) {
+                                    Toast.makeText(this@CpbhActivity, "有单据已完成备货，请重新审查", Toast.LENGTH_SHORT).show()
+                                }
+                            })
+                }
+        )
     }
 
     /***
