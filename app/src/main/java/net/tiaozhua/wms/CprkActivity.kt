@@ -55,17 +55,17 @@ class CprkActivity : BaseActivity(R.layout.activity_cprk), View.OnClickListener 
                             }
                             productList.add(barcodeStr)
                             bz = data
-                            if (bz.check_num == bz.wrk_num) {
+                            if (code.check_num == bz.wrk_num) {
                                 var find = false
                                 for (item in rkd.rkmx) {
                                     if (item.bz_id == bz.bz_id) {
-                                        item.mx_num += bz.check_num
+                                        item.mx_num += code.check_num
                                         find = true
                                         break
                                     }
                                 }
                                 if (!find) {
-                                    rkd.rkmx.add(Rkmx(bz.xsd_bz_id, bz.check_num, bz.scd_no,
+                                    rkd.rkmx.add(Rkmx(bz.xsd_bz_id, code.check_num, bz.scd_no,
                                             bz.pro_name, bz.bz_id, bz.bz_code, bz.bz_hao,
                                             bz.pro_id, bz.kc_num, bz.wrk_num))
                                 }

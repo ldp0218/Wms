@@ -151,7 +151,7 @@ class LldInfoActivity : BaseActivity(R.layout.activity_lld_info), View.OnClickLi
                 //已勾选且超领没填说明的物料
                 overList = scdmx.plList!!.filter { it.checked
                         && it.num > 0.0 && it.num > it.mx_num - it.mx_wcnum
-                        && (it.mx_remark == null || it.mx_remark!!.trim() == "")}
+                        && (it.mx_remark == null || it.mx_remark!!.isBlank())}
                 if (overList.isNotEmpty()) {
                     if (overUsePopup == null) {
                         overUsePopup = OverUsePopup(this@LldInfoActivity)
