@@ -192,7 +192,7 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
                                                 popupView.textView_kcnum.text = material!!.kc_num.toString()
                                                 popupView.textView_kind.text = material!!.ma_kind_name
                                                 popupView.textView_hw.text = material!!.kc_hw_name
-                                                popupView.textView_remark.text = material!!.comment
+                                                popupView.editText_remark.setText(material!!.comment)
                                                 popupView.editText_num.requestFocus()
                                                 popupView.editText_num.setSelection(popupView.editText_num.text.toString().trim().length)
                                                 DialogUtil.showInputMethod(context, popupView.editText_num, true, 100)
@@ -495,6 +495,7 @@ class WlckActivity : BaseActivity(R.layout.activity_wlck), View.OnClickListener 
             }
             R.id.editText_wlck_ck -> {   //更换仓库
                 ckListPopup = ckListPopup ?: CkListPopup(this@WlckActivity)
+                ckListPopup!!.getCkList()
                 ckListPopup!!.showPopupWindow()
             }
         }

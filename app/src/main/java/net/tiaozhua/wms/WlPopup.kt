@@ -45,17 +45,19 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
         when (activity) {
             is WlrkActivity -> {
                 val m = activity.jhmx
-                popupView.editText_tm.setText(m.ma_code)
-                popupView.textView_name.text = m.ma_name
-                val num = if(m.mx_num == 0.0) "" else m.mx_num.toString()
-                popupView.editText_num.setText(num)
-                popupView.editText_num.requestFocus()
-                popupView.textView_kcnum.text = m.kcnum.toString()
-                val price = if(m.mx_price == 0.0) "" else m.mx_price.toString()
-                popupView.editText_price.setText(price)
-                popupView.textView_kind.text = m.ma_kind
-                popupView.textView_hw.text = m.hj_name
-                popupView.textView_remark.text = m.mx_remark
+                if (m != null) {
+                    popupView.editText_tm.setText(m.ma_code)
+                    popupView.textView_name.text = m.ma_name
+                    val num = if(m.mx_num == 0.0) "" else m.mx_num.toString()
+                    popupView.editText_num.setText(num)
+                    popupView.editText_num.requestFocus()
+                    popupView.textView_kcnum.text = m.kcnum.toString()
+                    val price = if(m.mx_price == 0.0) "" else m.mx_price.toString()
+                    popupView.editText_price.setText(price)
+                    popupView.textView_kind.text = m.ma_kind
+                    popupView.textView_hw.text = m.hj_name
+                    popupView.editText_remark.setText(m.mx_remark)
+                }
             }
         }
     }
@@ -67,15 +69,17 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
         when (activity) {
             is WlrkActivity -> {
                 val m = activity.jhmx
-                popupView.editText_tm.setText(m.ma_code)
-                popupView.textView_name.text = m.ma_name
-                popupView.editText_num.setText(m.mx_num.toString())
-                popupView.editText_num.requestFocus()
-                popupView.textView_kcnum.text = m.kcnum.toString()
-                popupView.editText_price.setText(m.mx_price.toString())
-                popupView.textView_kind.text = m.ma_kind
-                popupView.textView_hw.text = m.hj_name
-                popupView.textView_remark.text = m.mx_remark
+                if (m != null) {
+                    popupView.editText_tm.setText(m.ma_code)
+                    popupView.textView_name.text = m.ma_name
+                    popupView.editText_num.setText(m.mx_num.toString())
+                    popupView.editText_num.requestFocus()
+                    popupView.textView_kcnum.text = m.kcnum.toString()
+                    popupView.editText_price.setText(m.mx_price.toString())
+                    popupView.textView_kind.text = m.ma_kind
+                    popupView.textView_hw.text = m.hj_name
+                    popupView.editText_remark.setText(m.mx_remark)
+                }
             }
             is WlckActivity -> {
                 popupView.button_commit.text = "确认"
@@ -87,7 +91,7 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                     popupView.textView_cknum.text = wl.ck_num.toString()
                     popupView.textView_kind.text = wl.ma_kind_name
                     popupView.textView_hw.text = wl.kc_hw_name
-                    popupView.textView_remark.text = wl.comment
+                    popupView.editText_remark.setText(wl.comment)
                     popupView.editText_num.requestFocus()
                     popupView.editText_num.setSelection(popupView.editText_num.text.toString().trim().length)
                 }
@@ -102,7 +106,7 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                 popupView.textView_kcnum.text = m.kc_num.toString()
                 popupView.textView_kind.text = m.kind
                 popupView.textView_hw.text = m.hw
-                popupView.textView_remark.text = m.comment
+                popupView.editText_remark.setText(m.comment)
             }
         }
     }
@@ -174,7 +178,7 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                                     popupView.textView_kcnum.text = material.kc_num.toString()
                                                     popupView.textView_kind.text = material.ma_kind_name
                                                     popupView.textView_hw.text = material.kc_hw_name
-                                                    popupView.textView_remark.text = material.comment
+                                                    popupView.editText_remark.setText(material.comment)
                                                     popupView.editText_num.requestFocus()
                                                     popupView.editText_num.setSelection(popupView.editText_num.text.toString().trim().length)
                                                 }
@@ -216,7 +220,7 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                                     popupView.textView_kcnum.text = material.kc_num.toString()
                                                     popupView.textView_kind.text = material.ma_kind_name
                                                     popupView.textView_hw.text = material.kc_hw_name
-                                                    popupView.textView_remark.text = material.comment
+                                                    popupView.editText_remark.setText(material.comment)
                                                     popupView.editText_num.requestFocus()
                                                     popupView.editText_num.setSelection(popupView.editText_num.text.toString().trim().length)
                                                     activity.pdmx.ck_id = activity.ckId
@@ -274,7 +278,7 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                             }
                             var hasMaterial = false
                             for (item in activity.jhd.jhmx!!) {
-                                if (item.ma_id == activity.jhmx.ma_id) {
+                                if (item.ma_id == activity.jhmx!!.ma_id) {
                                     val numStr = popupView.editText_num.text.toString()
                                     val priceStr = popupView.editText_price.text.toString()
                                     if (numStr.isBlank()) {
@@ -286,13 +290,15 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                                         return
                                     }
                                     val num = numStr.toDouble()
-                                    if (num > item.mx_wwcnum) {
-                                        Toast.makeText(context, "不能超过未入库数量", Toast.LENGTH_SHORT).show()
+                                    val remark = popupView.editText_remark.text.toString()
+                                    if (num > item.mx_wwcnum && remark.isBlank()) {
+                                        Toast.makeText(context, "超量请填写备注", Toast.LENGTH_SHORT).show()
                                         return
                                     }
                                     Toast.makeText(context, "数量清点完毕", Toast.LENGTH_SHORT).show()
                                     item.mx_num = num
                                     item.mx_price = priceStr.toDouble()
+                                    item.mx_remark = remark
                                     // 重新加载数据
                                     activity.wlAdapter.notifyDataSetChanged()
                                     clearData()
@@ -403,18 +409,26 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
                     }
                 } else if (popupView.button_commit.text == "修改") {      // 点击修改按钮执行
                     val numStr = popupView.editText_num.text.toString()
-                    if (numStr.trim().isBlank() || numStr.toDouble() == 0.0) {
+                    val priceStr = popupView.editText_price.text.toString()
+                    if (numStr.isBlank() || numStr.toDouble() == 0.0) {
                         Toast.makeText(context, "请输入数量", Toast.LENGTH_SHORT).show()
+                        return
+                    }
+                    if (priceStr.isBlank() || priceStr.toDouble() == 0.0) {
+                        Toast.makeText(context, "请输入进价", Toast.LENGTH_SHORT).show()
                         return
                     }
                     val num = numStr.toDouble()
                     when (activity) {
                         is WlrkActivity -> {
-                            if (num > activity.jhmx.mx_wwcnum) {
-                                Toast.makeText(context, "不能超过未入库数量", Toast.LENGTH_SHORT).show()
+                            val remark = popupView.editText_remark.text.toString()
+                            if (num > activity.jhmx!!.mx_wwcnum && remark.isBlank()) {
+                                Toast.makeText(context, "超量请填写备注", Toast.LENGTH_SHORT).show()
                                 return
                             }
-                            activity.jhmx.mx_num = num
+                            activity.jhmx!!.mx_num = num
+                            activity.jhmx!!.mx_price = priceStr.toDouble()
+                            activity.jhmx!!.mx_remark = remark
                             activity.wlAdapter.notifyDataSetChanged()
                         }
                         is WlckActivity -> {
@@ -497,6 +511,6 @@ class WlPopup(private val activity: Activity) : BasePopupWindow(activity), View.
         popupView.editText_price.text.clear()
         popupView.textView_kind.text = ""
         popupView.textView_hw.text = ""
-        popupView.textView_remark.text = ""
+        popupView.editText_remark.text.clear()
     }
 }

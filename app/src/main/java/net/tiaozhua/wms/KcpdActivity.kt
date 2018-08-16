@@ -109,7 +109,7 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
                                         popupView.textView_kcnum.text = pdmx.kc_num.toString()
                                         popupView.textView_kind.text = pdmx.kind
                                         popupView.textView_hw.text = pdmx.hw
-                                        popupView.textView_remark.text = pdmx.comment
+                                        popupView.editText_remark.setText(pdmx.comment)
                                         popupView.editText_num.requestFocus()
                                         popupView.editText_num.setSelection(popupView.editText_num.text.toString().trim().length)
                                         DialogUtil.showInputMethod(context, popupView.editText_num, true, 100)
@@ -263,6 +263,7 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
             }
             R.id.button_selectCk -> {
                 ckListPopup = ckListPopup ?: CkListPopup(this)
+                ckListPopup!!.getCkList()
                 ckListPopup!!.showPopupWindow()
             }
         }
@@ -287,7 +288,7 @@ class KcpdActivity : BaseActivity(R.layout.activity_kcpd), View.OnClickListener 
                 view.textView_kcnum.text = material.kc_num.toString()
                 view.textView_kind.text = material.ma_kind_name
                 view.textView_hw.text = material.kc_hw_name
-                view.textView_remark.text = material.comment
+                view.editText_remark.setText(material.comment)
             }
         }
     }

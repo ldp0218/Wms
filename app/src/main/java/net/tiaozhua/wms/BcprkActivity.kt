@@ -244,6 +244,7 @@ class BcprkActivity : BaseActivity(R.layout.activity_bcprk), View.OnClickListene
             }
             R.id.editText_bcp_ck -> {   //更换仓库
                 ckListPopup = ckListPopup ?: CkListPopup(this@BcprkActivity)
+                ckListPopup!!.getCkList()
                 ckListPopup!!.showPopupWindow()
             }
         }

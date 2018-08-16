@@ -31,7 +31,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
     internal var receiverTag: Boolean = false
     private var status = ScanStatus.EMPTY
     internal lateinit var jhd: Jhd
-    internal lateinit var jhmx: Jhdmx
+    internal var jhmx: Jhdmx? = null
     internal var material: Material? = null
     internal lateinit var wlAdapter: BaseAdapter
     private var ckListPopup: CkListPopup? = null
@@ -43,6 +43,10 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
             barcodeStr = String(intent.getByteArrayExtra("barocode"), 0, intent.getIntExtra("length", 0))
 
             if (barcodeStr.startsWith(DjFlag.JHD.value)) {  //  以此标志判断扫描的是单据还是物料
+                if (status == ScanStatus.SCAN) {
+                    Toast.makeText(this@WlrkActivity, "有进货单未完成", Toast.LENGTH_SHORT).show()
+                    return
+                }
                 val id = try {      // 截取后面的id
                     barcodeStr.substring(2).toInt()
                 } catch (e: NumberFormatException) { 0 }
@@ -334,7 +338,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                 view.textView_kcnum.text = material!!.kc_num.toString()
                 view.textView_kind.text = material!!.ma_kind_name
                 view.textView_hw.text = material!!.kc_hw_name
-                view.textView_remark.text = material!!.comment
+                view.editText_remark.setText(material!!.comment)
             }
         }
     }
@@ -352,7 +356,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                 }
             }
             R.id.btn_jhd -> {   // 入库单
-                if (jhd.jhmx!!.size > 0) {
+                if (status == ScanStatus.SCAN) {
                     Toast.makeText(this@WlrkActivity, "有进货单未完成", Toast.LENGTH_SHORT).show()
                     return
                 }
@@ -411,9 +415,9 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
                                                     Toast.makeText(this@WlrkActivity, "完成入库", Toast.LENGTH_SHORT).show()
                                                     clearData()
                                                 }
-                                                override fun failureData(data: List<Jhdmx>) {
-                                                    Toast.makeText(this@WlrkActivity, "有物料超出可入库数量", Toast.LENGTH_SHORT).show()
-                                                }
+//                                                override fun failureData(data: List<Jhdmx>) {
+//                                                    Toast.makeText(this@WlrkActivity, "有物料超出可入库数量", Toast.LENGTH_SHORT).show()
+//                                                }
                                             })
                                 }
                         )
@@ -422,6 +426,7 @@ class WlrkActivity : BaseActivity(R.layout.activity_wlrk), View.OnClickListener 
             }
             R.id.editText_ck -> {   //更换仓库
                 ckListPopup = ckListPopup ?: CkListPopup(this@WlrkActivity)
+                ckListPopup!!.getCkList()
                 ckListPopup!!.showPopupWindow()
             }
         }

@@ -39,7 +39,7 @@ data class Jhd(var ck_id: Int, var ck_name: String, var client_id: Int, var clie
 data class Jhdmx(val ck_id: Int, val hj_name: String?, val jhdmx_id: Int, val ma_code: String,
                  val ma_id: Int, val ma_name: String, val ma_kind: String?, val ma_spec: String?, val ma_txm: String,
                  var mx_num: Double, val mx_wcnum: Double, val mx_wwcnum: Double, var mx_price: Double,
-                 val mx_remark: String?, val mx_unit: String, val kcnum: Double) : Parcelable
+                 var mx_remark: String?, val mx_unit: String, val kcnum: Double) : Parcelable
 
 @Parcelize
 //@Poko

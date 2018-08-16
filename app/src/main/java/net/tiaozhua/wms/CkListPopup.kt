@@ -33,8 +33,6 @@ class CkListPopup(private val activity: Activity) : BasePopupWindow(activity), V
     lateinit var adapter: ArrayAdapter<Ck>
 
     init {
-        getCkList()
-
         popupView.button_close.setOnClickListener(this)
         popupView.button_ok.setOnClickListener(this)
     }
